@@ -35,7 +35,7 @@ const defaultPreferences: Preferences = {
     companyName: 'Vben',
     companySiteLink: 'https://www.vben.pro',
     date: '2024',
-    enable: true,
+    enable: false,
     icp: '',
     icpLink: '',
     settingShow: true,

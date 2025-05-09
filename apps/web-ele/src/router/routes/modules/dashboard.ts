@@ -8,6 +8,7 @@ const routes: RouteRecordRaw[] = [
       icon: 'lucide:layout-dashboard',
       order: -1,
       title: $t('page.dashboard.title'),
+      authority: ['super']
     },
     name: 'Dashboard',
     path: '/dashboard',
@@ -19,18 +20,19 @@ const routes: RouteRecordRaw[] = [
         meta: {
           affixTab: true,
           icon: 'lucide:area-chart',
-          title: $t('page.dashboard.analytics'),
+          title: "运营分析",
+          authority: ['super']
         },
       },
-      {
-        name: 'Workspace',
-        path: '/workspace',
-        component: () => import('#/views/dashboard/workspace/index.vue'),
-        meta: {
-          icon: 'carbon:workspace',
-          title: $t('page.dashboard.workspace'),
-        },
-      },
+      // {
+      //   name: 'Workspace',
+      //   path: '/workspace',
+      //   component: () => import('#/views/dashboard/workspace/index.vue'),
+      //   meta: {
+      //     icon: 'carbon:workspace',
+      //     title: $t('page.dashboard.workspace'),
+      //   },
+      // },
     ],
   },
 ];

@@ -8,28 +8,24 @@ const routes: RouteRecordRaw[] = [
       icon: 'ic:baseline-view-in-ar',
       keepAlive: true,
       order: 1000,
-      title: $t('demos.title'),
+      title: "机构管理",
+      authority: ['super']
     },
-    name: 'Demos',
-    path: '/demos',
-    children: [
-      {
-        meta: {
-          title: $t('demos.elementPlus'),
-        },
-        name: 'NaiveDemos',
-        path: '/demos/element',
-        component: () => import('#/views/demos/element/index.vue'),
-      },
-      {
-        meta: {
-          title: $t('demos.form'),
-        },
-        name: 'BasicForm',
-        path: '/demos/form',
-        component: () => import('#/views/demos/form/basic.vue'),
-      },
-    ],
+    name: 'Organization',
+    path: '/Organization',
+    component: () => import('#/views/demos/element/index.vue'),
+  },
+  {
+    meta: {
+      icon: 'ic:baseline-view-in-ar',
+      keepAlive: true,
+      order: 1000,
+      title: "课程管理",
+      authority: ['super', "teacher"]
+    },
+    name: 'Curriculum',
+    path: '/Curriculum',
+    component: () => import('#/views/demos/element/index.vue'),
   },
 ];
 

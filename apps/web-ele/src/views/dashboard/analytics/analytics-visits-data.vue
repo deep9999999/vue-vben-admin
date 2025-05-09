@@ -17,23 +17,17 @@ onMounted(() => {
     radar: {
       indicator: [
         {
-          name: '网页',
+          name: '文档(DOC)',
         },
         {
-          name: '移动端',
+          name: '幻灯片(PPT)',
         },
         {
-          name: 'Ipad',
+          name: '音频(Audio)',
         },
         {
-          name: '客户端',
-        },
-        {
-          name: '第三方',
-        },
-        {
-          name: '其它',
-        },
+          name: '视频(Video)',
+        }
       ],
       radius: '60%',
       splitNumber: 8,

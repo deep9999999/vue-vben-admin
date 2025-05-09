@@ -124,6 +124,13 @@ const ElUpload = defineAsyncComponent(() =>
   ]).then(([res]) => res.ElUpload),
 );
 
+const ElCascader = defineAsyncComponent(() =>
+  Promise.all([
+    import('element-plus/es/components/cascader/index'),
+    import('element-plus/es/components/cascader/style/css'),
+  ]).then(([res]) => res.ElCascader),
+);
+
 const withDefaultPlaceholder = <T extends Component>(
   component: T,
   type: 'input' | 'select',
@@ -177,6 +184,7 @@ export type ComponentType =
   | 'TimePicker'
   | 'TreeSelect'
   | 'Upload'
+  | 'Cascader'
   | BaseFormComponentType;
 
 async function initComponentAdapter() {
@@ -315,6 +323,7 @@ async function initComponentAdapter() {
     },
     TreeSelect: withDefaultPlaceholder(ElTreeSelect, 'select'),
     Upload: ElUpload,
+    Cascader: ElCascader,
   };
 
   // 将组件注册到全局共享状态中

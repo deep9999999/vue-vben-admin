@@ -11,26 +11,18 @@ export const MOCK_USERS: UserInfo[] = [
   {
     id: 0,
     password: '123456',
-    realName: 'Vben',
+    realName: 'admin',
     roles: ['super'],
-    username: 'vben',
+    username: 'admin',
   },
   {
     id: 1,
     password: '123456',
-    realName: 'Admin',
-    roles: ['admin'],
-    username: 'admin',
-    homePath: '/workspace',
-  },
-  {
-    id: 2,
-    password: '123456',
-    realName: 'Jack',
-    roles: ['user'],
-    username: 'jack',
-    homePath: '/analytics',
-  },
+    realName: 'teacher',
+    roles: ['teacher'],
+    username: 'teacher',
+    homePath: '/Curriculum',
+  }
 ];
 
 export const MOCK_CODES = [
