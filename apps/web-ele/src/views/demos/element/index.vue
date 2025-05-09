@@ -1,14 +1,9 @@
 <script lang="ts" setup>
 import type { VbenFormProps } from '#/adapter/form';
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
-
 import { Page } from '@vben/common-ui';
-
-import dayjs from 'dayjs';
-
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-
-//import { getExampleTableApi } from '#/api';
+import { getOrgList } from '#/api/core/sys';
 import areadata from './area-full.json'
 
 interface RowType {
@@ -118,98 +113,7 @@ const gridOptions: VxeTableGridOptions<RowType> = {
     highlight: true,
     labelField: 'index',
   },
-  data: [
-    {
-      id: '1',
-      name: '第一教育机构',
-      contact: '13800138000',
-      school: '第一中学',
-      area: '北京市海淀区',
-      state: '正常',
-      releaseDate: '2024-12-31',
-    },
-    {
-      id: '2',
-      name: '未来教育',
-      contact: '13900139000',
-      school: '第二中学',
-      area: '上海市浦东新区',
-      state: '正常',
-      releaseDate: '2024-11-30',
-    },
-    {
-      id: '3',
-      name: '智慧教育',
-      contact: '13700137000',
-      school: '实验中学',
-      area: '广州市天河区',
-      state: '即将到期',
-      releaseDate: '2024-10-31',
-    },
-    {
-      id: '4',
-      name: '育才教育',
-      contact: '13600136000',
-      school: '育才中学',
-      area: '深圳市南山区',
-      state: '正常',
-      releaseDate: '2024-09-30',
-    },
-    {
-      id: '5',
-      name: '重点教育',
-      contact: '13500135000',
-      school: '重点中学',
-      area: '成都市武侯区',
-      state: '已到期',
-      releaseDate: '2024-08-31',
-    },
-    {
-      id: '6',
-      name: '示范教育',
-      contact: '13400134000',
-      school: '示范中学',
-      area: '杭州市西湖区',
-      state: '正常',
-      releaseDate: '2024-07-31',
-    },
-    {
-      id: '7',
-      name: '附属教育',
-      contact: '13300133000',
-      school: '附属中学',
-      area: '南京市玄武区',
-      state: '正常',
-      releaseDate: '2024-06-30',
-    },
-    {
-      id: '8',
-      name: '寄宿教育',
-      contact: '13200132000',
-      school: '寄宿中学',
-      area: '武汉市江汉区',
-      state: '即将到期',
-      releaseDate: '2024-05-31',
-    },
-    {
-      id: '9',
-      name: '民办教育',
-      contact: '13100131000',
-      school: '民办中学',
-      area: '西安市雁塔区',
-      state: '正常',
-      releaseDate: '2024-04-30',
-    },
-    {
-      id: '10',
-      name: '国际教育',
-      contact: '13000130000',
-      school: '国际学校',
-      area: '重庆市渝中区',
-      state: '已到期',
-      releaseDate: '2024-03-31',
-    }
-  ],
+  //data: [],
   columns: [
     { align: 'left', title: '', type: 'checkbox', width: 50 },
     { title: '序号', type: 'seq', width: 50 },
@@ -234,19 +138,19 @@ const gridOptions: VxeTableGridOptions<RowType> = {
   height: 'auto',
   keepSource: true,
   pagerConfig: {},
-  // proxyConfig: {
-  //   ajax: {
-  //     query: async ({ page }, formValues) => {
-  //       //message.success(`Query params: ${JSON.stringify(formValues)}`);
-  //       // return await getExampleTableApi({
-  //       //   page: page.currentPage,
-  //       //   pageSize: page.pageSize,
-  //       //   ...formValues,
-  //       // });
-  //       return []
-  //     },
-  //   },
-  // },
+  proxyConfig: {
+    ajax: {
+      query: async ({ page }, formValues) => {
+        //ElMessage.success(`Query params: ${JSON.stringify(formValues)}`);
+        let resp:any =  await getOrgList({
+          page: page.currentPage,
+          pageSize: page.pageSize,
+        });
+
+        return resp;
+      },
+    },
+  },
   toolbarConfig: {
     custom: true,
     export: true,

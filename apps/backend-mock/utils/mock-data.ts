@@ -380,3 +380,33 @@ export function getMenuIds(menus: any[]) {
   });
   return ids;
 }
+
+// mock 机构列表
+// 生成100条教育机构数据
+export const OrgList = Array.from({ length: 100 }, (_, index) => {
+  const states = ['正常', '即将到期', '已到期'];
+  const areas = [
+    '北京市海淀区', '上海市浦东新区', '广州市天河区', '深圳市南山区', 
+    '成都市武侯区', '杭州市西湖区', '南京市玄武区', '武汉市江汉区',
+    '西安市雁塔区', '重庆市渝中区', '苏州市姑苏区', '青岛市市南区',
+    '天津市和平区', '长沙市岳麓区', '南昌市东湖区'
+  ];
+  const prefixes = ['未来', '智慧', '育才', '重点', '示范', '附属', '寄宿', '民办', '国际', '创新'];
+  
+  // 生成手机号
+  const phone = `13${String(Math.floor(Math.random() * 10000000000)).padStart(9, '0')}`;
+  
+  // 生成日期 (2024年内随机日期)
+  const date = new Date(2024, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1);
+  const releaseDate = date.toISOString().split('T')[0];
+
+  return {
+    id: String(index + 1),
+    name: `${prefixes[Math.floor(Math.random() * prefixes.length)]}教育${index + 1}号`,
+    contact: phone,
+    school: `${Math.floor(Math.random() * 20) + 1}号中学`,
+    area: areas[Math.floor(Math.random() * areas.length)],
+    state: states[Math.floor(Math.random() * states.length)],
+    releaseDate: releaseDate,
+  };
+});
