@@ -5,15 +5,38 @@ import { $t } from '#/locales';
 const routes: RouteRecordRaw[] = [
   {
     meta: {
-      icon: 'ic:baseline-view-in-ar',
+      icon: 'ic:round-menu',
       keepAlive: true,
       order: 1000,
       title: "机构管理",
-      authority: ['super']
+      authority: ['super'],
+      hideChildrenInMenu: true
     },
     name: 'Organization',
     path: '/Organization',
-    component: () => import('#/views/demos/element/index.vue'),
+    children: [
+      {
+        name: 'Index',
+        path: '',
+        component: () => import('#/views/demos/element/index.vue'),
+        meta: {
+          // hideInMenu: true,
+          title: "机构管理",
+        },
+      },
+      {
+        name: 'Detial',
+        path: 'detail',
+        component: () =>
+          import(
+            '#/views/demos/element/detail.vue'
+          ),
+        meta: {
+          // hideInMenu: true,
+          title: "机构详情",
+        },
+      },
+    ],
   },
   {
     meta: {
