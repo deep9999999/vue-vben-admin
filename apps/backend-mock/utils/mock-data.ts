@@ -406,6 +406,7 @@ export const OrgList = Array.from({ length: 100 }, (_, index) => {
     contact: phone,
     school: `${Math.floor(Math.random() * 20) + 1}号中学`,
     area: areas[Math.floor(Math.random() * areas.length)],
+    address: '人和街道幸福路123号',
     state: states[Math.floor(Math.random() * states.length)],
     releaseDate: releaseDate,
   };

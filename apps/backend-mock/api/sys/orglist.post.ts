@@ -53,6 +53,12 @@ export default defineEventHandler(async (event) => {
 
   let _OrgList = filteredList;
 
+  // 为每条记录添加state字段并与address连接
+  _OrgList = _OrgList.map(record => ({
+    ...record,
+    address: `${record.area || ''} ${record.address}`
+  }));
+
   // 将数据倒序排列
   _OrgList = _OrgList.reverse();
 
@@ -60,6 +66,7 @@ export default defineEventHandler(async (event) => {
   const end = start + pageSize;
   const records = _OrgList.slice(start, end);
 
+  
   // 返回分页结果
   return useResponseSuccess({
     items: records,

@@ -4,6 +4,7 @@ interface OrgItem {
   contact: string;
   school: string;
   area: string;
+  address: string;
   state: string;
   releaseDate: string;
 }
@@ -31,6 +32,7 @@ export default defineEventHandler(async (event) => {
     area: Array.isArray(formData.area) ? formData.area.join(',') : formData.area,
     releaseDate: formData.releaseDate,
     state: formData.state,
+    address: formData.address,
   };
 
   console.log("newOrg", newOrg)

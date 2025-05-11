@@ -4,6 +4,7 @@ interface OrgItem {
   contact: string;
   school: string;
   area: string;
+  address: string;
   state: string;
   releaseDate: string;
 }
@@ -37,6 +38,7 @@ export default defineEventHandler(async (event) => {
     name: formData.name,
     contact: formData.contact,
     area: Array.isArray(formData.area) ? formData.area.join(',') : formData.area,
+    address: formData.address,
     state: formData.state,
   });
 
