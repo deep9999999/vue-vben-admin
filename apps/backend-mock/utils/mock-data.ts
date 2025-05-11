@@ -730,3 +730,146 @@ export const TeacherList: TeacherItem[] = [
     password: '123456'
   }
 ];
+
+export const CourseList = [
+  {
+    id: '1',
+    name: '数学基础课程',
+    secname: '第一章：数与代数',
+    state: '进行中',
+    releaseDate: '2024-12-31'
+  },
+  {
+    id: '2',
+    name: '英语进阶课程',
+    secname: '第二章：阅读理解',
+    state: '已结束',
+    releaseDate: '2024-06-30'
+  },
+  {
+    id: '3',
+    name: '物理实验课程',
+    secname: '第三章：力学实验',
+    state: '进行中',
+    releaseDate: '2024-11-15'
+  },
+  {
+    id: '4',
+    name: '化学基础课程',
+    secname: '第四章：化学反应',
+    state: '未开始',
+    releaseDate: '2024-09-01'
+  },
+  {
+    id: '5',
+    name: '生物专题课程',
+    secname: '第五章：细胞生物学',
+    state: '进行中',
+    releaseDate: '2024-10-20'
+  },
+  {
+    id: '6',
+    name: '历史精讲课程',
+    secname: '第六章：古代史',
+    state: '已结束',
+    releaseDate: '2024-05-31'
+  },
+  {
+    id: '7',
+    name: '地理探索课程',
+    secname: '第七章：自然地理',
+    state: '进行中',
+    releaseDate: '2024-12-15'
+  },
+  {
+    id: '8',
+    name: '政治理论课程',
+    secname: '第八章：马克思主义',
+    state: '未开始',
+    releaseDate: '2024-08-01'
+  },
+  {
+    id: '9',
+    name: '艺术鉴赏课程',
+    secname: '第九章：文艺复兴',
+    state: '进行中',
+    releaseDate: '2024-11-30'
+  },
+  {
+    id: '10',
+    name: '体育训练课程',
+    secname: '第十章：体能训练',
+    state: '已结束',
+    releaseDate: '2024-04-30'
+  },
+  {
+    id: '11',
+    name: '编程基础课程',
+    secname: '第十一章：Python入门',
+    state: '进行中',
+    releaseDate: '2024-12-31'
+  },
+  {
+    id: '12',
+    name: '人工智能课程',
+    secname: '第十二章：机器学习基础',
+    state: '未开始',
+    releaseDate: '2024-09-15'
+  },
+  {
+    id: '13',
+    name: '数据分析课程',
+    secname: '第十三章：数据可视化',
+    state: '进行中',
+    releaseDate: '2024-11-01'
+  },
+  {
+    id: '14',
+    name: '网络安全课程',
+    secname: '第十四章：加密技术',
+    state: '已结束',
+    releaseDate: '2024-06-15'
+  },
+  {
+    id: '15',
+    name: '云计算课程',
+    secname: '第十五章：云存储',
+    state: '进行中',
+    releaseDate: '2024-10-31'
+  },
+  {
+    id: '16',
+    name: '大数据课程',
+    secname: '第十六章：Hadoop基础',
+    state: '未开始',
+    releaseDate: '2024-08-15'
+  },
+  {
+    id: '17',
+    name: '区块链课程',
+    secname: '第十七章：智能合约',
+    state: '进行中',
+    releaseDate: '2024-12-01'
+  },
+  {
+    id: '18',
+    name: '物联网课程',
+    secname: '第十八章：传感器技术',
+    state: '已结束',
+    releaseDate: '2024-05-15'
+  },
+  {
+    id: '19',
+    name: '机器学习课程',
+    secname: '第十九章：神经网络',
+    state: '进行中',
+    releaseDate: '2024-11-15'
+  },
+  {
+    id: '20',
+    name: '深度学习课程',
+    secname: '第二十章：卷积神经网络',
+    state: '未开始',
+    releaseDate: '2024-09-30'
+  }
+];

@@ -228,3 +228,69 @@ export async function queryTeacher(data: {
 }
 
 
+export namespace sysApi {
+  // 课程列表项目信息
+  export interface CourseListResult {
+    id: string; // 课程ID
+    name: string; // 机构名称
+    secname: string; // 联系方式
+    state: string; // 课程状态
+    releaseDate: string; // 到期时间
+  }
+}
+
+/**
+ * 获取课程列表
+ */
+export async function getCourseList(data: {
+  page: number;
+  pageSize: number;
+  formValues: any;
+}) {
+  return requestClient.post<sysApi.CourseListResult[]>('/sys/courselist', data);
+}
+
+/**
+ * 新增课程
+ */
+export async function addCourse(data: {
+  name: string;
+  secname: string;
+  state: string;
+  releaseDate: string;
+}) {
+  return requestClient.post<void>('/sys/addcourse', data);
+}
+
+/**
+ * 删除课程
+ */
+export async function deleteCourse(id: string[]) {
+  return requestClient.post<void>('/sys/removecourse', { id });
+}
+
+/**
+ * 编辑课程信息
+ */
+export async function editCourse(data: {
+  id: string;
+  name: string;
+  secname: string;
+  state: string;
+  releaseDate: string;
+}) {
+  return requestClient.post<void>('/sys/editcourse', data);
+}
+
+/**
+ * 查询课程信息
+ */
+export async function queryCourse(data: {
+  id: string;
+}) {
+  return requestClient.post<sysApi.CourseListResult[]>('/sys/querycourse', data);
+}
+
+
+
+

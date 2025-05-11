@@ -60,7 +60,7 @@ const routes: RouteRecordRaw[] = [
     },
     name: 'Curriculum',
     path: '/Curriculum',
-    component: () => import('#/views/demos/element/index.vue'),
+    component: () => import('#/views/demos/element/kc.vue'),
   },
 ];
 
