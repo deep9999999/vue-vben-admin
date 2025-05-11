@@ -12,6 +12,11 @@ export default defineConfig(async () => {
         }),
       ],
       server: {
+        allowedHosts: [
+          '1608-2409-8a4d-cc9-96c0-452d-df15-b090-bd0f.ngrok-free.app',
+          'localhost',
+          '127.0.0.1'
+        ],
         proxy: {
           '/api': {
             changeOrigin: true,
