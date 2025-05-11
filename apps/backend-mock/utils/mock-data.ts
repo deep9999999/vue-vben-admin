@@ -384,7 +384,7 @@ export function getMenuIds(menus: any[]) {
 // mock 机构列表
 // 生成100条教育机构数据
 export const OrgList = Array.from({ length: 100 }, (_, index) => {
-  const states = ['正常', '即将到期', '已到期'];
+  const states = ['正常授权', '授权到期', '停止授权'];
   const areas = [
     '北京省,北京市,海淀区', '上海省,上海市,浦东新区', '广东省,广州市,天河区', '广东省,深圳市,南山区',
     '四川省,成都市,武侯区', '浙江省,杭州市,西湖区', '江苏省,南京市,玄武区', '湖北省,武汉市,江汉区',

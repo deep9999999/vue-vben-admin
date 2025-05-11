@@ -3,7 +3,7 @@ import type { VbenFormProps } from '#/adapter/form';
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 import { Page } from '@vben/common-ui';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { getOrgList, addOrg, deleteOrg, queryOrg } from '#/api/core/sys';
+import { getOrgList, addOrg, deleteOrg, editOrg, queryOrg } from '#/api/core/sys';
 import areadata from './area-full.json'
 import { ElButton, ElMessage, ElMessageBox } from 'element-plus';
 
@@ -218,13 +218,13 @@ const onAdd = () => {
 
 const handleSchoolManage = (row : any) => {
   ElMessage.success('学校管理');
-  // router.push({
-  //   path: '/Organization/detail',
-  //   query: {
-  //     id: row.id,
-  //     name: row.name,
-  //   }
-  // });
+  router.push({
+    path: '/Organization/detail',
+    query: {
+      id: row.id,
+      name: row.name,
+    }
+  });
 }
 
 const handleTeacherManage = (row : any) => {
@@ -277,20 +277,20 @@ const [Form, formApi] = useVbenForm({
         options: [
           {
             label: '正常授权',
-            value: '1',
+            value: '正常授权',
           },
           {
             label: '授权到期',
-            value: '2',
+            value: '授权到期',
           },
           {
             label: '停止授权',
-            value: '3',
+            value: '停止授权',
           },
         ],
       },
       rules: 'required',
-      defaultValue: '1',
+      defaultValue: '正常授权',
       fieldName: 'state',
       label: '授权状态',
     },
@@ -321,15 +321,30 @@ const [Modal, modalApi] = useVbenModal({
 async function onSubmit(values: Record<string, any>) {
   ElMessage.success('正在提交中...');
   modalApi.lock();
-  const formvalues:any = await formApi.getValues<Record<string, any>>();
-    if (formvalues) {
-      await addOrg(formvalues)
-    }
-  //setTimeout(() => {
-    modalApi.close();
-    gridApi.reload();
-    ElMessage.success(`提交成功：${JSON.stringify(values)}`);
-  //}, 1000);
+  try {
+      const formvalues:any = await formApi.getValues<Record<string, any>>();
+      const { values } = modalApi.getData<Record<string, any>>();
+      if (formvalues) {
+        if (values && values.id != null) {
+          await editOrg({
+            id:values.id,
+            ...formvalues
+          })
+        }
+        else {
+          await addOrg(formvalues)
+        }
+      }
+    //setTimeout(() => {
+      modalApi.close();
+      gridApi.reload();
+      ElMessage.success(`提交成功：${JSON.stringify(values)}`);
+    //}, 1000);
+  }catch (error) {
+    ElMessage.error('提交失败');
+    modalApi.unlock();
+  }
+  
 }
 
 const onOrgDatil = async (row : any) => {
@@ -342,10 +357,11 @@ const onOrgDatil = async (row : any) => {
     const clonedData = JSON.parse(JSON.stringify(rowdata.data));
 
     clonedData.area = clonedData.area.split(',');
-
+    
     modalApi.setData({
       // 表单值
       values: clonedData,
+      id: row.id,
     })
     
     modalApi.setState({
@@ -359,6 +375,13 @@ const onOrgDatil = async (row : any) => {
 // 打开对话框
 function openFormModal() {
     modalApi.open();
+    // 清空表单数据
+    formApi.resetForm();
+    modalApi.setData({
+    })
+    modalApi.setState({
+      title: '新增机构信息'
+    });
 }
 </script>
 
