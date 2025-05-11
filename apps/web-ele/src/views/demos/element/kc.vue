@@ -3,8 +3,8 @@ import type { VbenFormProps } from '#/adapter/form';
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 import { Page } from '@vben/common-ui';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { getCourseList } from '#/api/core/sys';
-import { ElButton, ElMessage, ElMessageBox, ElTag } from 'element-plus';
+import { getCourseList, deleteCourse } from '#/api/core/sys';
+import { ElButton, ElMessage, ElMessageBox } from 'element-plus';
 import { useVbenModal } from '@vben/common-ui';
 import { useVbenForm } from '#/adapter/form';
 import { useRouter } from 'vue-router';
@@ -124,6 +124,32 @@ const [Grid, gridApi] = useVbenVxeGrid({
   gridOptions,
 });
 
+
+const onDel = async () => {
+  const rows = gridApi.grid.getCheckboxRecords();
+  if (rows.length === 0) {
+    ElMessage.warning('请选择要删除的课程');
+    return;
+  }
+  ElMessageBox.confirm(`确定要删除选中的 ${rows.length} 个课程吗?`, '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning',
+  }).then(async () => {
+    try {
+      // 调用删除接口
+      await deleteCourse(rows.map(row => row.id));
+      ElMessage.success('删除成功');
+      // 刷新表格数据
+      gridApi.reload();
+    } catch (error) {
+      ElMessage.error('删除失败');
+    }
+  }).catch(() => {
+    ElMessage.info('已取消删除');
+  });
+}
+
 </script>
 
 
@@ -148,7 +174,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
         <ElButton type="primary">
           新增
         </ElButton>
-        <ElButton type="danger" class="mt-1">
+        <ElButton type="danger" class="mt-1" @click="onDel">
           删除
         </ElButton>
         <ElButton type="danger" class="mt-1">
