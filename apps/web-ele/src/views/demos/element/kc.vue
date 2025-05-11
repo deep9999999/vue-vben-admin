@@ -73,7 +73,7 @@ const gridOptions: VxeTableGridOptions<RowType> = {
     { align: 'left', title: '', type: 'checkbox', width: 50 },
     { field: 'id', title: '序号', width: 50 },
     { field: 'name', align: 'left', title: '课程名', width: 120 },
-    { field: 'secname', title: '课程章节', width: 140 },
+    { field: 'secname', align: 'left', title: '课程章节', width: 140 },
     { field: 'state', title: '状态',width: 100, slots: { default: 'state' }, },
     { field: 'releaseDate', formatter: 'formatDate', title: '到期时间',width: 150 },
     {
