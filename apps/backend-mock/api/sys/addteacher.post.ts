@@ -11,6 +11,7 @@ interface TeacherItem {
   schoolName?: string;
   orgName?: string;
   expireDate: string;
+  password: string;
 }
 
 export default defineEventHandler(async (event) => {
@@ -38,7 +39,8 @@ export default defineEventHandler(async (event) => {
     state: formData.state,
     schoolId: formData.schoolId || '',
     orgId: formData.orgId,
-    expireDate: formData.expireDate
+    expireDate: formData.expireDate,
+    password: formData.password
   };
 
   // 根据schoolId获取学校名称
@@ -56,7 +58,6 @@ export default defineEventHandler(async (event) => {
       newTeacher.orgName = org.name;
     }
   }
-
 
   console.log("newTeacher", newTeacher);
 

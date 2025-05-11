@@ -561,6 +561,7 @@ interface TeacherItem {
   schoolName?: string;
   orgName?: string;
   expireDate: string;
+  password: string;
 }
 
 export const TeacherList: TeacherItem[] = [
@@ -574,7 +575,8 @@ export const TeacherList: TeacherItem[] = [
     state: '正常授权',
     orgId: '100',
     orgName: '未来教育1号',
-    expireDate: '2024-12-31'
+    expireDate: '2024-12-31',
+    password: '123456'
   },
   {
     id: '1',
@@ -588,7 +590,8 @@ export const TeacherList: TeacherItem[] = [
     schoolName: '武汉第一中学',
     orgId: '100',
     orgName: '未来教育1号',
-    expireDate: '2024-12-31'
+    expireDate: '2024-12-31',
+    password: '123456'
   },
   {
     id: '2', 
@@ -602,7 +605,8 @@ export const TeacherList: TeacherItem[] = [
     schoolName: '武汉第一中学',
     orgId: '100',
     orgName: '未来教育1号',
-    expireDate: '2024-12-31'
+    expireDate: '2024-12-31',
+    password: '123456'
   },
   {
     id: '3',
@@ -616,7 +620,8 @@ export const TeacherList: TeacherItem[] = [
     schoolName: '武汉育才中学',
     orgId: '100',
     orgName: '未来教育1号',
-    expireDate: '2024-10-31'
+    expireDate: '2024-10-31',
+    password: '123456'
   },
   {
     id: '4',
@@ -630,7 +635,8 @@ export const TeacherList: TeacherItem[] = [
     schoolName: '武汉育才中学',
     orgId: '100',
     orgName: '未来教育1号',
-    expireDate: '2024-12-31'
+    expireDate: '2024-12-31',
+    password: '123456'
   },
   {
     id: '5',
@@ -644,7 +650,8 @@ export const TeacherList: TeacherItem[] = [
     schoolName: '武汉八中',
     orgId: '100',
     orgName: '未来教育1号',
-    expireDate: '2024-06-30'
+    expireDate: '2024-06-30',
+    password: '123456'
   },
   {
     id: '6',
@@ -658,7 +665,8 @@ export const TeacherList: TeacherItem[] = [
     schoolName: '武汉八中',
     orgId: '100',
     orgName: '未来教育1号',
-    expireDate: '2024-12-31'
+    expireDate: '2024-12-31',
+    password: '123456'
   },
   {
     id: '7',
@@ -672,7 +680,8 @@ export const TeacherList: TeacherItem[] = [
     schoolName: '华师一附中',
     orgId: '100',
     orgName: '未来教育1号',
-    expireDate: '2024-12-31'
+    expireDate: '2024-12-31',
+    password: '123456'
   },
   {
     id: '8',
@@ -686,7 +695,8 @@ export const TeacherList: TeacherItem[] = [
     schoolName: '华师一附中',
     orgId: '100',
     orgName: '未来教育1号',
-    expireDate: '2024-09-30'
+    expireDate: '2024-09-30',
+    password: '123456'
   },
   {
     id: '9',
@@ -700,7 +710,8 @@ export const TeacherList: TeacherItem[] = [
     schoolName: '武汉实验中学',
     orgId: '100',
     orgName: '未来教育1号',
-    expireDate: '2024-12-31'
+    expireDate: '2024-12-31',
+    password: '123456'
   },
   {
     id: '10',
@@ -714,6 +725,7 @@ export const TeacherList: TeacherItem[] = [
     schoolName: '武汉实验中学',
     orgId: '100',
     orgName: '未来教育1号',
-    expireDate: '2024-12-31'
+    expireDate: '2024-12-31',
+    password: '123456'
   }
 ];

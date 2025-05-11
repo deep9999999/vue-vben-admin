@@ -161,6 +161,7 @@ export namespace sysApi {
     schoolId?: string; // 所属学校ID
     orgId: string; // 所属机构ID
     expireDate: string; // 到期时间
+    password: string; // 密码
   }
 }
 
@@ -188,6 +189,7 @@ export async function addTeacher(data: {
   phone: string;
   email: string;
   expireDate: string;
+  password: string;
 }) {
   return requestClient.post<void>('/sys/addteacher', data);
 }
@@ -211,6 +213,7 @@ export async function editTeacher(data: {
   email: string;
   entryDate: string;
   schoolId: string;
+  password: string;
 }) {
   return requestClient.post<void>('/sys/editteacher', data);
 }

@@ -32,7 +32,7 @@
 <script setup lang="ts">
 import type { VxeGridProps } from '#/adapter/vxe-table';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { getSchoolList, getTeacherList, addTeacher, deleteTeacher } from '#/api/core/sys';
+import { getTeacherList, addTeacher, deleteTeacher, queryTeacher, editTeacher } from '#/api/core/sys';
 import { ElButton, ElMessage, ElMessageBox, ElTag } from 'element-plus';
 import { useVbenModal } from '@vben/common-ui';
 import { useVbenForm, z } from '#/adapter/form';
@@ -93,6 +93,8 @@ interface TeacherRowType {
   orgName: string;
   /** 到期时间 */
   expireDate: string;
+  /** 登录密码 */
+  password: string;
 }
 
 const gridOptions: VxeGridProps<TeacherRowType> = {
@@ -136,6 +138,12 @@ const gridOptions: VxeGridProps<TeacherRowType> = {
     { 
       field: 'email',
       title: '电子邮箱',
+      width: 180,
+      editRender: { name: 'input' }
+    },
+    { 
+      field: 'password',
+      title: '密码',
       width: 180,
       editRender: { name: 'input' }
     },
@@ -198,7 +206,23 @@ const gridOptions: VxeGridProps<TeacherRowType> = {
 
 const [Grid, gridApi] = useVbenVxeGrid({ gridOptions });
 
-const onTeacherDatil = async (row : any) => {  
+const onTeacherDatil = async (row : any) => {
+  let rowdata:any = await queryTeacher({id:row.id});
+    // 克隆数据以避免直接修改原始数据
+    const clonedData = JSON.parse(JSON.stringify(rowdata.data));
+
+    modalApi.setData({
+      // 表单值
+      values: clonedData,
+      id: row.id,
+    })
+    
+    modalApi.setState({
+        title:'教师信息'
+      }
+    );
+
+    modalApi.open();
 }
 
 const onTeacherAdd = async () => {
@@ -285,6 +309,17 @@ const [Form, formApi] = useVbenForm({
       rules: z.string().email('请输入正确的邮箱'),
     },
     {
+      component: 'Input',
+      componentProps: {
+        placeholder: '请输入密码',
+        type: 'password',
+        showPassword: true
+      },
+      fieldName: 'password',
+      label: '登录密码',
+      rules: z.string().min(6, '密码长度至少6位'),
+    },
+    {
       component: 'RadioGroup',
       componentProps: {
         options: [
@@ -349,10 +384,10 @@ async function onSubmit(values: Record<string, any>) {
       const { values } = modalApi.getData<Record<string, any>>();
       if (formvalues) {
         if (values && values.id != null) {
-          // await editSchool({
-          //   id:values.id,
-          //   ...formvalues
-          // })
+          await editTeacher({
+            id:values.id,
+            ...formvalues
+          })
         }
         else {
           await addTeacher({
