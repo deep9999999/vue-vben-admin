@@ -108,6 +108,7 @@ export async function addSchool(data: {
   type: string;
   foundDate: string;
   orgId: string;
+  area: string;
 }) {
   return requestClient.post<void>('/sys/addschool', data);
 }
@@ -115,7 +116,7 @@ export async function addSchool(data: {
 /**
  * 删除 机构下的学校
  */
-export async function deleteSchool(id: string) {
+export async function deleteSchool(id: string[]) {
   return requestClient.post<void>('/sys/removeschool', { id });
 }
 
@@ -130,6 +131,7 @@ export async function editSchool(data: {
   address: string; // 学校地址
   phone: string; // 联系电话
   type: string; // 学校类型
+  area: string; // 所属区域
   foundDate: string; // 成立日期
 }) {
   return requestClient.post<void>('/sys/editschool', data);
@@ -155,8 +157,9 @@ export namespace sysApi {
     subject: string; // 任教科目
     phone: string; // 联系电话
     email: string; // 电子邮箱
-    entryDate: string; // 入职日期
+    state: string; // 授权状态
     schoolId?: string; // 所属学校ID
+    orgId: string; // 所属机构ID
     expireDate: string; // 到期时间
   }
 }
@@ -165,7 +168,8 @@ export namespace sysApi {
  * 获取学校下的教师列表
  */
 export async function getTeacherList(data: {
-  schoolId: string;
+  orgId: string;
+  schoolId?: string;
   page: number;
   pageSize: number;
 }) {
@@ -176,13 +180,14 @@ export async function getTeacherList(data: {
  * 新增教师
  */
 export async function addTeacher(data: {
+  orgId: string;
+  schoolId?: string;
   name: string;
   gender: string;
   subject: string;
   phone: string;
   email: string;
-  entryDate: string;
-  schoolId: string;
+  expireDate: string;
 }) {
   return requestClient.post<void>('/sys/addteacher', data);
 }
@@ -190,7 +195,7 @@ export async function addTeacher(data: {
 /**
  * 删除教师
  */
-export async function deleteTeacher(id: string) {
+export async function deleteTeacher(id: string[]) {
   return requestClient.post<void>('/sys/removeteacher', { id });
 }
 

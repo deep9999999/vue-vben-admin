@@ -1,30 +1,23 @@
 <template>
-  <div >
+  <div>
     <Grid>
       <template #action="{ row }">
         <Button 
         type="link" 
         style="color: #1890ff; margin-right: 8px" 
-        @click="onSchoolDatil(row)"
+        @click="onTeacherDatil(row)"
       >
         详情
       </Button>
-      <Button 
-          type="link" 
-          style="color: #1890ff"
-          @click="handleTeacherManage(row)"
-        >
-          教师管理
-        </Button>
       </template>
       <template #state="{ row }">
         <ElTag :type="getStateType(row.state)">{{ row.state }}</ElTag>
       </template>
       <template #toolbar-actions>
-          <ElButton type="primary" @click="onSchoolAdd">
+          <ElButton type="primary" @click="onTeacherAdd">
             新增
           </ElButton>
-          <ElButton type="danger" class="mt-1" @click="onSchoolDel">
+          <ElButton type="danger" class="mt-1" @click="onTeacherDel">
             删除
           </ElButton>
       </template>
@@ -37,91 +30,145 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRoute } from 'vue-router'
-import { useTabs } from '@vben/hooks';
-import { ElTabs, ElTabPane } from 'element-plus';
 import type { VxeGridProps } from '#/adapter/vxe-table';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { getSchoolList, addSchool, deleteSchool, querySchool, editSchool } from '#/api/core/sys';
+import { getSchoolList, getTeacherList, addTeacher, deleteTeacher } from '#/api/core/sys';
 import { ElButton, ElMessage, ElMessageBox, ElTag } from 'element-plus';
 import { useVbenModal } from '@vben/common-ui';
-import { useVbenForm } from '#/adapter/form';
-import areadata from './area-full.json'
-
-import { useRouter } from 'vue-router';
-
-const router = useRouter();
-
-// 将地区数据转换为级联选择器需要的格式
-const convertAreaDataToOptions = (areaData: any[]): any[] => {
-  // 转换函数
-  const convert = (items: any[]) => {
-    return items.map((item) => {
-      const result: any = {
-        value: item.name,
-        label: item.name,
-      };
-
-      if (item.districts && item.districts.length) {
-        result.children = convert(item.districts);
-      }
-
-      return result;
-    });
-  };
-
-  return convert(areaData);
-};
-
-// 转换后的地区数据
-const areaOptions = convertAreaDataToOptions(areadata);
-
-const options = areaOptions;
+import { useVbenForm, z } from '#/adapter/form';
+import { useRouter, useRoute } from 'vue-router';
+import { useTabs } from '@vben/hooks';
+import { ref, watch } from 'vue';
 
 const { setTabTitle } = useTabs();
-
-
 // 获取路由实例
 const route = useRoute()
+const router = useRouter();
 
 // 从 URL 获取参数
 const id = route.query.id as string
+const sid = route.query.sid as string
 const name = route.query.name as string
 
 console.log('URL参数:', { id, name })
 
-setTabTitle(`${name} - 学校管理`);
-
-
-interface SchoolRowType {
-  id: string; // 学校ID
-  name: string; // 学校名称
-  principal: string; // 校长
-  address: string; // 学校地址
-  phone: string; // 联系电话
-  type: string; // 学校类型
-  releaseDate: string; // 到期时间
-  state: string; // 授权状态
-  orgId: string; // 所属机构ID
+// 根据授权状态返回对应的颜色
+const getStateType = (state: string) => {
+  switch (state) {
+    case '正常授权':
+      return 'success'
+    case '授权到期':
+      return 'danger' // 黄色
+    case '停止授权':
+      return 'info' // 红色
+    default:
+      return 'primary' // 灰色
+  }
 }
 
-const gridOptions: VxeGridProps<SchoolRowType> = {
+setTabTitle(`${name} - 教师管理`);
+
+interface TeacherRowType {
+  /** 教师ID */
+  id: string;
+  /** 教师姓名 */
+  name: string;
+  /** 性别 */
+  gender: string;
+  /** 任教科目 */
+  subject: string;
+  /** 联系电话 */
+  phone: string;
+  /** 电子邮箱 */
+  email: string;
+  /** 授权状态 */
+  state: string;
+  /** 学校ID（可选） */
+  schoolId?: string;
+  /** 学校名称（可选） */
+  schoolName?: string;
+  /** 组织ID */
+  orgId: string;
+  /** 组织名称 */
+  orgName: string;
+  /** 到期时间 */
+  expireDate: string;
+}
+
+const gridOptions: VxeGridProps<TeacherRowType> = {
   checkboxConfig: {
     highlight: true,
     labelField: 'index',
   },
   columns: [
     { align: 'left', title: '', type: 'checkbox', width: 50 },
-    { field: 'id', title: '学校ID',width: 100 },
-    { editRender: { name: 'input' }, field: 'name', title: '学校名称', width: 150 },
-    { editRender: { name: 'input' }, field: 'address', title: '学校地址',width: 150 },
-    { editRender: { name: 'input' }, field: 'principal', title: '校长' },
-    { editRender: { name: 'input' }, field: 'phone', title: '联系电话' },
-    { editRender: { name: 'input' }, field: 'type', title: '学校类型' },
-    { field: 'state', title: '状态',width: 100, slots: { default: 'state' }, },
-    { field: 'releaseDate', formatter: 'formatDate', title: '到期时间' },
-    { slots: { default: 'action' }, title: '操作', width: 160 },
+    { field: 'id', title: '教师ID', width: 100 },
+    { 
+      field: 'name',
+      title: '教师姓名', 
+      width: 150,
+      editRender: { name: 'input' }
+    },
+    { 
+      field: 'gender',
+      title: '性别',
+      width: 80,
+      editRender: { 
+        name: 'select',
+        options: [
+          { label: '男', value: '男' },
+          { label: '女', value: '女' }
+        ]
+      }
+    },
+    { 
+      field: 'subject',
+      title: '任教科目',
+      width: 120,
+      editRender: { name: 'input' }
+    },
+    { 
+      field: 'phone',
+      title: '联系电话',
+      width: 120,
+      editRender: { name: 'input' }
+    },
+    { 
+      field: 'email',
+      title: '电子邮箱',
+      width: 180,
+      editRender: { name: 'input' }
+    },
+    { 
+      field: 'state',
+      title: '授权状态',
+      width: 100,
+      slots: { default: 'state' }
+    },
+    {
+      field: 'schoolName',
+      title: '所属学校',
+      width: 150,
+      editRender: { name: 'input' }
+    },
+    {
+      field: 'orgName',
+      title: '所属组织',
+      width: 150,
+      editRender: { name: 'input' }
+    },
+    { 
+      field: 'expireDate',
+      title: '到期时间',
+      width: 120,
+      formatter: 'formatDate'
+    },
+    { 
+      title: '操作',
+      width: 160,
+      fixed: 'right',
+      slots: { default: 'action' }
+    }
   ],
   height: '700px',
   keepSource: true,
@@ -129,8 +176,9 @@ const gridOptions: VxeGridProps<SchoolRowType> = {
   proxyConfig: {
     ajax: {
       query: async ({ page }) => {
-        let resp:any =  await getSchoolList({
-          orgid: id,
+        let resp:any =  await getTeacherList({
+          orgId: id,
+          schoolId: sid,
           page: page.currentPage,
           pageSize: page.pageSize,
         });
@@ -150,23 +198,27 @@ const gridOptions: VxeGridProps<SchoolRowType> = {
 
 const [Grid, gridApi] = useVbenVxeGrid({ gridOptions });
 
-const onSchoolAdd = () => {
+const onTeacherDatil = async (row : any) => {  
+}
+
+const onTeacherAdd = async () => {
   openFormModal();
 }
-const onSchoolDel = () => {
+
+const onTeacherDel = async () => {
   const rows = gridApi.grid.getCheckboxRecords();
   if (rows.length === 0) {
-    ElMessage.warning('请选择要删除的学校');
+    ElMessage.warning('请选择要删除的教师');
     return;
   }
-  ElMessageBox.confirm(`确定要删除选中的 ${rows.length} 个学校吗?`, '提示', {
+  ElMessageBox.confirm(`确定要删除选中的 ${rows.length} 个教师吗?`, '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning',
   }).then(async () => {
     try {
       // 调用删除接口
-      await deleteSchool(rows.map(row => row.id));
+      await deleteTeacher(rows.map(row => row.id));
       ElMessage.success('删除成功');
       // 刷新表格数据
       gridApi.reload();
@@ -176,20 +228,6 @@ const onSchoolDel = () => {
   }).catch(() => {
     ElMessage.info('已取消删除');
   });
-}
-
-// 根据授权状态返回对应的颜色
-const getStateType = (state: string) => {
-  switch (state) {
-    case '正常授权':
-      return 'success'
-    case '授权到期':
-      return 'danger' // 黄色
-    case '停止授权':
-      return 'info' // 红色
-    default:
-      return 'primary' // 灰色
-  }
 }
 
 // 编辑对话框
@@ -202,26 +240,20 @@ const [Form, formApi] = useVbenForm({
         placeholder: '请输入',
       },
       fieldName: 'name',
-      label: '学校名称',
+      label: '教师姓名',
       rules: 'required',
     },
     {
-      component: 'Input', 
+      component: 'Select',
       componentProps: {
-        placeholder: '请输入',
+        placeholder: '请选择',
+        options: [
+          { label: '男', value: '男' },
+          { label: '女', value: '女' }
+        ]
       },
-      fieldName: 'principal',
-      label: '校长',
-      rules: 'required',
-    },
-    {
-      component: 'Cascader',
-      componentProps: {
-        options: options,
-      },
-      defaultValue: [],
-      fieldName: 'area',
-      label: '所属区域',
+      fieldName: 'gender',
+      label: '性别',
       rules: 'required',
     },
     {
@@ -229,8 +261,9 @@ const [Form, formApi] = useVbenForm({
       componentProps: {
         placeholder: '请输入',
       },
-      fieldName: 'address', 
-      label: '',
+      fieldName: 'subject',
+      label: '任教科目',
+      rules: 'required',
     },
     {
       component: 'Input',
@@ -242,17 +275,14 @@ const [Form, formApi] = useVbenForm({
       rules: 'required',
     },
     {
-      component: 'Select',
+      component: 'Input',
       componentProps: {
-        placeholder: '请输入',
-        options: [
-          { label: '公立', value: '公立' },
-          { label: '私立', value: '私立' }
-        ]
+        placeholder: '请输入电子邮箱',
+        type: 'email'
       },
-      fieldName: 'type',
-      label: '学校类型',
-      rules: 'required',
+      fieldName: 'email',
+      label: '电子邮箱',
+      rules: z.string().email('请输入正确的邮箱'),
     },
     {
       component: 'RadioGroup',
@@ -280,10 +310,12 @@ const [Form, formApi] = useVbenForm({
     {
       component: 'DatePicker',
       componentProps: {
-        placeholder: '请输入',
+        placeholder: '请选择到期时间',
+        type: 'date'
       },
-      fieldName: 'releaseDate',
+      fieldName: 'expireDate',
       label: '到期时间',
+      rules: 'required',
     }
   ],
   showDefaultActions: false,
@@ -317,14 +349,15 @@ async function onSubmit(values: Record<string, any>) {
       const { values } = modalApi.getData<Record<string, any>>();
       if (formvalues) {
         if (values && values.id != null) {
-          await editSchool({
-            id:values.id,
-            ...formvalues
-          })
+          // await editSchool({
+          //   id:values.id,
+          //   ...formvalues
+          // })
         }
         else {
-          await addSchool({
+          await addTeacher({
           orgId: id,
+          schoolId: sid,
           ...formvalues
           })
         }
@@ -340,58 +373,20 @@ async function onSubmit(values: Record<string, any>) {
   }
 }
 
-const onSchoolDatil = async (row : any) => {
-  let rowdata:any = await querySchool({id:row.id});
-    // 克隆数据以避免直接修改原始数据
-    const clonedData = JSON.parse(JSON.stringify(rowdata.data));
-
-    clonedData.area = clonedData.area.split(',');
-    
-    modalApi.setData({
-      // 表单值
-      values: clonedData,
-      id: row.id,
-    })
-    
-    modalApi.setState({
-        title:'学校详情'
-      }
-    );
-
-    modalApi.open();
-};
-
-const handleTeacherManage = (row :any ) => {
-  router.push({
-    path: '/Organization/teachermgr',
-    query: {
-      id: id,
-      sid: row.id,
-      name: `${name} | ${row.name}`
-    }
-  });
-}
-
 function openFormModal() {
     modalApi.open();
     // 清空表单数据
     formApi.resetForm();
     modalApi.setData({
-      orgId: id
+      orgId: id,
+      sid: sid
     })
     modalApi.setState({
-      title: '新增学校信息'
+      title: '新增教师信息'
     });
 }
-
-
-
-
-
 </script>
 
 <style scoped>
-.demo-tabs {
-  margin: 30px;
-}
+
 </style>

@@ -410,3 +410,310 @@ export const OrgList = Array.from({ length: 100 }, (_, index) => {
     releaseDate: releaseDate,
   };
 });
+
+
+interface SchoolItem {
+  id: string;
+  name: string;
+  principal: string;
+  address?: string;
+  area: string;
+  phone: string;
+  type: string;
+  releaseDate: string;
+  state: string;
+  orgId: string;
+}
+
+export const SchoolList: SchoolItem[] = [
+  {
+    id: '1',
+    name: '武汉第一中学',
+    principal: '张大明',
+    address: '人和街道幸福路123号',
+    area: '湖北省,武汉市,洪山区',
+    phone: '027-12345678',
+    type: '公立学校',
+    releaseDate: '2000-09-01',
+    orgId: '100',
+    state: '正常授权'
+  },
+  {
+    id: '2',
+    name: '武汉育才中学',
+    principal: '李文华',
+    address: '五里店大道456号',
+    area: '湖北省,武汉市,洪山区',
+    phone: '027-87654321',
+    type: '公立学校',
+    releaseDate: '1995-09-01',
+    orgId: '100',
+    state: '授权到期'
+  },
+  {
+    id: '3',
+    name: '武汉八中',
+    principal: '王建国',
+    address: '民族路789号',
+    area: '湖北省,武汉市,洪山区',
+    phone: '027-65432198',
+    type: '公立学校',
+    releaseDate: '1998-09-01',
+    orgId: '100',
+    state: '正常授权'
+  },
+  {
+    id: '4',
+    name: '华师一附中',
+    principal: '赵明',
+    address: '学府大道234号',
+    area: '湖北省,武汉市,洪山区',
+    phone: '027-56789012',
+    type: '公立学校',
+    releaseDate: '1997-09-01',
+    orgId: '100',
+    state: '停止授权'
+  },
+  {
+    id: '5',
+    name: '武汉实验中学',
+    principal: '陈光',
+    address: '龙兴街道567号',
+    area: '湖北省,武汉市,洪山区',
+    phone: '027-34567890',
+    type: '公立学校',
+    releaseDate: '1996-09-01',
+    orgId: '100',
+    state: '正常授权'
+  },
+  {
+    id: '6',
+    name: '树人学校',
+    principal: '周华',
+    address: '科园四路890号',
+    area: '湖北省,武汉市,洪山区',
+    phone: '027-23456789',
+    type: '私立学校',
+    releaseDate: '2010-09-01',
+    orgId: '100',
+    state: '授权到期'
+  },
+  {
+    id: '7',
+    name: '行知学校',
+    principal: '吴军',
+    address: '大学城中路123号',
+    area: '湖北省,武汉市,洪山区',
+    phone: '027-45678901',
+    type: '私立学校',
+    releaseDate: '2012-09-01',
+    orgId: '100',
+    state: '正常授权'
+  },
+  {
+    id: '8',
+    name: '光谷中学',
+    principal: '刘强',
+    address: '金开大道456号',
+    area: '湖北省,武汉市,洪山区',
+    phone: '027-89012345',
+    type: '公立学校',
+    releaseDate: '2015-09-01',
+    orgId: '100',
+    state: '停止授权'
+  },
+  {
+    id: '9',
+    name: '江南实验学校',
+    principal: '张文',
+    address: '江南大道789号',
+    area: '湖北省,武汉市,洪山区',
+    phone: '027-90123456',
+    type: '公立学校',
+    releaseDate: '2008-09-01',
+    orgId: '100',
+    state: '正常授权'
+  },
+  {
+    id: '10',
+    name: '融创学校',
+    principal: '李明',
+    address: '创新路101号',
+    area: '湖北省,武汉市,洪山区',
+    phone: '027-78901234',
+    type: '私立学校',
+    releaseDate: '2018-09-01',
+    orgId: '100',
+    state: '授权到期'
+  }
+];
+
+interface TeacherItem {
+  id: string;
+  name: string;
+  gender: string;
+  subject: string;
+  phone: string;
+  email: string;
+  state: string;
+  schoolId?: string;
+  orgId: string;
+  schoolName?: string;
+  orgName?: string;
+  expireDate: string;
+}
+
+export const TeacherList: TeacherItem[] = [
+  {
+    id: '0',
+    name: '张三',
+    gender: '男',
+    subject: '数学',
+    phone: '13800138001',
+    email: 'zhangsan@school.com',
+    state: '正常授权',
+    orgId: '100',
+    orgName: '未来教育1号',
+    expireDate: '2024-12-31'
+  },
+  {
+    id: '1',
+    name: '张三',
+    gender: '男',
+    subject: '数学',
+    phone: '13800138001',
+    email: 'zhangsan@school.com',
+    state: '正常授权',
+    schoolId: '1',
+    schoolName: '武汉第一中学',
+    orgId: '100',
+    orgName: '未来教育1号',
+    expireDate: '2024-12-31'
+  },
+  {
+    id: '2', 
+    name: '李四',
+    gender: '女',
+    subject: '语文',
+    phone: '13800138002',
+    email: 'lisi@school.com',
+    state: '正常授权',
+    schoolId: '1',
+    schoolName: '武汉第一中学',
+    orgId: '100',
+    orgName: '未来教育1号',
+    expireDate: '2024-12-31'
+  },
+  {
+    id: '3',
+    name: '王五',
+    gender: '男',
+    subject: '英语',
+    phone: '13800138003',
+    email: 'wangwu@school.com',
+    state: '授权到期',
+    schoolId: '2',
+    schoolName: '武汉育才中学',
+    orgId: '100',
+    orgName: '未来教育1号',
+    expireDate: '2024-10-31'
+  },
+  {
+    id: '4',
+    name: '赵六',
+    gender: '女',
+    subject: '物理',
+    phone: '13800138004',
+    email: 'zhaoliu@school.com',
+    state: '正常授权',
+    schoolId: '2',
+    schoolName: '武汉育才中学',
+    orgId: '100',
+    orgName: '未来教育1号',
+    expireDate: '2024-12-31'
+  },
+  {
+    id: '5',
+    name: '孙七',
+    gender: '男',
+    subject: '化学',
+    phone: '13800138005',
+    email: 'sunqi@school.com',
+    state: '停止授权',
+    schoolId: '3',
+    schoolName: '武汉八中',
+    orgId: '100',
+    orgName: '未来教育1号',
+    expireDate: '2024-06-30'
+  },
+  {
+    id: '6',
+    name: '周八',
+    gender: '女',
+    subject: '生物',
+    phone: '13800138006',
+    email: 'zhouba@school.com',
+    state: '正常授权',
+    schoolId: '3',
+    schoolName: '武汉八中',
+    orgId: '100',
+    orgName: '未来教育1号',
+    expireDate: '2024-12-31'
+  },
+  {
+    id: '7',
+    name: '吴九',
+    gender: '男',
+    subject: '历史',
+    phone: '13800138007',
+    email: 'wujiu@school.com',
+    state: '正常授权',
+    schoolId: '4',
+    schoolName: '华师一附中',
+    orgId: '100',
+    orgName: '未来教育1号',
+    expireDate: '2024-12-31'
+  },
+  {
+    id: '8',
+    name: '郑十',
+    gender: '女',
+    subject: '地理',
+    phone: '13800138008',
+    email: 'zhengshi@school.com',
+    state: '授权到期',
+    schoolId: '4',
+    schoolName: '华师一附中',
+    orgId: '100',
+    orgName: '未来教育1号',
+    expireDate: '2024-09-30'
+  },
+  {
+    id: '9',
+    name: '钱十一',
+    gender: '男',
+    subject: '政治',
+    phone: '13800138009',
+    email: 'qianshiyi@school.com',
+    state: '正常授权',
+    schoolId: '5',
+    schoolName: '武汉实验中学',
+    orgId: '100',
+    orgName: '未来教育1号',
+    expireDate: '2024-12-31'
+  },
+  {
+    id: '10',
+    name: '孔十二',
+    gender: '女',
+    subject: '体育',
+    phone: '13800138010',
+    email: 'kongshier@school.com',
+    state: '正常授权',
+    schoolId: '5',
+    schoolName: '武汉实验中学',
+    orgId: '100',
+    orgName: '未来教育1号',
+    expireDate: '2024-12-31'
+  }
+];

@@ -36,6 +36,18 @@ const routes: RouteRecordRaw[] = [
           title: "机构详情",
         },
       },
+      {
+        name: 'Teacher',
+        path: 'teachermgr',
+        component: () =>
+          import(
+            '#/views/demos/element/teacherMgr.vue'
+          ),
+        meta: {
+          // hideInMenu: true,
+          title: "学校管理",
+        },
+      },
     ],
   },
   {

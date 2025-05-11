@@ -5,7 +5,7 @@ import { Page } from '@vben/common-ui';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { getOrgList, addOrg, deleteOrg, editOrg, queryOrg } from '#/api/core/sys';
 import areadata from './area-full.json'
-import { ElButton, ElMessage, ElMessageBox } from 'element-plus';
+import { ElButton, ElMessage, ElMessageBox, ElTag } from 'element-plus';
 
 import { useVbenModal } from '@vben/common-ui';
 import { useVbenForm } from '#/adapter/form';
@@ -135,7 +135,7 @@ const gridOptions: VxeTableGridOptions<RowType> = {
     { field: 'contact', title: '联系信息', width: 140 },
     { field: 'school', title: '对应学校',width: 200 },
     { field: 'area', title: '所属区域',width: 200  },
-    { field: 'state', title: '状态',width: 100 },
+    { field: 'state', title: '状态',width: 100, slots: { default: 'state' }, },
     { field: 'releaseDate', formatter: 'formatDate', title: '到期时间',width: 150 },
     {
       field: 'action',
@@ -217,18 +217,25 @@ const onAdd = () => {
 };
 
 const handleSchoolManage = (row : any) => {
-  ElMessage.success('学校管理');
+  //ElMessage.success('学校管理');
   router.push({
     path: '/Organization/detail',
     query: {
       id: row.id,
-      name: row.name,
+      name: row.name
     }
   });
 }
 
 const handleTeacherManage = (row : any) => {
-  ElMessage.success('老师管理');
+  // ElMessage.success('老师管理');
+  router.push({
+    path: '/Organization/teachermgr',
+    query: {
+      id: row.id,
+      name: row.name
+    }
+  });
 }
 
 // 新增对话框
@@ -383,7 +390,25 @@ function openFormModal() {
       title: '新增机构信息'
     });
 }
+
+// 根据授权状态返回对应的颜色
+const getStateType = (state: string) => {
+  switch (state) {
+    case '正常授权':
+      return 'success'
+    case '授权到期':
+      return 'danger' // 黄色
+    case '停止授权':
+      return 'info' // 红色
+    default:
+      return 'primary' // 灰色
+  }
+}
 </script>
+
+
+
+
 
 <template>
   <Page auto-content-height>
@@ -408,8 +433,11 @@ function openFormModal() {
           style="color: #1890ff"
           @click="handleTeacherManage(row)"
         >
-          老师管理
+          教师管理
         </Button>
+      </template>
+      <template #state="{ row }">
+        <ElTag :type="getStateType(row.state)">{{ row.state }}</ElTag>
       </template>
       <template #toolbar-actions>
         <ElButton type="primary" @click="onAdd">
