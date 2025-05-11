@@ -256,8 +256,6 @@ export async function getCourseList(data: {
 export async function addCourse(data: {
   name: string;
   secname: string;
-  state: string;
-  releaseDate: string;
 }) {
   return requestClient.post<void>('/sys/addcourse', data);
 }

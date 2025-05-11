@@ -3,26 +3,13 @@ import type { VbenFormProps } from '#/adapter/form';
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 import { Page } from '@vben/common-ui';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { getCourseList, deleteCourse } from '#/api/core/sys';
+import { getCourseList, deleteCourse, addCourse, queryCourse } from '#/api/core/sys';
 import { ElButton, ElMessage, ElMessageBox } from 'element-plus';
 import { useVbenModal } from '@vben/common-ui';
 import { useVbenForm } from '#/adapter/form';
 import { useRouter } from 'vue-router';
 const router = useRouter();
 
-
-const getStateType = (state: string) => {
-  switch (state) {
-    case '正常授权':
-      return 'success'
-    case '授权到期':
-      return 'danger' // 黄色
-    case '停止授权':
-      return 'info' // 红色
-    default:
-      return 'primary' // 灰色
-  }
-}
 
 interface RowType {
   // 课程Id
@@ -150,6 +137,113 @@ const onDel = async () => {
   });
 }
 
+const onAdd = () => {
+  openFormModal();
+}
+
+const onDatil = async (row:any) => {
+  let rowdata:any = await queryCourse({id:row.id});
+    // 克隆数据以避免直接修改原始数据
+    const clonedData = JSON.parse(JSON.stringify(rowdata.data));
+
+    modalApi.setData({
+      // 表单值
+      values: clonedData,
+      id: row.id,
+    })
+    
+    modalApi.setState({
+        title:'课程详情'
+      }
+    );
+
+    modalApi.open();
+}
+
+function openFormModal() {
+    modalApi.open();
+    // 清空表单数据
+    formApi.resetForm();
+    modalApi.setData({
+    })
+    modalApi.setState({
+      title: '新增课程'
+    });
+}
+
+// 编辑对话框
+const [Form, formApi] = useVbenForm({
+  handleSubmit: onSubmit,
+  schema: [
+    {
+      component: 'Input',
+      componentProps: {
+        placeholder: '请输入',
+      },
+      fieldName: 'name',
+      label: '课程名称',
+      rules: 'required',
+    },
+    {
+      component: 'Input',
+      componentProps: {
+        placeholder: '请输入',
+      },
+      fieldName: 'secname',
+      label: '课程章节'
+    }
+  ],
+  showDefaultActions: false,
+});
+
+const [Modal, modalApi] = useVbenModal({
+  fullscreenButton: false,
+  onCancel() {
+    modalApi.close();
+  },
+  onConfirm: async () => {
+    await formApi.validateAndSubmitForm();
+    // modalApi.close();
+  },
+  onOpenChange(isOpen: boolean) {
+    if (isOpen) {
+      const { values } = modalApi.getData<Record<string, any>>();
+      if (values) {
+        formApi.setValues(values);
+      }
+    }
+  },
+  title: '新增课程',
+});
+
+async function onSubmit(values: Record<string, any>) {
+  ElMessage.success('正在提交中...');
+  modalApi.lock();
+  try {
+      const formvalues:any = await formApi.getValues<Record<string, any>>();
+      const { values } = modalApi.getData<Record<string, any>>();
+      if (formvalues) {
+        if (values && values.id != null) {
+          // await editOrg({
+          //   id:values.id,
+          //   ...formvalues
+          // })
+        }
+        else {
+          await addCourse(formvalues)
+        }
+      }
+    //setTimeout(() => {
+      modalApi.close();
+      gridApi.reload();
+      ElMessage.success(`提交成功：${JSON.stringify(values)}`);
+    //}, 1000);
+  }catch (error) {
+    ElMessage.error('提交失败');
+    modalApi.unlock();
+  }
+  
+}
 </script>
 
 
@@ -159,7 +253,8 @@ const onDel = async () => {
       <template #action="{ row }">
         <Button 
           type="link" 
-          style="color: #1890ff; margin-right: 8px" 
+          style="color: #1890ff; margin-right: 8px"
+           @click="onDatil(row)"
         >
           编辑
         </Button>
@@ -171,7 +266,7 @@ const onDel = async () => {
         </Button>
       </template>
       <template #toolbar-actions>
-        <ElButton type="primary">
+        <ElButton type="primary" @click="onAdd">
           新增
         </ElButton>
         <ElButton type="danger" class="mt-1" @click="onDel">
@@ -182,6 +277,9 @@ const onDel = async () => {
         </ElButton>
       </template>
     </Grid>
-    
+    <!-- 新增对话框 -->
+    <Modal>
+      <Form />
+    </Modal>
   </Page>
 </template>
