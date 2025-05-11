@@ -71,11 +71,9 @@ const gridOptions: VxeTableGridOptions<RowType> = {
   //data: [],
   columns: [
     { align: 'left', title: '', type: 'checkbox', width: 50 },
-    { field: 'id', title: '序号', width: 50 },
-    { field: 'name', align: 'left', title: '课程名', width: 120 },
-    { field: 'secname', align: 'left', title: '课程章节', width: 140 },
-    { field: 'state', title: '状态',width: 100, slots: { default: 'state' }, },
-    { field: 'releaseDate', formatter: 'formatDate', title: '到期时间',width: 150 },
+    { field: 'id', title: '序号', width: 200 },
+    { field: 'name', align: 'left', title: '课程名', width: 400,  treeNode: true },
+    { field: 'secname', align: 'left', title: '课程章节', width: 300 },
     {
       field: 'action',
       fixed: 'right',
@@ -85,6 +83,7 @@ const gridOptions: VxeTableGridOptions<RowType> = {
   ],
   rowConfig: {
     isHover: true,
+    keyField: 'id',
   },
 
   exportConfig: {},
@@ -113,7 +112,11 @@ const gridOptions: VxeTableGridOptions<RowType> = {
     search: true,
     zoom: true,
   },
-  
+  treeConfig: {
+      parentField: 'pid',
+      rowField: 'id',
+      transform: false,
+  }
 };
 
 const [Grid, gridApi] = useVbenVxeGrid({
@@ -122,9 +125,6 @@ const [Grid, gridApi] = useVbenVxeGrid({
 });
 
 </script>
-
-
-
 
 
 <template>
@@ -137,9 +137,12 @@ const [Grid, gridApi] = useVbenVxeGrid({
         >
           编辑
         </Button>
-      </template>
-      <template #state="{ row }">
-        <ElTag :type="getStateType(row.state)">{{ row.state }}</ElTag>
+        <Button 
+          type="link" 
+          style="color: #1890ff; margin-right: 8px" 
+        >
+          新增下级
+        </Button>
       </template>
       <template #toolbar-actions>
         <ElButton type="primary">
@@ -147,6 +150,9 @@ const [Grid, gridApi] = useVbenVxeGrid({
         </ElButton>
         <ElButton type="danger" class="mt-1">
           删除
+        </ElButton>
+        <ElButton type="danger" class="mt-1">
+          授权
         </ElButton>
       </template>
     </Grid>
