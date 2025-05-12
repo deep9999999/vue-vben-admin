@@ -160,6 +160,19 @@ const onDatil = async (row:any) => {
     modalApi.open();
 }
 
+const onddLevel = async (row:any) => {
+  
+  formApi.resetForm();
+  modalApi.sharedData.payload = row;
+    
+  modalApi.setState({
+      title:'新增下级-课程编辑'
+    }
+  );
+
+  modalApi.open();
+}
+
 function openFormModal() {
     modalApi.open();
     // 清空表单数据
@@ -235,9 +248,28 @@ async function onSubmit(values: Record<string, any>) {
             gridApi.grid.updateData();
           }
         }
+        else if (modalApi.sharedData.payload.id) {
+          // 保存当前展开的节点
+          const expandedKeys = gridApi.grid.getTreeExpandRecords().map(row => row.id);
+
+          // 新增下级节点
+          await addCourse({
+            ...formvalues,
+            pid: modalApi.sharedData.payload.id
+          });
+
+          // 重新加载数据
+          await gridApi.query();
+
+          // 恢复展开状态
+          expandedKeys.forEach(key => {
+            const row = gridApi.grid.getRowById(key);
+            if (row) gridApi.grid.setTreeExpand(row, true);
+          });
+        }
         else {
-          let newCourse:any = await addCourse(formvalues)
-          gridApi.grid.insert(newCourse.data);
+          await addCourse(formvalues)
+          gridApi.query()
         }
       }
     //setTimeout(() => {
@@ -268,6 +300,7 @@ async function onSubmit(values: Record<string, any>) {
         <Button 
           type="link" 
           style="color: #1890ff; margin-right: 8px" 
+          @click="onddLevel(row)"
         >
           新增下级
         </Button>

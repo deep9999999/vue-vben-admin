@@ -256,6 +256,7 @@ export async function getCourseList(data: {
 export async function addCourse(data: {
   name: string;
   secname: string;
+  pid?: string;
 }) {
   return requestClient.post<void>('/sys/addcourse', data);
 }
