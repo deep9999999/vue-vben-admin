@@ -1280,3 +1280,43 @@ export const CourseList = [
     ]
   }
 ];
+
+
+export const CourseResourceList = [
+  {
+    id: '20101',
+    name:"看图写话批改模版",
+    createTime: "2022-01-01",
+    type: "doc",
+  },
+  {
+    id: '20101',
+    name:"第一课课后反馈",
+    createTime: "2022-01-01",
+    type: "doc",
+  },
+  {
+    id: '20101',
+    name:"一年级看图写话公开课资料",
+    createTime: "2022-01-01",
+    type: "doc",
+  },
+  {
+    id: '20102',
+    name:"第一课PPT",
+    createTime: "2022-01-01",
+    type: "ppt",
+  },
+  {
+    id: '20103',
+    name:"第一课课后反馈",
+    createTime: "2022-01-01",
+    type: "doc",
+  },
+  {
+    id: '20104',
+    name:"一年级看图写话公开课资料",
+    createTime: "2022-01-01",
+    type: "doc",
+  }
+]

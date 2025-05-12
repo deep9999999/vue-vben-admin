@@ -31,7 +31,7 @@
     <!-- 右侧内容区域 -->
     <div class="course-content">
       <el-card class="h-full">
-        <el-tabs v-model="activeTab" class="course-tabs" >
+        <el-tabs v-model="activeTab" class="course-tabs" @tab-click="selectTab">
           <el-tab-pane 
             v-for="(tab, index) in tabs" 
             :key="index"
@@ -52,7 +52,6 @@
               </el-button>
             </template>
           </Grid>
-
       </el-card>
     </div>
     </div>
@@ -64,14 +63,14 @@ import { ElButton, ElMessage, ElMessageBox, ElCard, ElMenu, ElMenuItem, ElTabs, 
 import { ref, onMounted, computed } from 'vue'
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { getCourseList } from '#/api/core/sys';
+import { fetchResources } from '#/api/core/sys';
 
 // 定义主标题和副标题
 const mainTitle = ref('一秋看图写话')
 const subTitle = ref('一年级秋季')
 
 // 当前激活的课程目录索引
-const activeIndex = ref(0)
+const activeIndex:any = ref(0)
 const selectCourse = (index:any) => {
   activeIndex.value = index
 }
@@ -91,24 +90,25 @@ const courseList = ref([
 ])
 
  // 导航标签数据
- const tabs = ref([
-  { name: '课前备课' },
-  { name: '跟课讲作' },
-  { name: '课后家校联' },
-  { name: '课程作业' },
-  { name: '打卡练习' },
-  { name: '范文范例' }
+ const tabs:any = ref([
+  { name: '课前备课', value:20101},
+  { name: '跟课讲作', value:20102 },
+  { name: '课后家校联', value:20103 },
+  { name: '课程作业', value:20104 },
+  { name: '打卡练习', value:20105 },
+  { name: '范文范例', value:20106 }
 ])
 
 // 当前激活的标签索引
-const activeTab = ref(0)
-
+const activeTab:any = ref(0)
+let selectTabValue:any = tabs.value[0].value;
 // 选择标签的方法
-const selectTab = (index: number) => {
-  activeTab.value = index
+const selectTab = (v: any) => {
+  activeTab.value = v.index
+  selectTabValue = tabs.value[v.index].value
   // 使用gridApi重新加载对应标签页的数据
   // 设置数据并保持表格状态
-  gridApi.reload()
+  gridApi.query();
 }
 
 // 每个标签页的内容
@@ -219,7 +219,16 @@ const gridOptions: VxeTableGridOptions<RowType> = {
   proxyConfig: {
     ajax: {
       query: async ({ page }, formValues) => {
-        return tabContents.value[activeTab.value];
+        fetchResources
+        ElMessage.success(`Query params: ${JSON.stringify(formValues)}`);
+        let resp:any =  await fetchResources({
+          page: page.currentPage,
+          pageSize: page.pageSize,
+          id: activeIndex.value,
+          childId: selectTabValue
+        });
+
+        return resp;
       },
     },
   },

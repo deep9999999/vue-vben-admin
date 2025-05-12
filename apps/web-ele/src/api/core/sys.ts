@@ -292,7 +292,7 @@ export async function queryCourse(data: {
 export async function fetchResources(data :{
   page: number;
   pageSize: number;
-  id: string;    // 课程ID
+  id?: string;    // 课程ID
   childId?: string;  // 目录ID
 })  {
   return requestClient.post<sysApi.CourseListResult[]>('/sys/fetchResources', data);
