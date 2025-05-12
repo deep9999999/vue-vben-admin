@@ -31,7 +31,7 @@
     <!-- 右侧内容区域 -->
     <div class="course-content">
       <el-card class="h-full">
-        <el-tabs v-model="activeTab" class="course-tabs">
+        <el-tabs v-model="activeTab" class="course-tabs" >
           <el-tab-pane 
             v-for="(tab, index) in tabs" 
             :key="index"
@@ -40,10 +40,8 @@
           />
         </el-tabs>
 
-        <el-table :data="tabContents[activeTab]" style="width: 100%">
-          <el-table-column prop="name" label="资料" min-width="200" />
-          <el-table-column prop="createTime" label="创建时间" width="280" align="right">
-            <template #default="{ row }">
+        <Grid>
+            <template #action="{ row }">
               <span class="mr-3">{{ row.createTime }}</span>
               <el-button 
                 type="primary" 
@@ -53,17 +51,20 @@
                 {{ row.type === 'doc' ? '查看' : '上课' }}
               </el-button>
             </template>
-          </el-table-column>
-        </el-table>
+          </Grid>
+
       </el-card>
     </div>
     </div>
   </Page>
 </template>
 
-<script setup>
-import { ElButton, ElMessage, ElMessageBox, ElCard, ElMenu, ElMenuItem, ElTabs, ElTabPane, ElTable, ElTableColumn } from 'element-plus';
-import { ref, onMounted } from 'vue'
+<script setup lang="ts">
+import { ElButton, ElMessage, ElMessageBox, ElCard, ElMenu, ElMenuItem, ElTabs, ElTabPane } from 'element-plus';
+import { ref, onMounted, computed } from 'vue'
+import type { VxeTableGridOptions } from '#/adapter/vxe-table';
+import { useVbenVxeGrid } from '#/adapter/vxe-table';
+import { getCourseList } from '#/api/core/sys';
 
 // 定义主标题和副标题
 const mainTitle = ref('一秋看图写话')
@@ -71,7 +72,7 @@ const subTitle = ref('一年级秋季')
 
 // 当前激活的课程目录索引
 const activeIndex = ref(0)
-const selectCourse = (index) => {
+const selectCourse = (index:any) => {
   activeIndex.value = index
 }
 
@@ -103,12 +104,15 @@ const courseList = ref([
 const activeTab = ref(0)
 
 // 选择标签的方法
-const selectTab = (index) => {
- activeTab.value = index
+const selectTab = (index: number) => {
+  activeTab.value = index
+  // 使用gridApi重新加载对应标签页的数据
+  // 设置数据并保持表格状态
+  gridApi.reload()
 }
 
 // 每个标签页的内容
-const tabContents = ref({
+const tabContents:any = ref({
   0: [
     { name: '01课课', createTime: '2025-02-16 21:51', type: 'doc' },
     { name: '一秋预课', createTime: '2025-01-21 17:38', type: 'ppt' },
@@ -169,11 +173,11 @@ const fetchCourseData = async () => {
 
 // 在组件挂载时获取数据
 onMounted(() => {
-  fetchCourseData()
+  //fetchCourseData()
 })
 
 // 打开资源方法
-const openResource = (item) => {
+const openResource = (item:any) => {
 let url = ''
 if (item.type === 'doc') {
   // 文档类型，打开文档预览链接
@@ -188,6 +192,43 @@ if (url) {
 }
 }
 
+// 定义表格行数据类型
+interface RowType {
+  name: string;
+  createTime: string;
+  type: 'doc' | 'ppt';
+}
+
+// 定义表格配置
+const gridOptions: VxeTableGridOptions<RowType> = {
+  columns: [
+    { field: 'name', title: '资料', minWidth: 200 },
+    { 
+      field: 'createTime',
+      title: '创建时间',
+      width: 280,
+      align: 'left',
+      slots: { default: 'action' }
+    }
+  ],
+  rowConfig: {
+    isHover: true,
+    keyField: 'name',
+  },
+  height: '100px',
+  proxyConfig: {
+    ajax: {
+      query: async ({ page }, formValues) => {
+        return tabContents.value[activeTab.value];
+      },
+    },
+  },
+};
+
+// 创建表格实例
+const [Grid, gridApi] = useVbenVxeGrid({
+  gridOptions,
+});
 </script>
 
 <style scoped lang="scss">

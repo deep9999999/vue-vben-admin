@@ -288,6 +288,17 @@ export async function queryCourse(data: {
   return requestClient.post<sysApi.CourseListResult[]>('/sys/querycourse', data);
 }
 
+// 查询课程下的资源列表
+export async function fetchResources(data :{
+  page: number;
+  pageSize: number;
+  id: string;    // 课程ID
+  childId?: string;  // 目录ID
+})  {
+  return requestClient.post<sysApi.CourseListResult[]>('/sys/fetchResources', data);
+};
+
+
 
 
 
