@@ -219,8 +219,6 @@ const gridOptions: VxeTableGridOptions<RowType> = {
   proxyConfig: {
     ajax: {
       query: async ({ page }, formValues) => {
-        fetchResources
-        ElMessage.success(`Query params: ${JSON.stringify(formValues)}`);
         let resp:any =  await fetchResources({
           page: page.currentPage,
           pageSize: page.pageSize,
