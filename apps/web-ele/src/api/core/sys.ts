@@ -264,8 +264,8 @@ export async function addCourse(data: {
 /**
  * 删除课程
  */
-export async function deleteCourse(id: string[]) {
-  return requestClient.post<void>('/sys/removecourse', { id });
+export async function deleteCourse(id: string[], ischild: boolean = false) {
+  return requestClient.post<void>('/sys/removecourse', { id, ischild });
 }
 
 /**

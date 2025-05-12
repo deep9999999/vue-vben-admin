@@ -16,7 +16,7 @@ const routes: RouteRecordRaw[] = [
     path: '/Organization',
     children: [
       {
-        name: 'Index',
+        name: 'Organization_Index',
         path: '',
         component: () => import('#/views/demos/element/index.vue'),
         meta: {
@@ -54,13 +54,33 @@ const routes: RouteRecordRaw[] = [
     meta: {
       icon: 'ic:baseline-view-in-ar',
       keepAlive: true,
-      order: 1000,
+      order: 1001,
       title: "课程管理",
-      authority: ['super', "teacher"]
+      authority: ['super', "teacher"],
+      hideChildrenInMenu: true
     },
     name: 'Curriculum',
     path: '/Curriculum',
-    component: () => import('#/views/demos/element/kc.vue'),
+    children: [
+      {
+        name: 'Curriculum_Index',
+        path: '',
+        component: () => import('#/views/demos/element/kc.vue'),
+        meta: {
+          // hideInMenu: true,
+          title: "课程管理",
+        },
+      },
+      {
+        name: 'Information',
+        path: 'information',
+        component: () => import('#/views/demos/element/information.vue'),
+        meta: {
+          // hideInMenu: true,
+          title: "资料管理",
+        },
+      },
+    ]
   },
 ];
 

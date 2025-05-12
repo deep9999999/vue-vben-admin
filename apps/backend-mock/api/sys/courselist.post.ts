@@ -5,7 +5,7 @@ interface CourseItem {
 }
 
 export default defineEventHandler(async (event) => {
-  const { page, pageSize } = await readBody(event);
+  const { page, pageSize, formValues } = await readBody(event);
   
   // 验证必填参数
   if (!page || !pageSize) {
@@ -18,6 +18,22 @@ export default defineEventHandler(async (event) => {
 
   // 获取课程列表数据
   let courseList = [...CourseList];
+
+  // 根据 formValues 过滤数据
+  if (formValues) {
+    if (formValues.name) {
+      courseList = courseList.filter(item => 
+        item.name.toLowerCase().includes(formValues.name.toLowerCase())
+      );
+    }
+    if (formValues.secname) {
+      courseList = courseList.filter(item => 
+        item.secname.toLowerCase().includes(formValues.secname.toLowerCase())
+      );
+    }
+  }
+
+  
 
   // 将数据倒序排列
   courseList = courseList.reverse();

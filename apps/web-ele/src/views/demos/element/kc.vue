@@ -64,6 +64,7 @@ const gridOptions: VxeTableGridOptions<RowType> = {
     {
       field: 'action',
       fixed: 'right',
+      align: 'left',
       slots: { default: 'action' },
       title: '操作',
     },
@@ -171,6 +172,45 @@ const onddLevel = async (row:any) => {
   );
 
   modalApi.open();
+}
+
+const onDelLevel = async (row:any) => {
+  ElMessageBox.confirm(`确定要删除选中的 ${row.name} 课程吗?`, '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning',
+  }).then(async () => {
+    try {
+      // 保存当前展开的节点
+      const expandedKeys = gridApi.grid.getTreeExpandRecords().map(row => row.id);
+      
+      // 调用删除接口
+      await deleteCourse([row.id], true);
+      ElMessage.success('删除成功');
+      
+      // 重新加载数据
+      await gridApi.query();
+      
+      // 恢复展开状态
+      expandedKeys.forEach(key => {
+        const row = gridApi.grid.getRowById(key);
+        if (row) gridApi.grid.setTreeExpand(row, true);
+      });
+    } catch (error) {
+      ElMessage.error('删除失败');
+    }
+  }).catch(() => {
+    ElMessage.info('已取消删除');
+  });
+}
+
+const onInformationMgr = async (row:any) => {
+  router.push({
+    path: '/Curriculum/information',
+    query: {
+      courseId: row.id,
+    }
+  });
 }
 
 function openFormModal() {
@@ -298,11 +338,27 @@ async function onSubmit(values: Record<string, any>) {
           编辑
         </Button>
         <Button 
-          type="link" 
+          type="link"
           style="color: #1890ff; margin-right: 8px" 
           @click="onddLevel(row)"
         >
           新增下级
+        </Button>
+        <Button 
+          type="link" 
+          v-if="row.pid != null"
+          style="color: #1890ff; margin-right: 8px" 
+          @click="onDelLevel(row)"
+        >
+          删除
+        </Button>
+        <Button 
+          type="link" 
+          v-if="row.pid == null"
+          style="color: #1890ff; margin-right: 8px" 
+          @click="onInformationMgr(row)"
+        >
+          资料管理
         </Button>
       </template>
       <template #toolbar-actions>
