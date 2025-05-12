@@ -274,8 +274,6 @@ export async function editCourse(data: {
   id: string;
   name: string;
   secname: string;
-  state: string;
-  releaseDate: string;
 }) {
   return requestClient.post<void>('/sys/editcourse', data);
 }

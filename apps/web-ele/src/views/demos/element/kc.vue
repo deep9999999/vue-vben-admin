@@ -3,7 +3,7 @@ import type { VbenFormProps } from '#/adapter/form';
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 import { Page } from '@vben/common-ui';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { getCourseList, deleteCourse, addCourse, queryCourse } from '#/api/core/sys';
+import { getCourseList, deleteCourse, addCourse, queryCourse, editCourse } from '#/api/core/sys';
 import { ElButton, ElMessage, ElMessageBox } from 'element-plus';
 import { useVbenModal } from '@vben/common-ui';
 import { useVbenForm } from '#/adapter/form';
@@ -224,18 +224,25 @@ async function onSubmit(values: Record<string, any>) {
       const { values } = modalApi.getData<Record<string, any>>();
       if (formvalues) {
         if (values && values.id != null) {
-          // await editOrg({
-          //   id:values.id,
-          //   ...formvalues
-          // })
+          await editCourse({
+            id:values.id,
+            ...formvalues
+          })
+          // 更新表格数据
+          const updatedRow = gridApi.grid.getRowById(values.id);
+          if (updatedRow) {
+            Object.assign(updatedRow, formvalues);
+            gridApi.grid.updateData();
+          }
         }
         else {
-          await addCourse(formvalues)
+          let newCourse:any = await addCourse(formvalues)
+          gridApi.grid.insert(newCourse.data);
         }
       }
     //setTimeout(() => {
       modalApi.close();
-      gridApi.reload();
+      
       ElMessage.success(`提交成功：${JSON.stringify(values)}`);
     //}, 1000);
   }catch (error) {

@@ -2,8 +2,6 @@ interface CourseItem {
   id: string;
   name: string;
   secname: string;
-  state: string;
-  releaseDate: string;
 }
 
 export default defineEventHandler(async (event) => {
