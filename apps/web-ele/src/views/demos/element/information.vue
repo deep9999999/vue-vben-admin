@@ -1,69 +1,68 @@
 <template>
-  <div class="course-container">
-    <el-loading v-model:full-screen="loading" />
-    <!-- 左侧课程目录 -->
-    <div class="course-sidebar">
-      <div class="course-title">
-        {{ mainTitle }}
-        <div class="sub-title">{{ subTitle }}</div>
-      </div>
-      <div class="course-list">
-        <div class="course-item" :class="{ active: activeIndex === index }" v-for="(item, index) in courseList" :key="index" @click="selectCourse(index)">
-          <span class="course-num">{{ String(index + 1).padStart(2, '0') }}</span>
-          <span class="course-name">{{ item.name }}</span>
-        </div>
-      </div>
-    </div>
+  <Page auto-content-height>
+    <div class="course-container">
+      <el-loading v-model:full-screen="loading" />
+      <!-- 左侧课程目录 -->
+      <el-card class="course-sidebar" shadow="hover">
+        <template #header>
+          <div class="flex flex-col">
+            <span class="text-base font-bold">{{ mainTitle }}</span>
+            <span class="text-sm text-gray-500 mt-2">{{ subTitle }}</span>
+          </div>
+        </template>
+        <el-menu
+          :default-active="String(activeIndex)"
+          class="course-menu"
+        >
+          <el-menu-item 
+            v-for="(item, index) in courseList" 
+            :key="index"
+            :index="String(index)"
+            @click="selectCourse(index)"
+          >
+            <template #title>
+              <span class="text-blue-500 mr-2">{{ String(index + 1).padStart(2, '0') }}</span>
+              <span>{{ item.name }}</span>
+            </template>
+          </el-menu-item>
+        </el-menu>
+      </el-card>
 
     <!-- 右侧内容区域 -->
     <div class="course-content">
-      <div class="nav-tabs">
-        <div 
-          v-for="(tab, index) in tabs" 
-          :key="index"
-          class="tab-item"
-          :class="{ active: activeTab === index }"
-          @click="selectTab(index)"
-        >
-          {{ tab.name }}
-        </div>
-      </div>
-      
-      <!-- 使用统一的模板结构 -->
-      <div class="course-table">
-        <div class="table-header">
-          <span>资料</span>
-          <span>创建时间</span>
-        </div>
-        <div class="table-body">
-          <div class="table-row" v-for="(item, index) in tabContents[activeTab]" :key="index">
-            <span class="resource-name">{{ item.name }}</span>
-            <span class="create-time">
-              <span>{{ item.createTime }}</span>
+      <el-card class="h-full">
+        <el-tabs v-model="activeTab" class="course-tabs">
+          <el-tab-pane 
+            v-for="(tab, index) in tabs" 
+            :key="index"
+            :label="tab.name"
+            :name="index"
+          />
+        </el-tabs>
+
+        <el-table :data="tabContents[activeTab]" style="width: 100%">
+          <el-table-column prop="name" label="资料" min-width="200" />
+          <el-table-column prop="createTime" label="创建时间" width="280" align="right">
+            <template #default="{ row }">
+              <span class="mr-3">{{ row.createTime }}</span>
               <el-button 
                 type="primary" 
-                size="small" 
-                style="margin-left: 10px"
-                @click="openResource(item)"
+                size="small"
+                @click="openResource(row)"
               >
-                {{ item.type === 'doc' ? '查看' : '上课' }}
+                {{ row.type === 'doc' ? '查看' : '上课' }}
               </el-button>
-            </span>
-          </div>
-        </div>
-        <!-- 分页 -->
-        <!-- <div class="pagination">
-          <span class="prev">上一页</span>
-          <span class="page-num active">1</span>
-          <span class="next">下一页</span>
-          <span class="page-info">共 1 页</span>
-        </div> -->
-      </div>
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-card>
     </div>
-  </div>
+    </div>
+  </Page>
 </template>
 
 <script setup>
+import { ElButton, ElMessage, ElMessageBox, ElCard, ElMenu, ElMenuItem, ElTabs, ElTabPane, ElTable, ElTableColumn } from 'element-plus';
 import { ref, onMounted } from 'vue'
 
 // 定义主标题和副标题
@@ -191,18 +190,43 @@ if (url) {
 
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .course-container {
   display: flex;
   height: 100vh;
-  background: #f5f5f5;
 }
 
 .course-sidebar {
   width: 240px;
-  background: white;
   margin: 20px;
-  border-right: 1px solid #eee;
+  
+  :deep(.el-card__header) {
+    padding: 15px;
+  }
+  
+  :deep(.el-menu) {
+    border-right: none;
+  }
+  
+  :deep(.el-menu-item) {
+    height: 45px;
+    line-height: 45px;
+    
+    &:hover {
+      background-color: var(--el-menu-hover-bg-color);
+      color: var(--el-menu-hover-text-color);
+    }
+    
+    &.is-active {
+      background-color: var(--el-menu-active-bg-color);
+      color: var(--el-menu-active-text-color);
+      border-right: 2px solid var(--el-menu-active-border-color);
+      
+      &::after {
+        display: none;
+      }
+    }
+  }
 }
 
 .course-title {
@@ -229,7 +253,7 @@ if (url) {
 }
 
 .course-item:hover {
-  background: #f0f9ff;
+  background: #022740;
 }
 
 .course-item.active {
@@ -245,11 +269,25 @@ if (url) {
 .course-content {
   flex: 1;
   padding: 20px;
+
+  :deep(.el-tabs__header) {
+    margin-bottom: 16px;
+  }
+
+  :deep(.el-table) {
+    --el-table-border-color: var(--el-border-color-lighter);
+    
+    .el-table__header-wrapper {
+      th {
+        background-color: var(--el-fill-color-light);
+        font-weight: 600;
+      }
+    }
+  }
 }
 
 .nav-tabs {
   display: flex;
-  background: white;
   border-radius: 4px;
   margin-bottom: 20px;
 }
@@ -273,7 +311,6 @@ if (url) {
 }
 
 .course-table {
-  background: white;
   border-radius: 4px;
   padding: 20px;
 }
@@ -281,7 +318,6 @@ if (url) {
 .table-header {
   display: flex;
   padding: 12px 20px;
-  background: #fafafa;
   font-weight: bold;
 }
 
