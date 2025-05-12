@@ -42,7 +42,6 @@
 
         <Grid>
             <template #action="{ row }">
-              <span class="mr-3">{{ row.createTime }}</span>
               <el-button 
                 type="primary" 
                 size="small"
@@ -202,20 +201,24 @@ interface RowType {
 // 定义表格配置
 const gridOptions: VxeTableGridOptions<RowType> = {
   columns: [
-    { field: 'name', title: '资料', minWidth: 200 },
+    { field: 'name', title: '资料', width: 1000, align: 'left', },
     { 
       field: 'createTime',
       title: '创建时间',
-      width: 280,
       align: 'left',
-      slots: { default: 'action' }
-    }
+    },
+    {
+      field: 'action',
+      fixed: 'right',
+      slots: { default: 'action' },
+      title: '操作',
+    },
   ],
   rowConfig: {
     isHover: true,
     keyField: 'name',
   },
-  height: '100px',
+  height: '600px',
   proxyConfig: {
     ajax: {
       query: async ({ page }, formValues) => {
@@ -246,7 +249,10 @@ const [Grid, gridApi] = useVbenVxeGrid({
 
 .course-sidebar {
   width: 240px;
+  min-width: 240px; /* 添加最小宽度 */
+  max-width: 240px; /* 添加最大宽度 */
   margin: 20px;
+  flex-shrink: 0;  /* 防止侧边栏被压缩 */
   
   :deep(.el-card__header) {
     padding: 15px;

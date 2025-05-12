@@ -13,7 +13,7 @@ export default defineConfig(async () => {
       ],
       server: {
         allowedHosts: [
-          '99c1-35-240-132-46.ngrok-free.app',
+          'b461-59-174-127-81.ngrok-free.app',
           'localhost',
           '127.0.0.1'
         ],
