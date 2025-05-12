@@ -50,6 +50,14 @@
                 {{ row.type === 'doc' ? '查看' : '上课' }}
               </el-button>
             </template>
+            <template #toolbar-actions>
+            <ElButton type="primary" >
+              新增
+            </ElButton>
+            <ElButton type="danger" class="mt-1" >
+              删除
+            </ElButton>
+            </template>
           </Grid>
       </el-card>
     </div>
@@ -198,9 +206,14 @@ interface RowType {
   type: 'doc' | 'ppt';
 }
 
-// 定义表格配置
+// 修改表格配置，添加checkbox配置
 const gridOptions: VxeTableGridOptions<RowType> = {
+  checkboxConfig: {
+    highlight: true,
+    labelField: 'index',
+  },
   columns: [
+    { align: 'left', title: '', type: 'checkbox', width: 50 },
     { field: 'name', title: '资料', width: 1000, align: 'left', },
     { 
       field: 'createTime',
@@ -233,12 +246,52 @@ const gridOptions: VxeTableGridOptions<RowType> = {
       },
     },
   },
+  toolbarConfig: {
+    custom: true,
+    export: true,
+    refresh: true,
+    resizable: true,
+    zoom: true,
+  },
 };
 
 // 创建表格实例
 const [Grid, gridApi] = useVbenVxeGrid({
   gridOptions,
 });
+
+// 添加新增方法
+const onAdd = async () => {
+  // 这里可以打开新增表单对话框
+  ElMessage.info('新增功能待实现');
+}
+
+// 添加删除方法
+const onDel = async () => {
+  const rows = gridApi.grid.getCheckboxRecords();
+  if (rows.length === 0) {
+    ElMessage.warning('请选择要删除的资料');
+    return;
+  }
+  
+  ElMessageBox.confirm(`确定要删除选中的 ${rows.length} 个资料吗?`, '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning',
+  }).then(async () => {
+    try {
+      // TODO: 调用删除接口
+      // await deleteResources(rows.map(row => row.id));
+      ElMessage.success('删除成功');
+      // 刷新表格数据
+      gridApi.reload();
+    } catch (error) {
+      ElMessage.error('删除失败');
+    }
+  }).catch(() => {
+    ElMessage.info('已取消删除');
+  });
+}
 </script>
 
 <style scoped lang="scss">
@@ -265,6 +318,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
   :deep(.el-menu-item) {
     height: 45px;
     line-height: 45px;
+    transition: all 0.3s ease;
     
     &:hover {
       background-color: var(--el-menu-hover-bg-color);
@@ -272,12 +326,17 @@ const [Grid, gridApi] = useVbenVxeGrid({
     }
     
     &.is-active {
-      background-color: var(--el-menu-active-bg-color);
-      color: var(--el-menu-active-text-color);
-      border-right: 2px solid var(--el-menu-active-border-color);
+      background-color: var(--el-color-primary-light-9);
+      color: var(--el-color-primary);
+      border-right: 2px solid var(--el-color-primary);
+      font-weight: bold;
       
       &::after {
         display: none;
+      }
+      
+      .text-blue-500 {
+        color: var(--el-color-primary);
       }
     }
   }
