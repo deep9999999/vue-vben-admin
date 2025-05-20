@@ -23,7 +23,7 @@ export async function getOrgList(data:{
   pageSize: number;
   formValues: any;
 }) {
-  return requestClient.post<sysApi.OrgListResult[]>('/sys/orglist', data);
+  return requestClient.post<sysApi.OrgListResult[]>('/org/orglist', data);
 }
 
 /**
@@ -37,7 +37,7 @@ export async function addOrg(data: {
   state: string
   releaseDate: string,
 }) {
-return requestClient.post<void>('/sys/addorglist', data);
+return requestClient.post<void>('/org/add', data);
 }
 
 /**
