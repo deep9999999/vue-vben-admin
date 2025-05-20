@@ -16,24 +16,24 @@ export default defineEventHandler(async (event) => {
 
   if (formValues) {
     // 根据表单值过滤数据
-    if (formValues.Name != '') {
+    if (formValues.name != '') {
       filteredList = filteredList.filter(item => {
-          return item.name.toLowerCase().includes(formValues.Name.toLowerCase())
+          return item.name.toLowerCase().includes(formValues.name.toLowerCase())
         }
       );
     }
     
-    if (formValues.tel != '') {
+    if (formValues.contact != '') {
       filteredList = filteredList.filter(item => 
-        item.contact.includes(formValues.tel)
+        item.contact.includes(formValues.contact)
       );
     }
 
-    if (formValues.school != '') {
-      filteredList = filteredList.filter(item => {
-        return item.school.toLowerCase().includes(formValues.school.toLowerCase())
-      });
-    }
+    // if (formValues.school != '') {
+    //   filteredList = filteredList.filter(item => {
+    //     return item.school.toLowerCase().includes(formValues.school.toLowerCase())
+    //   });
+    // }
 
     // 如果存在地区范围,去掉逗号分隔符
     if (formValues.area != '') {

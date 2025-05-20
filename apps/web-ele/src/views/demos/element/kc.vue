@@ -346,7 +346,6 @@ async function onSubmit(values: Record<string, any>) {
         </Button>
         <Button 
           type="link" 
-          v-if="row.pid != null"
           style="color: #1890ff; margin-right: 8px" 
           @click="onDelLevel(row)"
         >
@@ -354,7 +353,7 @@ async function onSubmit(values: Record<string, any>) {
         </Button>
         <Button 
           type="link" 
-          v-if="row.pid == null"
+          v-if="row.root"
           style="color: #1890ff; margin-right: 8px" 
           @click="onInformationMgr(row)"
         >

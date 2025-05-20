@@ -23,6 +23,8 @@ export default defineConfig(async () => {
             rewrite: (path) => path.replace(/^\/api/, ''),
             // mock代理目标地址
             target: 'http://localhost:5320/api',
+            // 后端代理目标地址
+            //target: 'https://daf4-35-240-132-46.ngrok-free.app/api',
             ws: true,
           },
         },

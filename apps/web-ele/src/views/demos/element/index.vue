@@ -64,21 +64,21 @@ const formOptions: VbenFormProps = {
     {
       component: 'Input',
       defaultValue: '',
-      fieldName: 'Name',
+      fieldName: 'name',
       label: '机构名称',
     },
     {
       component: 'Input',
-      fieldName: 'tel',
+      fieldName: 'contact',
       defaultValue: '',
       label: '联系电话',
     },
-    {
-      component: 'Input',
-      fieldName: 'school',
-      defaultValue: '',
-      label: '学校',
-    },
+    // {
+    //   component: 'Input',
+    //   fieldName: 'school',
+    //   defaultValue: '',
+    //   label: '学校',
+    // },
     // {
     //   component: 'Select',
     //   componentProps: {
@@ -282,6 +282,9 @@ const [Form, formApi] = useVbenForm({
       component: 'DatePicker',
       componentProps: {
         placeholder: '请输入',
+        type: 'date',
+        format: 'YYYY-MM-DD',
+        valueFormat: 'YYYY-MM-DD'
       },
       fieldName: 'releaseDate',
       label: '到期时间',
