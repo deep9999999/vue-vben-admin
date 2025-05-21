@@ -59,7 +59,7 @@ export async function editOrg(data: {
     state: string
     releaseDate: string,
 }) {
-  return requestClient.post<void>('/sys/editorglist', data);
+  return requestClient.post<void>('/org/editOrg', data);
 }
 
 /**
@@ -68,7 +68,7 @@ export async function editOrg(data: {
 export async function queryOrg(data: {
   id: string
 }) {
-  return requestClient.post<sysApi.OrgListResult[]>('/sys/queryorgitem', data);
+  return requestClient.post<sysApi.OrgListResult[]>('/org/orgDetail', data);
 }
 
 
