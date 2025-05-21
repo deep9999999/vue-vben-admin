@@ -143,7 +143,7 @@ export async function editSchool(data: {
 export async function querySchool(data: {
   id: string;
 }) {
-  return requestClient.post<sysApi.SchoolListResult[]>('/sys/queryschool', data);
+  return requestClient.post<sysApi.SchoolListResult[]>('/org/schoolDetail', data);
 }
 
 
