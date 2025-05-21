@@ -134,7 +134,7 @@ const gridOptions: VxeTableGridOptions<RowType> = {
     { field: 'name', align: 'left', title: '机构名称', width: 120 },
     { field: 'contact', title: '联系信息', width: 140 },
     //{ field: 'school', title: '对应学校',width: 200 },
-    { field: 'address', title: '机构地址',width: 150 },
+    { field: 'address', title: '机构地址',width: 250 },
     { field: 'state', title: '状态',width: 100, slots: { default: 'state' }, },
     { field: 'releaseDate', formatter: 'formatDate', title: '到期时间',width: 150 },
     {
