@@ -15,10 +15,10 @@ export default defineEventHandler(async (event) => {
 
   // 获取资源列表数据
   if (_childId != '') {
-    resources = CourseResourceList.filter(item => {
-      // 检查数据项的地区是否包含所有选择的地区层级
-      return item.id  == _childId;
-    });
+    // resources = CourseResourceList.filter(item => {
+    //   // 检查数据项的地区是否包含所有选择的地区层级
+    //   return item.id  == _childId;
+    // });
   }
   // 计算分页
   const start = (page - 1) * pageSize;

@@ -298,15 +298,77 @@ export async function getCourseDetail(data: {
 }
 
 
-// 查询课程下的资源列表
-export async function fetchResources(data :{
+export namespace sysApi {
+  // 课程列表项目信息
+  export interface FileDetailResult {
+    id: string; // 课程ID
+    name: string; // 机构名称
+    type: string; // 文件类型
+    state: string; // 课程状态
+    releaseDate: string; // 到期时间
+  }
+}
+
+/**
+ * 查询当前课程资料
+ */
+export async function fetchResources(data: {
+  id: string;  // 课程ID
   page: number;
-  pageSize: number;
-  id?: string;    // 课程ID
-  childId?: string;  // 目录ID
-})  {
-  return requestClient.post<sysApi.CourseListResult[]>('/sys/fetchResources', data);
-};
+  pageSize: number
+}) {
+  return requestClient.post<sysApi.FileDetailResult>('/classesSrc/fileList', data);
+}
+
+/**
+ * 新增课程资料
+ */
+export async function addFile(data: {
+  classId: string; // 课程ID
+  name: string; // 资料名称
+  type: string; // 文件类型
+  fileUrl: string; // 文件对象
+}) {
+  return requestClient.post<void>('/classesSrc/addFile', data);
+}
+
+
+/**
+ * 修改课程资料
+ */
+export async function editFile(data: {
+  id: string; // 资料ID
+  name: string; // 资料名称
+  type: string; // 文件类型
+  fileUrl: string; // 文件对象
+}) {
+  return requestClient.post<void>('/classesSrc/editFile', data);
+}
+
+/**
+ * 获取资料详情
+ */
+export async function getFileDetail(data: {
+  id: string; // 资料ID
+}) {
+  return requestClient.post<sysApi.FileDetailResult>('/classesSrc/fileDetail', data);
+}
+
+/**
+ * 删除课程资料
+ */
+export async function deleteFile(id: string[]) {
+  return requestClient.post<void>('/classesSrc/delFile', { id });
+}
+
+/**
+ * 根据url删除附件
+ */
+export async function removeFile(data: {
+  id: string; // 资料ID
+}) {
+  return requestClient.post<void>('/file/remove', data);
+}
 
 
 

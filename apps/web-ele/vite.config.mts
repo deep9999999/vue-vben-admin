@@ -18,7 +18,7 @@ export default defineConfig(async () => {
           '127.0.0.1'
         ],
         proxy: {
-          '/api/sys/courselist': {
+          '/api/sys/fetchResources': {
             target: 'http://localhost:5320/api',
             changeOrigin: true,
             rewrite: (path) => path.replace(/^\/api/, ''),

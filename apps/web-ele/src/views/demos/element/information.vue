@@ -47,18 +47,29 @@
                 size="small"
                 @click="openResource(row)"
               >
-                {{ row.type === 'doc' ? '查看' : '上课' }}
+                {{ row.type === 'DOC' ? '备课' : '上课' }}
+              </el-button>
+              <el-button 
+                type="primary" 
+                size="small"
+                @click="onKcDatil(row)"
+              >
+                详情
               </el-button>
             </template>
             <template #toolbar-actions>
-            <ElButton type="primary" >
+            <ElButton type="primary" @click="onAdd" >
               新增
             </ElButton>
-            <ElButton type="danger" class="mt-1" >
+            <ElButton type="danger" class="mt-1" @click="onDel">
               删除
             </ElButton>
             </template>
-          </Grid>
+        </Grid>
+        <!-- 新增对话框 -->
+        <Modal>
+          <Form />
+        </Modal>
       </el-card>
     </div>
     </div>
@@ -66,12 +77,23 @@
 </template>
 
 <script setup lang="ts">
-import { ElButton, ElMessage, ElMessageBox, ElCard, ElMenu, ElMenuItem, ElTabs, ElTabPane } from 'element-plus';
-import { ref, onMounted, computed } from 'vue'
+import { ElButton, ElMessage, ElMessageBox, ElCard, ElMenu, ElMenuItem, ElTabs, ElTabPane, valueEquals } from 'element-plus';
+import { ref, onMounted, computed, h } from 'vue'
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { fetchResources, getCourseDetail } from '#/api/core/sys';
+import { fetchResources, getCourseDetail, addFile, editFile, getFileDetail, deleteFile, removeFile } from '#/api/core/sys';
 import { useRoute } from 'vue-router'
+import { useVbenForm } from '#/adapter/form';
+import { useVbenModal } from '@vben/common-ui';
+import { requestClient } from '#/api/request';
+import { useAccessStore } from '@vben/stores';
+
+interface UploadFileParams {
+  file: File;
+  onError?: (error: Error) => void;
+  onProgress?: (progress: { percent: number }) => void;
+  onSuccess?: (data: any, file: File) => void;
+}
 
 // 获取路由实例
 const route = useRoute()
@@ -80,42 +102,45 @@ const route = useRoute()
 const courseId = route.query.courseId as string
 
 // 定义主标题和副标题
-const mainTitle = ref('一秋看图写话')
-const subTitle = ref('一年级秋季')
+const mainTitle = ref('')
+const subTitle = ref('')
 
 // 当前激活的课程目录索引
 const activeIndex:any = ref(0)
 const selectCourse = (index:any) => {
   activeIndex.value = index
-}
 
+  // 根据选中的课程索引获取对应的标签列表
+  if (tabsList.value && tabsList.value[index]) {
+    // 获取当前选中课程的标签数据
+    const currentTabs = tabsList.value[index].children || []
+    // 更新tabs数据
+    tabs.value = currentTabs.map((tab: any) => ({
+      name: tab.name,
+      value: tab.id
+    }))
+    // 重置当前激活的标签为第一个
+    activeTab.value = 0
+    // 更新选中的标签值
+    selectTabValue = tabs.value[0]?.value
+    // 重新加载表格数据
+    gridApi.query()
+  }
+}
+const tabsList = ref()
 // 课程目录数据
-const courseList = ref([
-  { name: '《认识新朋友》' },
-  { name: '《我的小伙伴》' },
-  { name: '《猪猪他是谁》' },
-  { name: '《悠悠做老七》' },
-  { name: '《我的房间》' },
-  { name: '《周末大扫除》' },
-  { name: '《快乐的周末》' },
-  { name: '《天气变变变》' },
-  { name: '《快乐户外行》' },
-  { name: '《手高的傅品》' }
-])
+const courseList = ref()
 
  // 导航标签数据
- const tabs:any = ref([
-  { name: '课前备课', value:20101},
-  { name: '跟课讲作', value:20102 },
-  { name: '课后家校联', value:20103 },
-  { name: '课程作业', value:20104 },
-  { name: '打卡练习', value:20105 },
-  { name: '范文范例', value:20106 }
-])
+const tabs:any = ref([])
 
 // 当前激活的标签索引
 const activeTab:any = ref(0)
-let selectTabValue:any = tabs.value[0].value;
+let selectTabValue:any = null
+
+if (tabs.value.length > 0) {
+  selectTabValue = tabs.value[0].value;
+}
 // 选择标签的方法
 const selectTab = (v: any) => {
   activeTab.value = v.index
@@ -124,36 +149,6 @@ const selectTab = (v: any) => {
   // 设置数据并保持表格状态
   gridApi.query();
 }
-
-// 每个标签页的内容
-const tabContents:any = ref({
-  0: [
-    { name: '01课课', createTime: '2025-02-16 21:51', type: 'doc' },
-    { name: '一秋预课', createTime: '2025-01-21 17:38', type: 'ppt' },
-    { name: '一年级秋季课程反馈-教案合集', createTime: '2025-01-21 17:38', type: 'doc' },
-    { name: '一年级练习册答案', createTime: '2025-01-21 17:29', type: 'doc' }
-  ],
-  1: [
-    { name: '跟课讲作指导1', createTime: '2025-02-16 21:51', type: 'doc' },
-    { name: '跟课讲作指导2', createTime: '2025-01-21 17:38', type: 'ppt' },
-  ],
-  2: [
-    { name: '家校联系记录1', createTime: '2025-02-16 21:51', type: 'doc' },
-    { name: '家校联系记录2', createTime: '2025-01-21 17:38', type: 'doc' },
-  ],
-  3: [
-    { name: '课程作业1', createTime: '2025-02-16 21:51', type: 'doc' },
-    { name: '课程作业2', createTime: '2025-01-21 17:38', type: 'ppt' },
-  ],
-  4: [
-    { name: '打卡练习1', createTime: '2025-02-16 21:51', type: 'doc' },
-    { name: '打卡练习2', createTime: '2025-01-21 17:38', type: 'doc' },
-  ],
-  5: [
-    { name: '范文示例1', createTime: '2025-02-16 21:51', type: 'ppt' },
-    { name: '范文示例2', createTime: '2025-01-21 17:38', type: 'doc' },
-  ]
-})
 
 // 定义加载状态
 const loading = ref(false)
@@ -170,7 +165,13 @@ const fetchCourseData = async () => {
       subTitle.value = courseDetail.secname
       // 更新课程列表
       if (courseDetail.children && courseDetail.children.length > 0) {
-        courseList.value = courseDetail.children
+        courseList.value = courseDetail.children.map((item: any) => ({
+          name: item.name,
+          value: item.id
+        }))
+
+        tabsList.value = courseDetail.children
+        selectCourse(0);
       }
     }
   } catch (error) {
@@ -183,18 +184,37 @@ const fetchCourseData = async () => {
 
 // 在组件挂载时获取数据
 onMounted(() => {
-  //fetchCourseData()
+  fetchCourseData()
 })
+
+
+async function upload_file({
+  file,
+  onError,
+  onProgress,
+  onSuccess,
+}: UploadFileParams) {
+  try {
+    onProgress?.({ percent: 0 });
+
+    const data = await requestClient.upload('/upload', { file });
+
+    onProgress?.({ percent: 100 });
+    onSuccess?.(data, file);
+  } catch (error) {
+    onError?.(error instanceof Error ? error : new Error(String(error)));
+  }
+}
 
 // 打开资源方法
 const openResource = (item:any) => {
 let url = ''
-if (item.type === 'doc') {
+if (item.type === 'DOC') {
   // 文档类型，打开文档预览链接
-  url = `https://ow365.cn/?i=35593&furl=http://118.31.173.178:8081/${encodeURIComponent(item.name)}.docx`
-} else if (item.type === 'ppt') {
+  url = `https://b63c-35-240-132-46.ngrok-free.app${item.fileUrl}`
+} else if (item.type === 'PPT') {
   // PPT类型，打开PPT预览链接
-  url = `https://ow365.cn/?i=35593&furl=http://118.31.173.178:8081/${encodeURIComponent(item.name)}.pptx`
+  url = `https://ow365.cn/?ssl=1&i=35593&furl=https://b63c-35-240-132-46.ngrok-free.app${item.fileUrl}`
 }
 
 if (url) {
@@ -217,11 +237,12 @@ const gridOptions: VxeTableGridOptions<RowType> = {
   },
   columns: [
     { align: 'left', title: '', type: 'checkbox', width: 50 },
-    { field: 'name', title: '资料', width: 1000, align: 'left', },
+    { field: 'name', title: '资料', width: 200, align: 'left', },
+    { field: 'type', title: '类型', width: 50, align: 'left', },
+    { field: 'fileUrl', title: 'URL', width: 300, align: 'left', },
     { 
       field: 'createTime',
       title: '创建时间',
-      align: 'left',
     },
     {
       field: 'action',
@@ -238,11 +259,12 @@ const gridOptions: VxeTableGridOptions<RowType> = {
   proxyConfig: {
     ajax: {
       query: async ({ page }, formValues) => {
+        if (!selectTabValue) return [];
+
         let resp:any =  await fetchResources({
           page: page.currentPage,
           pageSize: page.pageSize,
-          id: activeIndex.value,
-          childId: selectTabValue
+          id: selectTabValue
         });
 
         return resp;
@@ -260,13 +282,181 @@ const gridOptions: VxeTableGridOptions<RowType> = {
 
 // 创建表格实例
 const [Grid, gridApi] = useVbenVxeGrid({
-  gridOptions,
+  gridOptions
 });
+
+//  编辑对话框
+const [Form, formApi] = useVbenForm({
+  handleSubmit: onSubmit,
+  schema: [
+    {
+      component: 'Input',
+      componentProps: {
+        placeholder: '请输入',
+      },
+      fieldName: 'name',
+      label: '资料名称',
+      rules: 'required',
+    },
+    {
+      component: 'Select',
+      componentProps: {
+        placeholder: '请输入',
+        options: [
+          { label: 'PPT', value: 'PPT' },
+          { label: 'DOC', value: 'DOC' },
+          { label: 'AUDIO', value: 'AUDIO' },
+          { label: 'VIDEO', value: 'VIDEO' }
+        ]
+      },
+      fieldName: 'type',
+      label: '文件类型',
+      rules: 'required',
+    },
+    // {
+    //   component: 'RadioGroup',
+    //   componentProps: {
+    //     options: [
+    //       {
+    //         label: '查看',
+    //         value: '查看',
+    //       },
+    //       {
+    //         label: '下载',
+    //         value: '下载',
+    //       }
+    //     ],
+    //   },
+    //   rules: 'required',
+    //   defaultValue: '正常授权',
+    //   fieldName: 'state',
+    //   label: '授权状态',
+    // },
+    {
+      component: 'Upload',
+      componentProps: {
+        headers: {
+          Authorization: "Bearer " + useAccessStore().accessToken,
+        },
+        accept: '.pptx.ppt,.doc,.docx,.mp3,.mp4',
+        action: "/api/file/upload",
+        limit: 1,
+        multiple: false,
+        // 上传列表的内建样式，支持四种基本样式 text, picture, picture-card 和 picture-circle
+        listType: 'text',
+        name: "file",
+        "on-remove": async (uploadFile: any, uploadFiles: any) => {
+          await removeFile({id:uploadFile.id});
+          gridApi.query();
+        }
+      },
+      fieldName: 'files',
+      label: "文件",
+      renderComponentContent: () => {
+        return {
+          default: () => h('span', { style: { fontSize: '14px' } }, '点击上传资料'),
+        };
+      },
+      rules: 'required',
+    },
+  ],
+  showDefaultActions: false,
+});
+
+const [Modal, modalApi] = useVbenModal({
+  fullscreenButton: false,
+  onCancel() {
+    modalApi.close();
+  },
+  onConfirm: async () => {
+    await formApi.validateAndSubmitForm();
+    // modalApi.close();
+  },
+  onOpenChange(isOpen: boolean) {
+    if (isOpen) {
+      const { values } = modalApi.getData<Record<string, any>>();
+      if (values) {
+        formApi.setValues(values);
+      }
+    }
+  },
+  title: '资料信息',
+});
+
+async function onSubmit(values: Record<string, any>) {
+  ElMessage.success('正在提交中...');
+  modalApi.lock();
+  try {
+      const formvalues:any = await formApi.getValues<Record<string, any>>();
+      const { values } = modalApi.getData<Record<string, any>>();
+      if (formvalues) {
+        if (values && values.id != null) {
+          await editFile({
+            id:values.id,
+            ...formvalues
+          })
+        }
+        else {
+          await addFile({
+          classId: selectTabValue,
+          "fileUrl": formvalues.files[0].response.data.url,
+          "name": formvalues.name,
+          "type": formvalues.type
+          })
+        }
+      }
+    //setTimeout(() => {
+      modalApi.close();
+      gridApi.reload();
+      ElMessage.success(`提交成功：${JSON.stringify(formvalues)}`);
+    //}, 1000);
+  }catch (error) {
+    ElMessage.error('提交失败');
+    modalApi.unlock();
+  }
+}
+
+const onKcDatil = async (row : any) => {
+  let rowdata:any = await getFileDetail({id:row.id});
+    // 克隆数据以避免直接修改原始数据
+    const clonedData = JSON.parse(JSON.stringify(rowdata));
+    
+    clonedData.files = [{
+    name: clonedData.fileUrl,
+    url: clonedData.fileUrl,
+    id: clonedData.id,
+    response: {
+      data: {
+        url: clonedData.fileUrl,
+      }
+    }
+  }];
+
+    modalApi.setData({
+      // 表单值
+      values: clonedData,
+      id: row.id,
+    })
+    
+    modalApi.setState({
+        title:'资料详情'
+      }
+    );
+
+    modalApi.open();
+};
 
 // 添加新增方法
 const onAdd = async () => {
-  // 这里可以打开新增表单对话框
-  ElMessage.info('新增功能待实现');
+  modalApi.open();
+    // 清空表单数据
+    formApi.resetForm();
+    modalApi.setData({
+      courseId: selectTabValue
+    })
+    modalApi.setState({
+      title: '新增资料'
+    });
 }
 
 // 添加删除方法
@@ -284,7 +474,7 @@ const onDel = async () => {
   }).then(async () => {
     try {
       // TODO: 调用删除接口
-      // await deleteResources(rows.map(row => row.id));
+      await deleteFile(rows.map(row => row.id));
       ElMessage.success('删除成功');
       // 刷新表格数据
       gridApi.reload();
