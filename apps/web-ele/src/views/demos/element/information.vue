@@ -70,7 +70,14 @@ import { ElButton, ElMessage, ElMessageBox, ElCard, ElMenu, ElMenuItem, ElTabs, 
 import { ref, onMounted, computed } from 'vue'
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { fetchResources } from '#/api/core/sys';
+import { fetchResources, getCourseDetail } from '#/api/core/sys';
+import { useRoute } from 'vue-router'
+
+// 获取路由实例
+const route = useRoute()
+
+// 从 URL 获取参数
+const courseId = route.query.courseId as string
 
 // 定义主标题和副标题
 const mainTitle = ref('一秋看图写话')
@@ -155,21 +162,17 @@ const loading = ref(false)
 const fetchCourseData = async () => {
   try {
     loading.value = true
-    // 获取主标题和副标题
-    const titleResponse = await fetch('/api/course/title')
-    const titleData = await titleResponse.json()
-    mainTitle.value = titleData.mainTitle
-    subTitle.value = titleData.subTitle
-
-    // 获取课程列表
-    const courseResponse = await fetch('/api/course/list')
-    const courseData = await courseResponse.json()
-    courseList.value = courseData.list
-
-    // 获取标签页内容
-    const tabResponse = await fetch('/api/course/tab-contents')
-    const tabData = await tabResponse.json()
-    tabContents.value = tabData.contents
+    // 调用接口获取课程详情
+    const courseDetail:any = await getCourseDetail({id:courseId})
+    if (courseDetail) {
+      // 更新课程标题信息
+      mainTitle.value = courseDetail.name
+      subTitle.value = courseDetail.secname
+      // 更新课程列表
+      if (courseDetail.children && courseDetail.children.length > 0) {
+        courseList.value = courseDetail.children
+      }
+    }
   } catch (error) {
     console.error('获取课程数据失败:', error)
     ElMessage.error('获取课程数据失败')

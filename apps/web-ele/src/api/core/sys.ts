@@ -251,7 +251,7 @@ export async function getCourseList(data: {
 }
 
 /**
- * 新增课程
+ * 新增课程节点
  */
 export async function addCourse(data: {
   name: string;
@@ -262,14 +262,14 @@ export async function addCourse(data: {
 }
 
 /**
- * 删除课程
+ * 删除课程节点
  */
 export async function deleteCourse(id: string[], ischild: boolean = false) {
   return requestClient.post<void>('/classes/delClasses', { id, ischild });
 }
 
 /**
- * 编辑课程信息
+ * 编辑课程节点信息
  */
 export async function editCourse(data: {
   id: string;
@@ -280,13 +280,23 @@ export async function editCourse(data: {
 }
 
 /**
- * 查询课程信息
+ * 查询课程节点信息
  */
 export async function queryCourse(data: {
   id: string;
 }) {
   return requestClient.post<sysApi.CourseListResult[]>('/classes/classesInfo', data);
 }
+
+/**
+ * 查询单个课程详情
+ */
+export async function getCourseDetail(data: {
+  id: string;  // 课程ID
+}) {
+  return requestClient.post<sysApi.CourseListResult>('/classes/getChildClasses', data);
+}
+
 
 // 查询课程下的资源列表
 export async function fetchResources(data :{

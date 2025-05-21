@@ -34,7 +34,8 @@ const routes: RouteRecordRaw[] = [
           ),
         meta: {
           // hideInMenu: true,
-          title: "机构详情",
+          keepAlive: true,
+          title: "学校管理",
         },
       },
       {
@@ -46,7 +47,8 @@ const routes: RouteRecordRaw[] = [
           ),
         meta: {
           // hideInMenu: true,
-          title: "学校管理",
+          keepAlive: true,
+          title: "教师管理",
         },
       },
     ],
@@ -70,6 +72,7 @@ const routes: RouteRecordRaw[] = [
         meta: {
           // hideInMenu: true,
           title: "课程管理",
+          keepAlive: true,
         },
       },
       {
@@ -78,6 +81,7 @@ const routes: RouteRecordRaw[] = [
         component: () => import('#/views/demos/element/information.vue'),
         meta: {
           // hideInMenu: true,
+          keepAlive: true,
           title: "资料管理",
         },
       },
