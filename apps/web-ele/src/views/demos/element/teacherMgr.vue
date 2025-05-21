@@ -166,7 +166,7 @@ const gridOptions: VxeGridProps<TeacherRowType> = {
       editRender: { name: 'input' }
     },
     { 
-      field: 'expireDate',
+      field: 'releaseDate',
       title: '到期时间',
       width: 120,
       formatter: 'formatDate'
@@ -346,9 +346,11 @@ const [Form, formApi] = useVbenForm({
       component: 'DatePicker',
       componentProps: {
         placeholder: '请选择到期时间',
-        type: 'date'
+        type: 'date',
+        format: 'YYYY-MM-DD',
+        valueFormat: 'YYYY-MM-DD'
       },
-      fieldName: 'expireDate',
+      fieldName: 'releaseDate',
       label: '到期时间',
       rules: 'required',
     }
