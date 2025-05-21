@@ -247,7 +247,7 @@ export async function getCourseList(data: {
   pageSize: number;
   formValues: any;
 }) {
-  return requestClient.post<sysApi.CourseListResult[]>('/sys/courselist', data);
+  return requestClient.post<sysApi.CourseListResult[]>('/classes/getMenuList', data);
 }
 
 /**
@@ -258,7 +258,7 @@ export async function addCourse(data: {
   secname: string;
   pid?: string;
 }) {
-  return requestClient.post<void>('/sys/addcourse', data);
+  return requestClient.post<void>('/classes/addClasses', data);
 }
 
 /**
@@ -276,7 +276,7 @@ export async function editCourse(data: {
   name: string;
   secname: string;
 }) {
-  return requestClient.post<void>('/sys/editcourse', data);
+  return requestClient.post<void>('/classes/editClasses', data);
 }
 
 /**
@@ -285,7 +285,7 @@ export async function editCourse(data: {
 export async function queryCourse(data: {
   id: string;
 }) {
-  return requestClient.post<sysApi.CourseListResult[]>('/sys/querycourse', data);
+  return requestClient.post<sysApi.CourseListResult[]>('/classes/classesInfo', data);
 }
 
 // 查询课程下的资源列表
