@@ -90,7 +90,7 @@ export namespace sysApi {
  * 获取 机构下的学校列表
  */
 export async function getSchoolList(data: {
-  orgid: string;
+  orgId: string;
   page: number;
   pageSize: number;
 }) {

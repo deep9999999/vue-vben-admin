@@ -115,7 +115,7 @@ const gridOptions: VxeGridProps<SchoolRowType> = {
     { align: 'left', title: '', type: 'checkbox', width: 50 },
     { field: 'id', title: '学校ID',width: 100 },
     { editRender: { name: 'input' }, field: 'name', title: '学校名称', width: 150 },
-    { editRender: { name: 'input' }, field: 'address', title: '学校地址',width: 150 },
+    { editRender: { name: 'input' }, field: 'address', title: '学校地址',width: 250 },
     { editRender: { name: 'input' }, field: 'principal', title: '校长' },
     { editRender: { name: 'input' }, field: 'phone', title: '联系电话' },
     { editRender: { name: 'input' }, field: 'type', title: '学校类型' },
@@ -130,7 +130,7 @@ const gridOptions: VxeGridProps<SchoolRowType> = {
     ajax: {
       query: async ({ page }) => {
         let resp:any =  await getSchoolList({
-          orgid: id,
+          orgId: id,
           page: page.currentPage,
           pageSize: page.pageSize,
         });
@@ -281,6 +281,9 @@ const [Form, formApi] = useVbenForm({
       component: 'DatePicker',
       componentProps: {
         placeholder: '请输入',
+        type: 'date',
+        format: 'YYYY-MM-DD',
+        valueFormat: 'YYYY-MM-DD'
       },
       fieldName: 'releaseDate',
       label: '到期时间',
