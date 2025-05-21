@@ -348,7 +348,7 @@ const onSchoolDatil = async (row : any) => {
     // 克隆数据以避免直接修改原始数据
     const clonedData = JSON.parse(JSON.stringify(rowdata.data));
 
-    clonedData.area = clonedData.area.split(',');
+    clonedData.area = clonedData.area;
     
     modalApi.setData({
       // 表单值

@@ -134,7 +134,7 @@ export async function editSchool(data: {
   area: string; // 所属区域
   foundDate: string; // 成立日期
 }) {
-  return requestClient.post<void>('/sys/editschool', data);
+  return requestClient.post<void>('/org/updateSchool', data);
 }
 
 /**
