@@ -215,7 +215,7 @@ export async function editTeacher(data: {
   schoolId: string;
   password: string;
 }) {
-  return requestClient.post<void>('/sys/editteacher', data);
+  return requestClient.post<void>('/org/updateTeacher', data);
 }
 
 /**
@@ -224,7 +224,7 @@ export async function editTeacher(data: {
 export async function queryTeacher(data: {
   id: string;
 }) {
-  return requestClient.post<sysApi.TeacherListResult[]>('/sys/queryteacher', data);
+  return requestClient.post<sysApi.TeacherListResult[]>('/org/teacherDetail', data);
 }
 
 
