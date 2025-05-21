@@ -18,10 +18,17 @@ export default defineConfig(async () => {
           '127.0.0.1'
         ],
         proxy: {
+          '/api/sys/courselist': {
+            target: 'http://localhost:5320/api',
+            changeOrigin: true,
+            rewrite: (path) => path.replace(/^\/api/, ''),
+            ws: true,
+          },
           '/api': {
             changeOrigin: true,
             rewrite: (path) => path.replace(/^\/api/, ''),
             // mock代理目标地址
+            
             //target: 'http://localhost:5320/api',
             // 后端代理目标地址
             target: 'https://b63c-35-240-132-46.ngrok-free.app/api',

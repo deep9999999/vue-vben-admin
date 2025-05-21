@@ -153,18 +153,18 @@ const gridOptions: VxeGridProps<TeacherRowType> = {
       width: 100,
       slots: { default: 'state' }
     },
-    {
-      field: 'schoolName',
-      title: '所属学校',
-      width: 150,
-      editRender: { name: 'input' }
-    },
-    {
-      field: 'orgName',
-      title: '所属组织',
-      width: 150,
-      editRender: { name: 'input' }
-    },
+    // {
+    //   field: 'schoolName',
+    //   title: '所属学校',
+    //   width: 150,
+    //   editRender: { name: 'input' }
+    // },
+    // {
+    //   field: 'orgName',
+    //   title: '所属组织',
+    //   width: 150,
+    //   editRender: { name: 'input' }
+    // },
     { 
       field: 'releaseDate',
       title: '到期时间',
@@ -313,7 +313,9 @@ const [Form, formApi] = useVbenForm({
       componentProps: {
         placeholder: '请输入密码',
         type: 'password',
-        showPassword: true
+        showPassword: true,
+        // 添加autocomplete属性避免Chrome密码自动填充警告
+        autocomplete: 'new-password'
       },
       fieldName: 'password',
       label: '登录密码',

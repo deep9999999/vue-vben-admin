@@ -8,6 +8,8 @@ import { ElButton, ElMessage, ElMessageBox } from 'element-plus';
 import { useVbenModal } from '@vben/common-ui';
 import { useVbenForm } from '#/adapter/form';
 import { useRouter } from 'vue-router';
+import { nextTick } from 'vue';
+import { ref } from 'vue';
 const router = useRouter();
 
 
@@ -50,6 +52,9 @@ const formOptions: VbenFormProps = {
   submitOnEnter: false,
 };
 
+// 用于存储展开状态的响应式变量
+const expandedKeys = ref<string[]>([]);
+
 const gridOptions: VxeTableGridOptions<RowType> = {
   checkboxConfig: {
     highlight: true,
@@ -81,12 +86,23 @@ const gridOptions: VxeTableGridOptions<RowType> = {
   proxyConfig: {
     ajax: {
       query: async ({ page }, formValues) => {
+        
         ElMessage.success(`Query params: ${JSON.stringify(formValues)}`);
-        let resp:any =  await getCourseList({
+        let resp:any = await getCourseList({
           page: page.currentPage,
           pageSize: page.pageSize,
           formValues
         });
+
+        // 在数据加载完成后恢复展开状态
+        setTimeout(() => {
+          expandedKeys.value.forEach(key => {
+            const row = gridApi.grid.getRowById(key);
+            if (row) {
+              gridApi.grid.setTreeExpand(row, true);
+            }
+          });
+        }, 0);
 
         return resp;
       },
@@ -107,9 +123,37 @@ const gridOptions: VxeTableGridOptions<RowType> = {
   }
 };
 
+
+// 监听展开状态变化
+const handleTreeExpand = (params: any) => {
+  console.log('展开状态变化:', params.expanded);
+  const { row } = params;
+  
+  if (params.expanded) {
+    // 添加到展开状态列表
+    if (!expandedKeys.value.includes(row.id)) {
+      expandedKeys.value.push(row.id);
+      console.log('展开节点列表：', expandedKeys.value);
+    }
+  } else {
+    // 从展开状态列表中移除
+    const index = expandedKeys.value.indexOf(row.id);
+    if (index > -1) {
+      expandedKeys.value.splice(index, 1);
+      console.log('收起后节点列表：', expandedKeys.value);
+    }
+  }
+};
+
+const gridEvents = {
+  // 展开/收起事件
+  toggleTreeExpand: handleTreeExpand
+}
+
 const [Grid, gridApi] = useVbenVxeGrid({
   formOptions,
   gridOptions,
+  gridEvents
 });
 
 
@@ -289,9 +333,6 @@ async function onSubmit(values: Record<string, any>) {
           }
         }
         else if (modalApi.sharedData.payload.id) {
-          // 保存当前展开的节点
-          const expandedKeys = gridApi.grid.getTreeExpandRecords().map(row => row.id);
-
           // 新增下级节点
           await addCourse({
             ...formvalues,
@@ -300,12 +341,6 @@ async function onSubmit(values: Record<string, any>) {
 
           // 重新加载数据
           await gridApi.query();
-
-          // 恢复展开状态
-          expandedKeys.forEach(key => {
-            const row = gridApi.grid.getRowById(key);
-            if (row) gridApi.grid.setTreeExpand(row, true);
-          });
         }
         else {
           await addCourse(formvalues)
@@ -323,12 +358,37 @@ async function onSubmit(values: Record<string, any>) {
   }
   
 }
+
+const expandAll = () => {
+  // 获取所有节点
+  const allRows = gridApi.grid?.getData();
+  // 展开所有节点
+  gridApi.grid?.setAllTreeExpand(true);
+  // 手动更新展开状态
+  allRows?.forEach(row => {
+    if (!expandedKeys.value.includes(row.id)) {
+      expandedKeys.value.push(row.id);
+    }
+  });
+  console.log('展开全部后的状态：', expandedKeys.value);
+};
+
+const collapseAll = () => {
+  gridApi.grid?.setAllTreeExpand(false);
+  // 清空展开状态
+  expandedKeys.value = [];
+  console.log('折叠全部后的状态：', expandedKeys.value);
+};
+
 </script>
 
 
 <template>
   <Page auto-content-height>
-    <Grid table-title="课程列表" table-title-help="显示所有的课程信息，用户可以通过上面的过滤条过滤数据，能够多选操作。">
+    <Grid 
+      table-title="课程列表" 
+      table-title-help="显示所有的课程信息，用户可以通过上面的过滤条过滤数据，能够多选操作。"
+    >
       <template #action="{ row }">
         <Button 
           type="link" 
@@ -370,6 +430,10 @@ async function onSubmit(values: Record<string, any>) {
         <ElButton type="danger" class="mt-1">
           授权
         </ElButton>
+        <ElButton class="mr-2" type="primary" @click="expandAll">
+          展开全部
+        </ElButton>
+        <ElButton type="primary" @click="collapseAll"> 折叠全部 </ElButton>
       </template>
     </Grid>
     <!-- 新增对话框 -->
