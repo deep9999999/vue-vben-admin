@@ -339,6 +339,11 @@ async function onSubmit(values: Record<string, any>) {
             pid: modalApi.sharedData.payload.id
           });
 
+          // 将父节点也加入到展开列表中
+          if (!expandedKeys.value.includes(modalApi.sharedData.payload.id)) {
+            expandedKeys.value.push(modalApi.sharedData.payload.id);
+          }
+
           // 重新加载数据
           await gridApi.query();
         }
@@ -406,6 +411,7 @@ const collapseAll = () => {
         </Button>
         <Button 
           type="link" 
+          v-if="!row.root" 
           style="color: #1890ff; margin-right: 8px" 
           @click="onDelLevel(row)"
         >
