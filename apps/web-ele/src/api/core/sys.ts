@@ -44,7 +44,7 @@ return requestClient.post<void>('/org/add', data);
  * 删除 机构列表项目
  */
 export async function deleteOrg(id: string[]) {
-  return requestClient.post<void>('/sys/removeorglist', { id });
+  return requestClient.post<void>('/org/delete', { id });
 }
 
 /**
@@ -94,7 +94,7 @@ export async function getSchoolList(data: {
   page: number;
   pageSize: number;
 }) {
-  return requestClient.post<sysApi.SchoolListResult[]>('/sys/schoollist', data);
+  return requestClient.post<sysApi.SchoolListResult[]>('org/schoollist', data);
 }
 
 /**
@@ -110,14 +110,14 @@ export async function addSchool(data: {
   orgId: string;
   area: string;
 }) {
-  return requestClient.post<void>('/sys/addschool', data);
+  return requestClient.post<void>('/org/addSchool', data);
 }
 
 /**
  * 删除 机构下的学校
  */
 export async function deleteSchool(id: string[]) {
-  return requestClient.post<void>('/sys/removeschool', { id });
+  return requestClient.post<void>('/org/deleteSchool', { id });
 }
 
 /**
@@ -174,7 +174,7 @@ export async function getTeacherList(data: {
   page: number;
   pageSize: number;
 }) {
-  return requestClient.post<sysApi.TeacherListResult[]>('/sys/teacherlist', data);
+  return requestClient.post<sysApi.TeacherListResult[]>('/org/teacherlist', data);
 }
 
 /**
@@ -191,14 +191,14 @@ export async function addTeacher(data: {
   expireDate: string;
   password: string;
 }) {
-  return requestClient.post<void>('/sys/addteacher', data);
+  return requestClient.post<void>('/org/addTeacher', data);
 }
 
 /**
  * 删除教师
  */
 export async function deleteTeacher(id: string[]) {
-  return requestClient.post<void>('/sys/removeteacher', { id });
+  return requestClient.post<void>('/org/deleteTeacher', { id });
 }
 
 /**
