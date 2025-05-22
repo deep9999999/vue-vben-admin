@@ -192,16 +192,17 @@ onMounted(() => {
   fetchCourseData()
 })
 
-
+let resroot = "http://118.31.173.178:6001/"
+// https://ow365.cn/?i=35717&furl=http://118.31.173.178:6001/api/download/2025/05/23/1%E5%89%AF%E6%9C%AC%E6%8B%BC%E8%AF%BB%E5%90%AF%E8%92%99PPT%E7%AC%AC%E4%B8%80%E8%AF%BE(1).pptx
 // 打开资源方法
 const openResource = (item:any) => {
 let url = ''
 if (item.type === 'DOC') {
   // 文档类型，打开文档预览链接
-  url = `https://b63c-35-240-132-46.ngrok-free.app${item.fileUrl}`
+  url = `${resroot}${item.fileUrl}`
 } else if (item.type === 'PPT') {
   // PPT类型，打开PPT预览链接
-  url = `https://ow365.cn/?ssl=1&i=35593&furl=https://b63c-35-240-132-46.ngrok-free.app${item.fileUrl}`
+  url = `https://ow365.cn/?i=35717&furl=${resroot}${item.fileUrl}`
 }
 
 if (url) {

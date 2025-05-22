@@ -371,6 +371,32 @@ export async function removeFile(data: {
 }
 
 
+/**
+ * 课程授权
+ * 
+ * {
+  "authObjType": "",
+  "courseList": [
+    {
+      "courseId": 0,
+      "releaseDate": "",
+      "type": 0
+    }
+  ],
+  "id": 0
+}
+ */
+export async function courseAuth(data: any) {
+  return requestClient.post<void>('/courseAuth/auth', data);
+}
+
+/**
+ * 获取已有权限列表
+ */
+export async function getAuthList(data: any) {
+  return requestClient.post<void>('/courseAuth/authList', data);
+}
+
 
 
 

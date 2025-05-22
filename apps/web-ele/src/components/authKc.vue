@@ -4,211 +4,216 @@ import { ElMessage } from 'element-plus';
 import { useVbenModal } from '@vben/common-ui';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
-import { getOrgList, getSchoolList, getTeacherList } from '#/api/core/sys';
-
-
-interface RowType {
-  // 机构ID
-  id: string;
-  // 机构名称
-  name: string;
-}
+import { getCourseList } from '#/api/core/sys';
+import type { VbenFormProps } from '#/adapter/form';
 
 // 定义 props
 const props = defineProps({
   visible: {
     type: Boolean,
     default: false
+  },
+  selectedKeys: {
+    type: Array,
+    default: () => []
   }
 });
 
-const selectedOrg = ref('');
-const selectedSchool = ref('');
-const selectedTeacher = ref('');
+interface RowType {
+  // 课程Id
+  id: string;
+  // 机构名称
+  name: string;
+  // 联系方式
+  secname: string;
+  // 课程状态
+  state: string;
+  // 到期时间
+  releaseDate: string;
+}
 
-// 机构表格配置
-const orgGridOptions: VxeTableGridOptions<RowType> = {
-  columns: [
-    { field: 'id', title: '机构ID', width: 100 },
-    { field: 'name', title: '机构名称', width: 200 },
+// 用于存储展开状态的响应式变量
+const expandedKeys = ref<string[]>([]);
+
+const deletedKeys:any = ref<string[]>([]);
+
+const formOptions: VbenFormProps = {
+  // 默认展开
+  collapsed: false,
+  fieldMappingTime: [['date', ['start', 'end']]],
+  schema: [
+    {
+      component: 'Input',
+      defaultValue: '',
+      fieldName: 'name',
+      label: '课程名',
+    },
+    {
+      component: 'Input',
+      defaultValue: '',
+      fieldName: 'secname',
+      label: '课程章节',
+    }
   ],
-  // data: [
-  //   { id: '1', name: '机构1' },
-  //   { id: '2', name: '机构2' },
-  // ],
-  height: 'auto',
+  // 控制表单是否显示折叠按钮
+  showCollapseButton: true,
+  // 是否在字段值改变时提交表单
+  submitOnChange: false,
+  // 按下回车时是否提交表单
+  submitOnEnter: false,
+};
+
+
+const gridOptions: VxeTableGridOptions<RowType> = {
+  checkboxConfig: {
+    highlight: true,
+    labelField: 'index',
+  },
+  //data: [],
+  columns: [
+    { align: 'left', title: '', type: 'checkbox', width: 50 },
+    { field: 'id', title: '序号', width: 200 },
+    { field: 'name', align: 'left', title: '课程名', width: 400,  treeNode: true },
+    { field: 'secname', align: 'left', title: '课程章节', width: 300 },
+    
+  ],
   rowConfig: {
-    keyField: 'id',
     isHover: true,
-    isCurrent: true,  // 开启当前行
+    keyField: 'id',
   },
-  highlightCurrentRow: true, // 高亮当前行
-  pagerConfig: {
-    enabled: true,
-  },
+
+  exportConfig: {},
+  height: 'auto',
+  keepSource: true,
+  pagerConfig: {},
   proxyConfig: {
     ajax: {
       query: async ({ page }, formValues) => {
+        
         // ElMessage.success(`Query params: ${JSON.stringify(formValues)}`);
-        let resp:any =  await getOrgList({
+        let resp:any = await getCourseList({
           page: page.currentPage,
           pageSize: page.pageSize,
           formValues
         });
 
+        // 在数据加载完成后恢复展开状态
+        setTimeout(() => {
+          
+          expandedKeys.value.forEach(key => {
+            const row = gridApi.grid.getRowById(key);
+            if (row) {
+              gridApi.grid.setTreeExpand(row, true);
+            }
+          });
+
+          // 恢复选中状态
+          deletedKeys.value.forEach(key => {
+            const row = gridApi.grid.getRowById(key);
+            if (row) {
+              gridApi.grid.setCheckboxRow(row, true);
+            }
+          });
+
+
+        }, 0);
+
         return resp;
       },
     },
   },
+  toolbarConfig: {
+    custom: true,
+    export: true,
+    refresh: true,
+    resizable: true,
+    search: true,
+    zoom: true,
+  },
+  treeConfig: {
+      parentField: 'pid',
+      rowField: 'id',
+      transform: false,
+  }
 };
 
-// 学校表格配置
-const schoolGridOptions: VxeTableGridOptions<RowType> = {
-  columns: [
-    { field: 'id', title: '学校ID', width: 100 },
-    { field: 'name', title: '学校名称', width: 200 },
-  ],
-  data: [],
-  height: 'auto',
-  rowConfig: {
-    keyField: 'id',
-    isHover: true,
-    isCurrent: true,  // 开启当前行
-  },
-  highlightCurrentRow: true, // 高亮当前行
-  pagerConfig: {
-    enabled: false,
-  },
-  proxyConfig: {
-    autoLoad: false,
-    ajax: {
-      query: async ({ page }) => {
-        let resp:any =  await getSchoolList({
-          orgId: selectedOrg.value,
-          page: page.currentPage,
-          pageSize: page.pageSize,
-        });
-        return resp;
-      },
-    },
-  },
-};
 
-// 教师表格配置
-const teacherGridOptions: VxeTableGridOptions<RowType> = {
-  columns: [
-    { field: 'id', title: '教师ID', width: 100 },
-    { field: 'name', title: '教师名称', width: 200 },
-  ],
-  data: [],
-  height: 'auto',
-  rowConfig: {
-    keyField: 'id',
-    isHover: true,
-    isCurrent: true,  // 开启当前行
-  },
-  highlightCurrentRow: true, // 高亮当前行
-  pagerConfig: {
-    enabled: false,
-  },
-  proxyConfig: {
-    autoLoad: false,
-    ajax: {
-      query: async ({ page }) => {
-        let resp:any =  await getTeacherList({
-          orgId: selectedOrg.value,
-          schoolId: selectedSchool.value,
-          page: page.currentPage,
-          pageSize: page.pageSize,
-        });
-        return resp;
-      },
-    },
-  },
-};
-
-let eventParams: any = {};
-
-// 创建表格实例
-const handleOrgSelect = async ({ row } : any ) => {
-  selectedOrg.value = row.id;
-
-  selectedSchool.value = '';
-  selectedTeacher.value = '';
-
-  // 清除其他表格的选中状态
-  schoolGridApi.grid.setCurrentRow(null);
-  teacherGridApi.grid.setCurrentRow(null);
+// 监听展开状态变化
+const handleTreeExpand = (params: any) => {
+  console.log('展开状态变化:', params.expanded);
+  const { row } = params;
   
-  eventParams = {
-    type: 'org',
-    orgId: row.id,
-    orgName: row.name
-  };
-
-  schoolGridApi.query()
-  teacherGridApi.query()
-};
-
-const handleSchoolSelect = async ({ row } : any) => {
-  selectedSchool.value = row.id;
-  
-  selectedTeacher.value = '';
-
-  orgGridApi.grid.setCurrentRow(null);
-  teacherGridApi.grid.setCurrentRow(null);
-  
-  eventParams = {
-    type: 'school',
-    schoolId: row.id,
-    schoolName: row.name
-  };
-
-  teacherGridApi.query();
-};
-
-const handleTeacherSelect = ({ row } : any) => {
-  selectedTeacher.value = row.id;
-
-  // 清除其他表格的选中状态
-  orgGridApi.grid.setCurrentRow(null);
-  schoolGridApi.grid.setCurrentRow(null);
-  
-  eventParams = {
-    type: 'teacher',
-    teacherId: row.id,
-    teacherName: row.name
-  };
+  if (params.expanded) {
+    // 添加到展开状态列表
+    if (!expandedKeys.value.includes(row.id)) {
+      expandedKeys.value.push(row.id);
+      console.log('展开节点列表：', expandedKeys.value);
+    }
+  } else {
+    // 从展开状态列表中移除
+    const index = expandedKeys.value.indexOf(row.id);
+    if (index > -1) {
+      expandedKeys.value.splice(index, 1);
+      console.log('收起后节点列表：', expandedKeys.value);
+    }
+  }
 };
 
 
+const gridEvents = {
+  // 展开/收起事件
+  toggleTreeExpand: handleTreeExpand,
+  // 复选框勾选事件处理
+  checkboxChange: ({ records, row, checked } : any) => {
+    console.log('当前选中行:', row);
+    console.log('是否勾选:', checked);
+    console.log('所有选中记录:', records);
 
-const [OrgGrid, orgGridApi] = useVbenVxeGrid({ 
-  gridEvents: {
-    // 监听行点击事件
-    cellClick:  handleOrgSelect
+    // 更新选中行的id到deletedKeys中
+    if (checked) {
+      // 如果是选中,将id添加到deletedKeys
+      if (!deletedKeys.value.includes(row.id)) {
+        deletedKeys.value.push(row.id);
+      }
+    } else {
+      // 如果是取消选中,从deletedKeys中移除
+      const index = deletedKeys.value.indexOf(row.id);
+      if (index > -1) {
+        deletedKeys.value.splice(index, 1);
+      }
+    }
+    console.log('删除列表：', deletedKeys.value);
   },
-  gridOptions: orgGridOptions,
+
+  // 全选事件处理
+  // checkboxAll: ({ records, checked }: any) => {
+  //   console.log('全选状态:', checked);
+  //   console.log('所有选中记录:', records);
+
+  //   if (checked) {
+  //     // 全选时,将所有记录的id添加到deletedKeys
+  //     records.forEach((record: any) => {
+  //       if (!deletedKeys.value.includes(record.id)) {
+  //         deletedKeys.value.push(record.id);
+  //       }
+  //     });
+  //   } else {
+  //     records.forEach((record: any) => {
+  //       const index = deletedKeys.value.indexOf(record.id);
+  //       if (index > -1) {
+  //         deletedKeys.value.splice(index, 1);
+  //       }
+  //     });
+  //   }
+  //   console.log('删除列表:', deletedKeys.value);
+  // },
+}
+
+const [Grid, gridApi] = useVbenVxeGrid({
+  formOptions,
+  gridOptions,
+  gridEvents
 });
-const [SchoolGrid, schoolGridApi] = useVbenVxeGrid({ 
-  gridEvents: {
-    // 监听行点击事件
-    cellClick:  handleSchoolSelect
-  },
-  gridOptions: schoolGridOptions 
-});
-const [TeacherGrid, teacherGridApi] = useVbenVxeGrid({ 
-  gridEvents: {
-    // 监听行点击事件
-    cellClick:  handleTeacherSelect
-  },
-  gridOptions: teacherGridOptions 
-});
-
-
-
-
-
 
 // 创建对话框实例
 const [Modal, modalApi] = useVbenModal({
@@ -220,12 +225,12 @@ const [Modal, modalApi] = useVbenModal({
     handleAfterClose();
   },
   onConfirm() {
-    if (!selectedTeacher.value && !selectedSchool.value && !selectedOrg.value) {
+    if (!deletedKeys.value) {
       ElMessage.warning('请至少选择一项');
       return false;
     }
 
-    emit('select',eventParams);
+    emit('select',deletedKeys.value);
     handleAfterClose();
     return true;
   },
@@ -242,6 +247,13 @@ watch(() => props.visible, (newVal) => {
   immediate: true
 });
 
+// 监听外部selectedKeys变化
+watch(() => props.selectedKeys, (newVal) => {
+  deletedKeys.value = [...newVal];
+}, {
+  immediate: true
+});
+
 // 对外暴露事件
 const emit = defineEmits(['select', 'update:visible']);
 
@@ -252,11 +264,6 @@ const handleClose = () => {
 
 // 重置选择状态
 const resetSelection = () => {
-  selectedOrg.value = '';
-  selectedSchool.value = '';
-  selectedTeacher.value = '';
-  schoolGridApi.setGridOptions({ data: [] });
-  teacherGridApi.setGridOptions({ data: [] });
 };
 
 // 监听弹窗关闭
@@ -268,29 +275,6 @@ const handleAfterClose = () => {
 
 <template>
   <Modal title="课程授权">
-    <div class="flex flex-col gap-4">
-      <div class="flex gap-4">
-        <div class="w-1/3">
-          <h3 class="text-lg font-medium mb-2">选择机构</h3>
-          <OrgGrid />
-        </div>
-        
-        <div class="w-1/3">
-          <h3 class="text-lg font-medium mb-2">选择学校</h3>
-          <SchoolGrid 
-            @cell-click="handleSchoolSelect"
-            @current-change="handleSchoolSelect"
-          />
-        </div>
-        
-        <div class="w-1/3">
-          <h3 class="text-lg font-medium mb-2">选择教师</h3>
-          <TeacherGrid 
-            @cell-click="handleTeacherSelect"
-            @current-change="handleTeacherSelect"
-          />
-        </div>
-      </div>
-    </div>
+    <Grid ref="grid" class="flex-1" />
   </Modal>
 </template>

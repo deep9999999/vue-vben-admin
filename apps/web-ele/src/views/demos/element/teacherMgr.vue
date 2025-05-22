@@ -9,6 +9,13 @@
       >
         详情
       </Button>
+      <Button 
+          type="link" 
+          style="color: #1890ff; margin-right: 8px" 
+          @click="onAuth(row)"
+        >
+          课程授权
+        </Button>
       </template>
       <template #state="{ row }">
         <ElTag :type="getStateType(row.state)">{{ row.state }}</ElTag>
@@ -26,19 +33,25 @@
       <Modal>
         <Form />
       </Modal>
+      <!-- 授权对话框-->
+     <authkc
+          v-model:visible="dialogVisible"
+          @select="handleSelect"
+        />
   </div>
 </template>
 
 <script setup lang="ts">
 import type { VxeGridProps } from '#/adapter/vxe-table';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { getTeacherList, addTeacher, deleteTeacher, queryTeacher, editTeacher } from '#/api/core/sys';
+import { getTeacherList, addTeacher, deleteTeacher, queryTeacher, editTeacher, courseAuth } from '#/api/core/sys';
 import { ElButton, ElMessage, ElMessageBox, ElTag } from 'element-plus';
 import { useVbenModal } from '@vben/common-ui';
 import { useVbenForm, z } from '#/adapter/form';
 import { useRouter, useRoute } from 'vue-router';
 import { useTabs } from '@vben/hooks';
 import { ref, watch } from 'vue';
+import authkc from "#/components/authKc.vue"
 
 const { setTabTitle } = useTabs();
 // 获取路由实例
@@ -423,6 +436,30 @@ function openFormModal() {
     modalApi.setState({
       title: '新增教师信息'
     });
+}
+
+// 授权
+const dialogVisible = ref(false);
+let currow:any = null;
+const handleSelect = async (data : any) => {
+  console.log('当前授权的课程', data)
+  // 处理选中数据
+  let auth = await courseAuth({
+    authObjType:"老师",
+    courseList: data.map((item:any) => ({
+      courseId: item,
+      releaseDate: '',
+      type: 1
+    })),
+    id: currow.id
+  });
+
+  ElMessage.success(`授权成功`);
+};
+
+const onAuth = async (row:any) => {
+  currow = row;
+  dialogVisible.value = true;
 }
 </script>
 

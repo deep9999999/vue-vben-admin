@@ -27,6 +27,11 @@ interface RowType {
   releaseDate: string;
 }
 
+// 用于存储展开状态的响应式变量
+const expandedKeys = ref<string[]>([]);
+
+const deletedKeys = ref<string[]>([]);
+
 const formOptions: VbenFormProps = {
   // 默认展开
   collapsed: false,
@@ -43,7 +48,24 @@ const formOptions: VbenFormProps = {
       defaultValue: '',
       fieldName: 'secname',
       label: '课程章节',
-    }
+    },
+    {
+      component: 'RadioGroup',
+      componentProps: {
+        options: [
+          {
+            label: '授权',
+            value: '授权',
+          },
+          {
+            label: '未授权',
+            value: '未授权',
+          },
+        ],
+      },
+      fieldName: 'radioGroup',
+      label: '授权状态',
+    },
   ],
   // 控制表单是否显示折叠按钮
   showCollapseButton: true,
@@ -52,11 +74,6 @@ const formOptions: VbenFormProps = {
   // 按下回车时是否提交表单
   submitOnEnter: false,
 };
-
-// 用于存储展开状态的响应式变量
-const expandedKeys = ref<string[]>([]);
-
-const deletedKeys = ref<string[]>([]);
 
 
 const gridOptions: VxeTableGridOptions<RowType> = {
@@ -207,7 +224,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
 
 
 const onDel = async () => {
-  const rows = deletedKeys.value
+  const rows:any = deletedKeys.value
 
   if (rows.length === 0) {
     ElMessage.warning('请选择要删除的课程');
@@ -220,7 +237,7 @@ const onDel = async () => {
   }).then(async () => {
     try {
       // 调用删除接口
-      await deleteCourse(rows.map(row => row.id));
+      await deleteCourse(rows.map((row:any) => row.id));
       ElMessage.success('删除成功');
       // 刷新表格数据
       gridApi.reload();
@@ -236,9 +253,7 @@ const onAdd = () => {
   openFormModal();
 }
 
-const onAuthKC = async (row:any) => {
-  dialogVisible.value = true;
-}
+
 
 const onDatil = async (row:any) => {
   let rowdata:any = await queryCourse({id:row.id});
@@ -442,12 +457,16 @@ const collapseAll = () => {
 // 授权
 const dialogVisible = ref(false);
 
-const handleSelect = (data) => {
+const handleSelect = (data:any) => {
   console.log('当前选中的课程', deletedKeys.value)
   console.log('选中的授权目标：', data);
   
   // 处理选中数据
 };
+
+const onAuthKC = async (row:any) => {
+  dialogVisible.value = true;
+}
 
 </script>
 
@@ -497,9 +516,9 @@ const handleSelect = (data) => {
         <ElButton type="danger" class="mt-1" @click="onDel">
           删除
         </ElButton>
-        <ElButton type="danger" class="mt-1" @click="onAuthKC">
+        <!-- <ElButton type="danger" class="mt-1" @click="onAuthKC">
           授权
-        </ElButton>
+        </ElButton> -->
         <ElButton class="mr-2" type="primary" @click="expandAll">
           展开全部
         </ElButton>

@@ -11,10 +11,17 @@
       </Button>
       <Button 
           type="link" 
-          style="color: #1890ff"
+          style="color: #1890ff; margin-right: 8px"
           @click="handleTeacherManage(row)"
         >
           教师管理
+        </Button>
+        <Button 
+          type="link" 
+          style="color: #1890ff; margin-right: 8px" 
+          @click="onAuth(row)"
+        >
+          课程授权
         </Button>
       </template>
       <template #state="{ row }">
@@ -33,6 +40,11 @@
       <Modal>
         <Form />
       </Modal>
+      <!-- 授权对话框-->
+     <authkc
+          v-model:visible="dialogVisible"
+          @select="handleSelect"
+        />
   </div>
 </template>
 
@@ -43,11 +55,13 @@ import { useTabs } from '@vben/hooks';
 import { ElTabs, ElTabPane } from 'element-plus';
 import type { VxeGridProps } from '#/adapter/vxe-table';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { getSchoolList, addSchool, deleteSchool, querySchool, editSchool } from '#/api/core/sys';
+import { getSchoolList, addSchool, deleteSchool, querySchool, editSchool, courseAuth } from '#/api/core/sys';
 import { ElButton, ElMessage, ElMessageBox, ElTag } from 'element-plus';
 import { useVbenModal } from '@vben/common-ui';
 import { useVbenForm } from '#/adapter/form';
 import areadata from './area-full.json'
+
+import authkc from "#/components/authKc.vue"
 
 import { useRouter } from 'vue-router';
 
@@ -113,7 +127,7 @@ const gridOptions: VxeGridProps<SchoolRowType> = {
   },
   columns: [
     { align: 'left', title: '', type: 'checkbox', width: 50 },
-    { field: 'id', title: '学校ID',width: 100 },
+    { field: 'id', title: '学校ID',width: 50 },
     { editRender: { name: 'input' }, field: 'name', title: '学校名称', width: 150 },
     { editRender: { name: 'input' }, field: 'address', title: '学校地址',width: 250 },
     { editRender: { name: 'input' }, field: 'principal', title: '校长' },
@@ -121,7 +135,7 @@ const gridOptions: VxeGridProps<SchoolRowType> = {
     { editRender: { name: 'input' }, field: 'type', title: '学校类型' },
     { field: 'state', title: '状态',width: 100, slots: { default: 'state' }, },
     { field: 'releaseDate', formatter: 'formatDate', title: '到期时间' },
-    { slots: { default: 'action' }, title: '操作', width: 160 },
+    { slots: { default: 'action' }, title: '操作', width: 200 },
   ],
   height: '700px',
   keepSource: true,
@@ -389,7 +403,29 @@ function openFormModal() {
 
 
 
+// 授权
+const dialogVisible = ref(false);
+let currow:any = null;
+const handleSelect = async (data : any) => {
+  console.log('当前授权的课程', data)
+  // 处理选中数据
+  let auth = await courseAuth({
+    authObjType:"学校",
+    courseList: data.map((item:any) => ({
+      courseId: item,
+      releaseDate: '',
+      type: 1
+    })),
+    id: currow.id
+  });
 
+  ElMessage.success(`授权成功`);
+};
+
+const onAuth = async (row:any) => {
+  currow = row
+  dialogVisible.value = true;
+}
 
 </script>
 

@@ -3,13 +3,16 @@ import type { VbenFormProps } from '#/adapter/form';
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 import { Page } from '@vben/common-ui';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { getOrgList, addOrg, deleteOrg, editOrg, queryOrg } from '#/api/core/sys';
+import { getOrgList, addOrg, deleteOrg, editOrg, queryOrg, courseAuth, getAuthList } from '#/api/core/sys';
 import areadata from './area-full.json'
 import { ElButton, ElMessage, ElMessageBox, ElTag } from 'element-plus';
 
 import { useVbenModal } from '@vben/common-ui';
 import { useVbenForm } from '#/adapter/form';
 import { useRouter } from 'vue-router';
+
+import authkc from "#/components/authKc.vue"
+import { ref } from 'vue';
 
 const router = useRouter();
 
@@ -415,6 +418,37 @@ const getStateType = (state: string) => {
       return 'primary' // 灰色
   }
 }
+
+// 授权
+const dialogVisible = ref(false);
+let currow:any = null
+
+const handleSelect = async (data : any) => {
+  console.log('当前授权的课程', data)
+  // 处理选中数据
+  let auth = await courseAuth({
+    authObjType:"机构",
+    courseList: data.map((item:any) => ({
+      courseId: item,
+      releaseDate: '',
+      type: 1
+    })),
+    id: currow.id
+  });
+
+  ElMessage.success(`授权成功`);
+};
+
+let authlist:any = ref([]);
+const onAuth = async (row:any) => {
+  currow = row
+  let authData = await getAuthList({
+    authObjType:"机构",
+    id: currow.id
+  })
+  authlist.value = authData;
+  dialogVisible.value = true;
+}
 </script>
 
 
@@ -441,10 +475,17 @@ const getStateType = (state: string) => {
         </Button>
         <Button 
           type="link" 
-          style="color: #1890ff"
+          style="color: #1890ff; margin-right: 8px"
           @click="handleTeacherManage(row)"
         >
           教师管理
+        </Button>
+        <Button 
+          type="link" 
+          style="color: #1890ff; margin-right: 8px" 
+          @click="onAuth(row)"
+        >
+          课程授权
         </Button>
       </template>
       <template #state="{ row }">
@@ -463,5 +504,11 @@ const getStateType = (state: string) => {
     <Modal>
       <Form />
     </Modal>
+     <!-- 授权对话框-->
+     <authkc
+          v-model:visible="dialogVisible"
+          @select="handleSelect"
+          :selected-keys="authlist"
+        />
   </Page>
 </template>
