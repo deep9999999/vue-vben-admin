@@ -237,7 +237,7 @@ const onDel = async () => {
   }).then(async () => {
     try {
       // 调用删除接口
-      await deleteCourse(rows.map((row:any) => row.id));
+      await deleteCourse(rows.map((row:any) => row));
       ElMessage.success('删除成功');
       // 刷新表格数据
       gridApi.reload();
