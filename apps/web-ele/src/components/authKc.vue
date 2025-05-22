@@ -3,6 +3,16 @@ import { ref, watch } from 'vue';
 import { ElMessage } from 'element-plus';
 import { useVbenModal } from '@vben/common-ui';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
+import type { VxeTableGridOptions } from '#/adapter/vxe-table';
+import { getOrgList, getSchoolList, getTeacherList } from '#/api/core/sys';
+
+
+interface RowType {
+  // 机构ID
+  id: string;
+  // 机构名称
+  name: string;
+}
 
 // 定义 props
 const props = defineProps({
@@ -12,39 +22,20 @@ const props = defineProps({
   }
 });
 
-// 模拟API调用
-const getSchoolList = async (orgId: string) => {
-  // 这里可以替换为真实的API调用
-  return [
-    { id: '1', name: `${orgId}下的学校1` },
-    { id: '2', name: `${orgId}下的学校2` },
-    { id: '3', name: `${orgId}下的学校3` },
-  ];
-};
-
-const getTeacherList = async (schoolId: string) => {
-  // 这里可以替换为真实的API调用
-  return [
-    { id: '1', name: `${schoolId}下的教师1` },
-    { id: '2', name: `${schoolId}下的教师2` },
-    { id: '3', name: `${schoolId}下的教师3` },
-  ];
-};
-
 const selectedOrg = ref('');
 const selectedSchool = ref('');
 const selectedTeacher = ref('');
 
 // 机构表格配置
-const orgGridOptions = {
+const orgGridOptions: VxeTableGridOptions<RowType> = {
   columns: [
     { field: 'id', title: '机构ID', width: 100 },
     { field: 'name', title: '机构名称', width: 200 },
   ],
-  data: [
-    { id: '1', name: '机构1' },
-    { id: '2', name: '机构2' },
-  ],
+  // data: [
+  //   { id: '1', name: '机构1' },
+  //   { id: '2', name: '机构2' },
+  // ],
   height: 'auto',
   rowConfig: {
     keyField: 'id',
@@ -55,17 +46,30 @@ const orgGridOptions = {
   pagerConfig: {
     enabled: true,
   },
+  proxyConfig: {
+    ajax: {
+      query: async ({ page }, formValues) => {
+        // ElMessage.success(`Query params: ${JSON.stringify(formValues)}`);
+        let resp:any =  await getOrgList({
+          page: page.currentPage,
+          pageSize: page.pageSize,
+          formValues
+        });
+
+        return resp;
+      },
+    },
+  },
 };
 
 // 学校表格配置
-const schoolGridOptions = {
+const schoolGridOptions: VxeTableGridOptions<RowType> = {
   columns: [
     { field: 'id', title: '学校ID', width: 100 },
     { field: 'name', title: '学校名称', width: 200 },
   ],
   data: [],
   height: 'auto',
-  width: '30%',
   rowConfig: {
     keyField: 'id',
     isHover: true,
@@ -75,17 +79,29 @@ const schoolGridOptions = {
   pagerConfig: {
     enabled: false,
   },
+  proxyConfig: {
+    autoLoad: false,
+    ajax: {
+      query: async ({ page }) => {
+        let resp:any =  await getSchoolList({
+          orgId: selectedOrg.value,
+          page: page.currentPage,
+          pageSize: page.pageSize,
+        });
+        return resp;
+      },
+    },
+  },
 };
 
 // 教师表格配置
-const teacherGridOptions = {
+const teacherGridOptions: VxeTableGridOptions<RowType> = {
   columns: [
     { field: 'id', title: '教师ID', width: 100 },
     { field: 'name', title: '教师名称', width: 200 },
   ],
   data: [],
   height: 'auto',
-  width: '30%',
   rowConfig: {
     keyField: 'id',
     isHover: true,
@@ -95,55 +111,74 @@ const teacherGridOptions = {
   pagerConfig: {
     enabled: false,
   },
+  proxyConfig: {
+    autoLoad: false,
+    ajax: {
+      query: async ({ page }) => {
+        let resp:any =  await getTeacherList({
+          orgId: selectedOrg.value,
+          schoolId: selectedSchool.value,
+          page: page.currentPage,
+          pageSize: page.pageSize,
+        });
+        return resp;
+      },
+    },
+  },
 };
+
+let eventParams: any = {};
 
 // 创建表格实例
 const handleOrgSelect = async ({ row } : any ) => {
   selectedOrg.value = row.id;
+
+  selectedSchool.value = '';
+  selectedTeacher.value = '';
+
   // 清除其他表格的选中状态
   schoolGridApi.grid.setCurrentRow(null);
   teacherGridApi.grid.setCurrentRow(null);
   
-  try {
-    const schools = await getSchoolList(row.id);
-    schoolGridApi.setGridOptions({ data: schools });
-    teacherGridApi.setGridOptions({ data: [] }); // 清空教师表格
-  } catch (error) {
-    ElMessage.error('获取学校列表失败');
-  }
+  eventParams = {
+    type: 'org',
+    orgId: row.id,
+    orgName: row.name
+  };
+
+  schoolGridApi.query()
+  teacherGridApi.query()
 };
 
 const handleSchoolSelect = async ({ row } : any) => {
   selectedSchool.value = row.id;
   
+  selectedTeacher.value = '';
+
   orgGridApi.grid.setCurrentRow(null);
   teacherGridApi.grid.setCurrentRow(null);
   
-  emit('select', {
+  eventParams = {
     type: 'school',
     schoolId: row.id,
     schoolName: row.name
-  });
+  };
 
-  try {
-    const teachers = await getTeacherList(row.id);
-    teacherGridApi.setGridOptions({ data: teachers });
-  } catch (error) {
-    ElMessage.error('获取教师列表失败');
-  }
+  teacherGridApi.query();
 };
 
 const handleTeacherSelect = ({ row } : any) => {
   selectedTeacher.value = row.id;
+
   // 清除其他表格的选中状态
   orgGridApi.grid.setCurrentRow(null);
   schoolGridApi.grid.setCurrentRow(null);
   
-  emit('select', {
+  eventParams = {
     type: 'teacher',
     teacherId: row.id,
     teacherName: row.name
-  });
+  };
 };
 
 
@@ -189,6 +224,9 @@ const [Modal, modalApi] = useVbenModal({
       ElMessage.warning('请至少选择一项');
       return false;
     }
+
+    emit('select',eventParams);
+    handleAfterClose();
     return true;
   },
 });

@@ -91,7 +91,7 @@ const gridOptions: VxeTableGridOptions<RowType> = {
     ajax: {
       query: async ({ page }, formValues) => {
         
-        ElMessage.success(`Query params: ${JSON.stringify(formValues)}`);
+        // ElMessage.success(`Query params: ${JSON.stringify(formValues)}`);
         let resp:any = await getCourseList({
           page: page.currentPage,
           pageSize: page.pageSize,
@@ -409,7 +409,7 @@ async function onSubmit(values: Record<string, any>) {
     //setTimeout(() => {
       modalApi.close();
       
-      ElMessage.success(`提交成功：${JSON.stringify(values)}`);
+      ElMessage.success(`提交成功`);
     //}, 1000);
   }catch (error) {
     ElMessage.error('提交失败');
@@ -443,7 +443,9 @@ const collapseAll = () => {
 const dialogVisible = ref(false);
 
 const handleSelect = (data) => {
-  console.log('选中的数据：', data);
+  console.log('当前选中的课程', deletedKeys.value)
+  console.log('选中的授权目标：', data);
+  
   // 处理选中数据
 };
 

@@ -155,7 +155,7 @@ const gridOptions: VxeTableGridOptions<RowType> = {
   proxyConfig: {
     ajax: {
       query: async ({ page }, formValues) => {
-        ElMessage.success(`Query params: ${JSON.stringify(formValues)}`);
+        // ElMessage.success(`Query params: ${JSON.stringify(formValues)}`);
         let resp:any =  await getOrgList({
           page: page.currentPage,
           pageSize: page.pageSize,
