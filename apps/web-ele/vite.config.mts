@@ -13,9 +13,7 @@ export default defineConfig(async () => {
       ],
       server: {
         allowedHosts: [
-          'b461-59-174-127-81.ngrok-free.app',
-          'localhost',
-          '127.0.0.1'
+          '*'
         ],
         proxy: {
           '/api/sys/fetchResources': {
@@ -31,7 +29,7 @@ export default defineConfig(async () => {
             
             //target: 'http://localhost:5320/api',
             // 后端代理目标地址
-            target: 'https://b63c-35-240-132-46.ngrok-free.app/api',
+            target: 'https://45a8-2409-8a4c-802d-e4c0-d55a-25af-53b8-93c3.ngrok-free.app/api',
             ws: true,
           },
         },

@@ -70,6 +70,7 @@
         <Modal>
           <Form />
         </Modal>
+       
       </el-card>
     </div>
     </div>
@@ -87,6 +88,10 @@ import { useVbenForm } from '#/adapter/form';
 import { useVbenModal } from '@vben/common-ui';
 import { requestClient } from '#/api/request';
 import { useAccessStore } from '@vben/stores';
+
+
+
+
 
 interface UploadFileParams {
   file: File;
@@ -187,24 +192,6 @@ onMounted(() => {
   fetchCourseData()
 })
 
-
-async function upload_file({
-  file,
-  onError,
-  onProgress,
-  onSuccess,
-}: UploadFileParams) {
-  try {
-    onProgress?.({ percent: 0 });
-
-    const data = await requestClient.upload('/upload', { file });
-
-    onProgress?.({ percent: 100 });
-    onSuccess?.(data, file);
-  } catch (error) {
-    onError?.(error instanceof Error ? error : new Error(String(error)));
-  }
-}
 
 // 打开资源方法
 const openResource = (item:any) => {
@@ -338,7 +325,7 @@ const [Form, formApi] = useVbenForm({
         headers: {
           Authorization: "Bearer " + useAccessStore().accessToken,
         },
-        accept: '.pptx.ppt,.doc,.docx,.mp3,.mp4',
+        accept: '.pptx,.ppt,.doc,.docx,.mp3,.mp4',
         action: "/api/file/upload",
         limit: 1,
         multiple: false,
@@ -421,16 +408,19 @@ const onKcDatil = async (row : any) => {
     // 克隆数据以避免直接修改原始数据
     const clonedData = JSON.parse(JSON.stringify(rowdata));
     
-    clonedData.files = [{
-    name: clonedData.fileUrl,
-    url: clonedData.fileUrl,
-    id: clonedData.id,
-    response: {
-      data: {
+    if (clonedData.fileUrl && clonedData.fileUrl.length > 0) {
+      clonedData.files = [{
+        name: clonedData.fileUrl,
         url: clonedData.fileUrl,
-      }
+        id: clonedData.id,
+        response: {
+          data: {
+            url: clonedData.fileUrl,
+          }
+        }
+      }];  
     }
-  }];
+    
 
     modalApi.setData({
       // 表单值

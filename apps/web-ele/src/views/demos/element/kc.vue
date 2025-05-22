@@ -8,8 +8,9 @@ import { ElButton, ElMessage, ElMessageBox } from 'element-plus';
 import { useVbenModal } from '@vben/common-ui';
 import { useVbenForm } from '#/adapter/form';
 import { useRouter } from 'vue-router';
-import { nextTick } from 'vue';
 import { ref } from 'vue';
+import authkc from "#/components/authKc.vue"
+
 const router = useRouter();
 
 
@@ -54,6 +55,9 @@ const formOptions: VbenFormProps = {
 
 // 用于存储展开状态的响应式变量
 const expandedKeys = ref<string[]>([]);
+
+const deletedKeys = ref<string[]>([]);
+
 
 const gridOptions: VxeTableGridOptions<RowType> = {
   checkboxConfig: {
@@ -145,9 +149,54 @@ const handleTreeExpand = (params: any) => {
   }
 };
 
+
 const gridEvents = {
   // 展开/收起事件
-  toggleTreeExpand: handleTreeExpand
+  toggleTreeExpand: handleTreeExpand,
+  // 复选框勾选事件处理
+  checkboxChange: ({ records, row, checked } : any) => {
+    console.log('当前选中行:', row);
+    console.log('是否勾选:', checked);
+    console.log('所有选中记录:', records);
+
+    // 更新选中行的id到deletedKeys中
+    if (checked) {
+      // 如果是选中,将id添加到deletedKeys
+      if (!deletedKeys.value.includes(row.id)) {
+        deletedKeys.value.push(row.id);
+      }
+    } else {
+      // 如果是取消选中,从deletedKeys中移除
+      const index = deletedKeys.value.indexOf(row.id);
+      if (index > -1) {
+        deletedKeys.value.splice(index, 1);
+      }
+    }
+    console.log('删除列表：', deletedKeys.value);
+  },
+
+  // 全选事件处理
+  // checkboxAll: ({ records, checked }: any) => {
+  //   console.log('全选状态:', checked);
+  //   console.log('所有选中记录:', records);
+
+  //   if (checked) {
+  //     // 全选时,将所有记录的id添加到deletedKeys
+  //     records.forEach((record: any) => {
+  //       if (!deletedKeys.value.includes(record.id)) {
+  //         deletedKeys.value.push(record.id);
+  //       }
+  //     });
+  //   } else {
+  //     records.forEach((record: any) => {
+  //       const index = deletedKeys.value.indexOf(record.id);
+  //       if (index > -1) {
+  //         deletedKeys.value.splice(index, 1);
+  //       }
+  //     });
+  //   }
+  //   console.log('删除列表:', deletedKeys.value);
+  // },
 }
 
 const [Grid, gridApi] = useVbenVxeGrid({
@@ -158,7 +207,8 @@ const [Grid, gridApi] = useVbenVxeGrid({
 
 
 const onDel = async () => {
-  const rows = gridApi.grid.getCheckboxRecords();
+  const rows = deletedKeys.value
+
   if (rows.length === 0) {
     ElMessage.warning('请选择要删除的课程');
     return;
@@ -184,6 +234,10 @@ const onDel = async () => {
 
 const onAdd = () => {
   openFormModal();
+}
+
+const onAuthKC = async (row:any) => {
+  dialogVisible.value = true;
 }
 
 const onDatil = async (row:any) => {
@@ -268,7 +322,7 @@ function openFormModal() {
     });
 }
 
-// 编辑对话框
+// 课程编辑对话框
 const [Form, formApi] = useVbenForm({
   handleSubmit: onSubmit,
   schema: [
@@ -385,6 +439,14 @@ const collapseAll = () => {
   console.log('折叠全部后的状态：', expandedKeys.value);
 };
 
+// 授权
+const dialogVisible = ref(false);
+
+const handleSelect = (data) => {
+  console.log('选中的数据：', data);
+  // 处理选中数据
+};
+
 </script>
 
 
@@ -433,7 +495,7 @@ const collapseAll = () => {
         <ElButton type="danger" class="mt-1" @click="onDel">
           删除
         </ElButton>
-        <ElButton type="danger" class="mt-1">
+        <ElButton type="danger" class="mt-1" @click="onAuthKC">
           授权
         </ElButton>
         <ElButton class="mr-2" type="primary" @click="expandAll">
@@ -446,5 +508,10 @@ const collapseAll = () => {
     <Modal>
       <Form />
     </Modal>
+     <!-- 授权对话框-->
+     <authkc
+          v-model:visible="dialogVisible"
+          @select="handleSelect"
+        />
   </Page>
 </template>
