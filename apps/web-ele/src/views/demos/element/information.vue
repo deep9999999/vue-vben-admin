@@ -1,96 +1,132 @@
 <template>
-  <Page auto-content-height class="flex flex-row">
-      <el-loading v-model:full-screen="loading" />
-      <!-- 左侧课程目录 -->
-      <div class="course-container">
-        <el-card class="course-sidebar" shadow="hover">
-          <template #header>
-            <div class="flex flex-col">
-              <span class="text-base font-bold">{{ mainTitle }}</span>
-              <span class="text-sm text-gray-500 mt-2">{{ subTitle }}</span>
-            </div>
-          </template>
-          <div class="h-[600px] overflow-y-auto">
-          <el-menu
-            :default-active="String(activeIndex)"
-            class="course-menu"
-          >
-            <el-menu-item 
-              v-for="(item, index) in courseList" 
-              :key="index"
-              :index="String(index)"
-              @click="selectCourse(index)"
-            >
-              <template #title>
-                <span class="text-blue-500 mr-2">{{ String(index + 1).padStart(2, '0') }}</span>
-                <span>{{ item.name }}</span>
-              </template>
-            </el-menu-item>
-          </el-menu>
+  <Page auto-content-height>
+
+  <ElRow :gutter="5">
+    <ElCol :span="4">
+      <el-card class="course-sidebar" shadow="hover">
+        <template #header>
+          <div class="flex flex-col">
+            <span class="text-base font-bold">{{ mainTitle }}</span>
+            <span class="text-sm text-gray-500 mt-2">{{ subTitle }}</span>
           </div>
-        </el-card>
-      </div>
+        </template>
+        <div class="h-[600px] overflow-y-auto">
+        <el-menu
+          :default-active="String(activeIndex)"
+          class="course-menu"
+        >
+          <el-menu-item 
+            v-for="(item, index) in courseList" 
+            :key="index"
+            :index="String(index)"
+            @click="selectCourse(index)"
+          >
+            <template #title>
+              <span class="text-blue-500 mr-2">{{ String(index + 1).padStart(2, '0') }}</span>
+              <span>{{ item.name }}</span>
+            </template>
+          </el-menu-item>
+        </el-menu>
+        </div>
+      </el-card>
+    </ElCol>
+    <ElCol :span="20">
+      <el-tabs v-model="activeTab" @tab-click="selectTab">
+              <el-tab-pane 
+                v-for="(tab, index) in tabs" 
+                :key="index"
+                :label="tab.name"
+                :name="index"
+              />
+      </el-tabs>
+      <Grid>
+        <template #action="{ row }">
+          <el-button 
+            type="primary" 
+            size="small"
+            :disabled="row.fileUrl == null || row.fileUrl == ''"
+            @click="openResource(row)"
+          >
+            {{ row.type === 'DOC' ? '备课' : '上课' }}
+          </el-button>
+          <el-button 
+            v-if="!isTeacher"
+            type="primary" 
+            size="small"
+            @click="onKcDatil(row)"
+          >
+            详情
+          </el-button>
+        </template>
+        <template #toolbar-actions>
+        <ElButton v-if="!isTeacher" type="primary" @click="onAdd" >
+          新增
+        </ElButton>
+        <ElButton v-if="!isTeacher" type="danger" class="mt-1" @click="onDel">
+          删除
+        </ElButton>
+        </template>
+      </Grid>
+    </ElCol>
+  </ElRow>
+
+    <!-- <el-loading v-model:full-screen="loading" /> -->
+    <!-- 左侧课程目录 -->
+    
+      
+     
 
     <!-- 右侧内容区域 -->
-    <div class="course-content" style="flex: 1;">
-      <el-card class="h-full flex flex-col">
-        
-        <div class="tabs-container" style="max-width: 1000px; min-width: 400px; overflow-x: auto; overflow-y: hidden;">
-          <el-tabs v-model="activeTab" @tab-click="selectTab">
-            <el-tab-pane 
-              v-for="(tab, index) in tabs" 
-              :key="index"
-              :label="tab.name"
-              :name="index"
-            />
-          </el-tabs>
-        </div>
+    <!-- <Page auto-content-width class="w-[100%]">
+      <el-tabs v-model="activeTab" @tab-click="selectTab">
+              <el-tab-pane 
+                v-for="(tab, index) in tabs" 
+                :key="index"
+                :label="tab.name"
+                :name="index"
+              />
+      </el-tabs>
+      <Grid>
+        <template #action="{ row }">
+          <el-button 
+            type="primary" 
+            size="small"
+            :disabled="row.fileUrl == null || row.fileUrl == ''"
+            @click="openResource(row)"
+          >
+            {{ row.type === 'DOC' ? '备课' : '上课' }}
+          </el-button>
+          <el-button 
+            v-if="!isTeacher"
+            type="primary" 
+            size="small"
+            @click="onKcDatil(row)"
+          >
+            详情
+          </el-button>
+        </template>
+        <template #toolbar-actions>
+        <ElButton v-if="!isTeacher" type="primary" @click="onAdd" >
+          新增
+        </ElButton>
+        <ElButton v-if="!isTeacher" type="danger" class="mt-1" @click="onDel">
+          删除
+        </ElButton>
+        </template>
+      </Grid>
+    </Page> -->
 
-        <div class="flex-1 overflow-hidden">
-          <Grid class="w-full">
-              <template #action="{ row }">
-                <el-button 
-                  type="primary" 
-                  size="small"
-                  :disabled="row.fileUrl == null || row.fileUrl == ''"
-                  @click="openResource(row)"
-                >
-                  {{ row.type === 'DOC' ? '备课' : '上课' }}
-                </el-button>
-                <el-button 
-                  v-if="!isTeacher"
-                  type="primary" 
-                  size="small"
-                  @click="onKcDatil(row)"
-                >
-                  详情
-                </el-button>
-              </template>
-              <template #toolbar-actions>
-              <ElButton v-if="!isTeacher" type="primary" @click="onAdd" >
-                新增
-              </ElButton>
-              <ElButton v-if="!isTeacher" type="danger" class="mt-1" @click="onDel">
-                删除
-              </ElButton>
-              </template>
-          </Grid>
-        </div>
-
-        <!-- 新增对话框 -->
-        <Modal class="w-[50%]">
-          <Form />
-        </Modal>
-       
-      </el-card>
-    </div>
+    <!-- 新增对话框 -->
+    <Modal class="w-[50%]">
+      <Form />
+    </Modal>
     
   
   </Page>
 </template>
 
 <script setup lang="ts">
-import { ElButton, ElMessage, ElMessageBox, ElCard, ElMenu, ElMenuItem, ElTabs, ElTabPane, valueEquals } from 'element-plus';
+import { ElButton, ElRow, ElCol, ElContainer, ElMessage, ElMessageBox, ElCard, ElMenu, ElMenuItem, ElTabs, ElTabPane, valueEquals } from 'element-plus';
 import { ref, onMounted, computed, h, nextTick } from 'vue'
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
@@ -519,9 +555,6 @@ const onDel = async () => {
 }
 
 .course-sidebar {
-  width: 240px;
-  min-width: 240px; /* 添加最小宽度 */
-  max-width: 240px; /* 添加最大宽度 */
   margin: 20px;
   
   flex-shrink: 0;  /* 防止侧边栏被压缩 */
