@@ -43,11 +43,22 @@ const expandedKeys = ref<string[]>([]);
 
 const deletedKeys = ref<string[]>([]);
 
-const formOptions: VbenFormProps = {
-  // 默认展开
-  collapsed: false,
-  fieldMappingTime: [['date', ['start', 'end']]],
-  schema: [
+let schema = [
+{
+      component: 'Input',
+      defaultValue: '',
+      fieldName: 'name',
+      label: '课程名',
+    },
+    {
+      component: 'Input',
+      defaultValue: '',
+      fieldName: 'secname',
+      label: '课程章节',
+    },
+]
+if (isTeacher.value) {
+  schema = [
     {
       component: 'Input',
       defaultValue: '',
@@ -82,7 +93,15 @@ const formOptions: VbenFormProps = {
       fieldName: 'authstate',
       label: '状态',
     },
-  ],
+  ]
+}
+
+
+const formOptions: VbenFormProps = {
+  // 默认展开
+  collapsed: false,
+  fieldMappingTime: [['date', ['start', 'end']]],
+  schema: schema,
   // 控制表单是否显示折叠按钮
   showCollapseButton: true,
   // 是否在字段值改变时提交表单
@@ -534,7 +553,7 @@ const onAuthKC = async (row:any) => {
         </Button>
         <Button 
           type="link" 
-          v-else
+          v-else-if="row.root"
           style="color: #1890ff; margin-right: 8px" 
           @click="onInformationMgr(row)"
         >
