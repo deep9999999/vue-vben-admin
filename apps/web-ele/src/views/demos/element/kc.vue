@@ -73,7 +73,7 @@ if (isTeacher.value) {
     },
     {
       component: 'RadioGroup',
-      defaultValue: '全部',
+      defaultValue: '授权',
       componentProps: {
         options: [
           {
