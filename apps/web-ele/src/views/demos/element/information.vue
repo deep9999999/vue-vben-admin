@@ -59,10 +59,10 @@
           </el-button>
         </template>
         <template #toolbar-actions>
-        <ElButton v-if="!isTeacher" type="primary" @click="onAdd" >
+        <ElButton v-if="!isTeacher && tabs.length > 0" type="primary" @click="onAdd" >
           新增
         </ElButton>
-        <ElButton v-if="!isTeacher" type="danger" class="mt-1" @click="onDel">
+        <ElButton v-if="!isTeacher && tabs.length > 0" type="danger" class="mt-1" @click="onDel">
           删除
         </ElButton>
         </template>
@@ -170,7 +170,7 @@ const selectCourse = (index:any) => {
   activeIndex.value = index
 
   // 根据选中的课程索引获取对应的标签列表
-  if (tabsList.value && tabsList.value[index]) {
+  if (tabsList.value && tabsList.value.length > 0 && tabsList.value[index]) {
     // 获取当前选中课程的标签数据
     const currentTabs = tabsList.value[index].children || []
     // 更新tabs数据
@@ -186,7 +186,7 @@ const selectCourse = (index:any) => {
     gridApi.query()
   }
 }
-const tabsList = ref()
+const tabsList = ref([])
 // 课程目录数据
 const courseList = ref()
 
