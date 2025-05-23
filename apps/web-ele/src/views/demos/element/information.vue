@@ -270,7 +270,7 @@ if (item.type === 'DOC') {
   url = `${resroot}${item.fileUrl}`
 } else if (item.type === 'PPT') {
   // PPT类型，打开PPT预览链接
-  url = `https://ow365.cn/?i=35717&furl=${resroot}${item.fileUrl}`
+  url = `https://ow365.cn/?i=35717&n=3&furl=${resroot}${item.fileUrl}`
 }
 
 if (url) {
