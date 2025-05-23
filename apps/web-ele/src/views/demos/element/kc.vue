@@ -96,6 +96,7 @@ const gridOptions: VxeTableGridOptions<RowType> = {
   checkboxConfig: {
     highlight: true,
     labelField: 'index',
+    showHeader: false,
   },
   //data: [],
   columns: [
@@ -183,53 +184,58 @@ const handleTreeExpand = (params: any) => {
 };
 
 
+const saveSelection = (row:any, checked:any) => {
+  if (checked) {
+      // 如果是选中,将id添加到deletedKeys
+      if (!deletedKeys.value.includes(row.id)) {
+        deletedKeys.value.push(row.id);
+      }
+  } else {
+    // 如果是取消选中,从deletedKeys中移除
+    const index = deletedKeys.value.indexOf(row.id);
+    if (index > -1) {
+      deletedKeys.value.splice(index, 1);
+    }
+  }
+
+  if (row.children.length > 0) {
+    row.children.forEach((child: any) => {
+      saveSelection(child, checked);
+    });
+  }
+}
+
 const gridEvents = {
   // 展开/收起事件
   toggleTreeExpand: handleTreeExpand,
   // 复选框勾选事件处理
   checkboxChange: ({ records, row, checked } : any) => {
-    console.log('当前选中行:', row);
-    console.log('是否勾选:', checked);
-    console.log('所有选中记录:', records);
-
-    // 更新选中行的id到deletedKeys中
-    if (checked) {
-      // 如果是选中,将id添加到deletedKeys
-      if (!deletedKeys.value.includes(row.id)) {
-        deletedKeys.value.push(row.id);
-      }
-    } else {
-      // 如果是取消选中,从deletedKeys中移除
-      const index = deletedKeys.value.indexOf(row.id);
-      if (index > -1) {
-        deletedKeys.value.splice(index, 1);
-      }
-    }
-    console.log('删除列表：', deletedKeys.value);
+    saveSelection(row, checked);
+    console.log('选中节点列表：', deletedKeys.value);
   },
 
   // 全选事件处理
-  checkboxAll: ({ records, checked }: any) => {
-    console.log('全选状态:', checked);
-    console.log('所有选中记录:', records);
+  // checkboxAll: ({ records, checked }: any) => {
+  //   console.log('全选状态:', checked);
+  //   console.log('所有选中记录:', records);
 
-    if (checked) {
-      // 全选时,将所有记录的id添加到deletedKeys
-      records.forEach((record: any) => {
-        if (!deletedKeys.value.includes(record.id)) {
-          deletedKeys.value.push(record.id);
-        }
-      });
-    } else {
-      records.forEach((record: any) => {
-        const index = deletedKeys.value.indexOf(record.id);
-        if (index > -1) {
-          deletedKeys.value.splice(index, 1);
-        }
-      });
-    }
-    console.log('删除列表:', deletedKeys.value);
-  },
+  //   if (checked) {
+  //     // 全选时,将所有记录的id添加到deletedKeys
+  //     records.forEach((record: any) => {
+  //       if (!deletedKeys.value.includes(record.id)) {
+  //         deletedKeys.value.push(record.id);
+  //       }
+  //     });
+  //   } else {
+  //     records.forEach((record: any) => {
+  //       const index = deletedKeys.value.indexOf(record.id);
+  //       if (index > -1) {
+  //         deletedKeys.value.splice(index, 1);
+  //       }
+  //     });
+  //   }
+  //   console.log('删除列表:', deletedKeys.value);
+  // },
 }
 
 const [Grid, gridApi] = useVbenVxeGrid({

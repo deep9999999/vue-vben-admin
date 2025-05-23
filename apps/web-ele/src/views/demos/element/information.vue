@@ -52,7 +52,7 @@
                 <el-button 
                   type="primary" 
                   size="small"
-                  :disabled="row.fileUrl == null"
+                  :disabled="row.fileUrl == null || row.fileUrl == ''"
                   @click="openResource(row)"
                 >
                   {{ row.type === 'DOC' ? '备课' : '上课' }}
