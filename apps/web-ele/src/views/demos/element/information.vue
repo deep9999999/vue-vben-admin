@@ -52,11 +52,13 @@
                 <el-button 
                   type="primary" 
                   size="small"
+                  :disabled="row.fileUrl == null"
                   @click="openResource(row)"
                 >
                   {{ row.type === 'DOC' ? '备课' : '上课' }}
                 </el-button>
                 <el-button 
+                  v-if="!isTeacher"
                   type="primary" 
                   size="small"
                   @click="onKcDatil(row)"
@@ -409,9 +411,12 @@ async function onSubmit(values: Record<string, any>) {
       const { values } = modalApi.getData<Record<string, any>>();
       if (formvalues) {
         if (values && values.id != null) {
+
           await editFile({
             id:values.id,
-            ...formvalues
+           "name": formvalues.name,
+           "type": formvalues.type,
+           fileUrl: formvalues.files[0].response.data.url
           })
         }
         else {
