@@ -209,27 +209,27 @@ const gridEvents = {
   },
 
   // 全选事件处理
-  // checkboxAll: ({ records, checked }: any) => {
-  //   console.log('全选状态:', checked);
-  //   console.log('所有选中记录:', records);
+  checkboxAll: ({ records, checked }: any) => {
+    console.log('全选状态:', checked);
+    console.log('所有选中记录:', records);
 
-  //   if (checked) {
-  //     // 全选时,将所有记录的id添加到deletedKeys
-  //     records.forEach((record: any) => {
-  //       if (!deletedKeys.value.includes(record.id)) {
-  //         deletedKeys.value.push(record.id);
-  //       }
-  //     });
-  //   } else {
-  //     records.forEach((record: any) => {
-  //       const index = deletedKeys.value.indexOf(record.id);
-  //       if (index > -1) {
-  //         deletedKeys.value.splice(index, 1);
-  //       }
-  //     });
-  //   }
-  //   console.log('删除列表:', deletedKeys.value);
-  // },
+    if (checked) {
+      // 全选时,将所有记录的id添加到deletedKeys
+      records.forEach((record: any) => {
+        if (!deletedKeys.value.includes(record.id)) {
+          deletedKeys.value.push(record.id);
+        }
+      });
+    } else {
+      records.forEach((record: any) => {
+        const index = deletedKeys.value.indexOf(record.id);
+        if (index > -1) {
+          deletedKeys.value.splice(index, 1);
+        }
+      });
+    }
+    console.log('删除列表:', deletedKeys.value);
+  },
 }
 
 const [Grid, gridApi] = useVbenVxeGrid({

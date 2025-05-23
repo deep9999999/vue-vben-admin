@@ -47,7 +47,7 @@
         </div>
 
         <div class="flex-1 overflow-hidden">
-          <Grid>
+          <Grid class="w-full">
               <template #action="{ row }">
                 <el-button 
                   type="primary" 
@@ -76,7 +76,7 @@
         </div>
 
         <!-- 新增对话框 -->
-        <Modal>
+        <Modal class="w-[50%]">
           <Form />
         </Modal>
        
