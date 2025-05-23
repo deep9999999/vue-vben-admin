@@ -82,7 +82,7 @@ const routes: RouteRecordRaw[] = [
         meta: {
           // hideInMenu: true,
           keepAlive: true,
-          title: "资料管理",
+          title: "课程管理",
         },
       },
     ]
