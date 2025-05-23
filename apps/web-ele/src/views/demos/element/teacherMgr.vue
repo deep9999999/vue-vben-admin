@@ -37,6 +37,7 @@
      <authkc
           v-model:visible="dialogVisible"
           @select="handleSelect"
+          :selected-keys="authlist"
         />
   </div>
 </template>
@@ -44,7 +45,7 @@
 <script setup lang="ts">
 import type { VxeGridProps } from '#/adapter/vxe-table';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { getTeacherList, addTeacher, deleteTeacher, queryTeacher, editTeacher, courseAuth } from '#/api/core/sys';
+import { getTeacherList, addTeacher, deleteTeacher, queryTeacher, editTeacher, courseAuth, getAuthList } from '#/api/core/sys';
 import { ElButton, ElMessage, ElMessageBox, ElTag } from 'element-plus';
 import { useVbenModal } from '@vben/common-ui';
 import { useVbenForm, z } from '#/adapter/form';
@@ -457,8 +458,14 @@ const handleSelect = async (data : any) => {
   ElMessage.success(`授权成功`);
 };
 
+let authlist:any = ref([]);
 const onAuth = async (row:any) => {
   currow = row;
+  let authData = await getAuthList({
+    authObjType:"老师",
+    id: currow.id
+  })
+  authlist.value = authData;
   dialogVisible.value = true;
 }
 </script>

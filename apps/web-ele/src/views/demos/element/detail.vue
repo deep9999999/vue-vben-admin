@@ -44,6 +44,7 @@
      <authkc
           v-model:visible="dialogVisible"
           @select="handleSelect"
+          :selected-keys="authlist"
         />
   </div>
 </template>
@@ -55,7 +56,7 @@ import { useTabs } from '@vben/hooks';
 import { ElTabs, ElTabPane } from 'element-plus';
 import type { VxeGridProps } from '#/adapter/vxe-table';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { getSchoolList, addSchool, deleteSchool, querySchool, editSchool, courseAuth } from '#/api/core/sys';
+import { getSchoolList, addSchool, deleteSchool, querySchool, editSchool, courseAuth, getAuthList } from '#/api/core/sys';
 import { ElButton, ElMessage, ElMessageBox, ElTag } from 'element-plus';
 import { useVbenModal } from '@vben/common-ui';
 import { useVbenForm } from '#/adapter/form';
@@ -422,8 +423,14 @@ const handleSelect = async (data : any) => {
   ElMessage.success(`授权成功`);
 };
 
+let authlist:any = ref([]);
 const onAuth = async (row:any) => {
   currow = row
+  let authData = await getAuthList({
+    authObjType:"学校",
+    id: currow.id
+  })
+  authlist.value = authData;
   dialogVisible.value = true;
 }
 
