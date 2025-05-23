@@ -1,71 +1,80 @@
 <template>
-  <Page auto-content-height>
-    <div class="course-container">
+  <Page auto-content-height class="flex flex-row">
       <el-loading v-model:full-screen="loading" />
       <!-- 左侧课程目录 -->
-      <el-card class="course-sidebar" shadow="hover">
-        <template #header>
-          <div class="flex flex-col">
-            <span class="text-base font-bold">{{ mainTitle }}</span>
-            <span class="text-sm text-gray-500 mt-2">{{ subTitle }}</span>
-          </div>
-        </template>
-        <el-menu
-          :default-active="String(activeIndex)"
-          class="course-menu"
-        >
-          <el-menu-item 
-            v-for="(item, index) in courseList" 
-            :key="index"
-            :index="String(index)"
-            @click="selectCourse(index)"
+      <div class="course-container">
+        <el-card class="course-sidebar" shadow="hover">
+          <template #header>
+            <div class="flex flex-col">
+              <span class="text-base font-bold">{{ mainTitle }}</span>
+              <span class="text-sm text-gray-500 mt-2">{{ subTitle }}</span>
+            </div>
+          </template>
+          <div class="h-[600px] overflow-y-auto">
+          <el-menu
+            :default-active="String(activeIndex)"
+            class="course-menu"
           >
-            <template #title>
-              <span class="text-blue-500 mr-2">{{ String(index + 1).padStart(2, '0') }}</span>
-              <span>{{ item.name }}</span>
-            </template>
-          </el-menu-item>
-        </el-menu>
-      </el-card>
+            <el-menu-item 
+              v-for="(item, index) in courseList" 
+              :key="index"
+              :index="String(index)"
+              @click="selectCourse(index)"
+            >
+              <template #title>
+                <span class="text-blue-500 mr-2">{{ String(index + 1).padStart(2, '0') }}</span>
+                <span>{{ item.name }}</span>
+              </template>
+            </el-menu-item>
+          </el-menu>
+          </div>
+        </el-card>
+      </div>
 
     <!-- 右侧内容区域 -->
-    <div class="course-content">
-      <el-card class="h-full">
-        <el-tabs v-model="activeTab" class="course-tabs" @tab-click="selectTab">
-          <el-tab-pane 
-            v-for="(tab, index) in tabs" 
-            :key="index"
-            :label="tab.name"
-            :name="index"
-          />
-        </el-tabs>
+    <div class="course-content" style="flex: 1;">
+      <el-card class="h-full flex flex-col">
+        
+        <div class="tabs-container" style="max-width: 1000px; min-width: 400px; overflow-x: auto; overflow-y: hidden;">
+          <el-tabs v-model="activeTab" @tab-click="selectTab">
+            <el-tab-pane 
+              v-for="(tab, index) in tabs" 
+              :key="index"
+              :label="tab.name"
+              :name="index"
+            />
+          </el-tabs>
+        </div>
 
-        <Grid>
-            <template #action="{ row }">
-              <el-button 
-                type="primary" 
-                size="small"
-                @click="openResource(row)"
-              >
-                {{ row.type === 'DOC' ? '备课' : '上课' }}
-              </el-button>
-              <el-button 
-                type="primary" 
-                size="small"
-                @click="onKcDatil(row)"
-              >
-                详情
-              </el-button>
-            </template>
-            <template #toolbar-actions>
-            <ElButton type="primary" @click="onAdd" >
-              新增
-            </ElButton>
-            <ElButton type="danger" class="mt-1" @click="onDel">
-              删除
-            </ElButton>
-            </template>
-        </Grid>
+        <div class="flex-1 overflow-hidden">
+          <Grid>
+              <template #action="{ row }">
+                <el-button 
+                  type="primary" 
+                  size="small"
+                  @click="openResource(row)"
+                >
+                  {{ row.type === 'DOC' ? '备课' : '上课' }}
+                </el-button>
+                <el-button 
+                  type="primary" 
+                  size="small"
+                  @click="onKcDatil(row)"
+                >
+                  详情
+                </el-button>
+              </template>
+              <template #toolbar-actions>
+              <ElButton type="primary" @click="onAdd" >
+                新增
+              </ElButton>
+              <ElButton type="danger" class="mt-1" @click="onDel">
+                删除
+              </ElButton>
+              </template>
+          </Grid>
+        </div>
+
         <!-- 新增对话框 -->
         <Modal>
           <Form />
@@ -73,13 +82,14 @@
        
       </el-card>
     </div>
-    </div>
+    
+  
   </Page>
 </template>
 
 <script setup lang="ts">
 import { ElButton, ElMessage, ElMessageBox, ElCard, ElMenu, ElMenuItem, ElTabs, ElTabPane, valueEquals } from 'element-plus';
-import { ref, onMounted, computed, h } from 'vue'
+import { ref, onMounted, computed, h, nextTick } from 'vue'
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { fetchResources, getCourseDetail, addFile, editFile, getFileDetail, deleteFile, removeFile } from '#/api/core/sys';
@@ -150,9 +160,23 @@ if (tabs.value.length > 0) {
 const selectTab = (v: any) => {
   activeTab.value = v.index
   selectTabValue = tabs.value[v.index].value
+  
+  // 添加滚动逻辑
+  nextTick(() => {
+    // 获取当前选中的标签元素
+    const activeTabElement = document.querySelector('.el-tabs__item.is-active')
+    if (activeTabElement) {
+      // 使用 scrollIntoView 进行平滑滚动
+      activeTabElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'center'
+      })
+    }
+  })
+
   // 使用gridApi重新加载对应标签页的数据
-  // 设置数据并保持表格状态
-  gridApi.query();
+  gridApi.query()
 }
 
 // 定义加载状态
@@ -481,7 +505,6 @@ const onDel = async () => {
 <style scoped lang="scss">
 .course-container {
   display: flex;
-  height: 100vh;
 }
 
 .course-sidebar {
@@ -489,6 +512,7 @@ const onDel = async () => {
   min-width: 240px; /* 添加最小宽度 */
   max-width: 240px; /* 添加最大宽度 */
   margin: 20px;
+  
   flex-shrink: 0;  /* 防止侧边栏被压缩 */
   
   :deep(.el-card__header) {

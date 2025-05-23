@@ -8,8 +8,10 @@ import { ElButton, ElMessage, ElMessageBox } from 'element-plus';
 import { useVbenModal } from '@vben/common-ui';
 import { useVbenForm } from '#/adapter/form';
 import { useRouter } from 'vue-router';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import authkc from "#/components/authKc.vue"
+import { useUserStore } from '@vben/stores';
+const userStore = useUserStore();
 
 const router = useRouter();
 
@@ -26,6 +28,13 @@ interface RowType {
   // 到期时间
   releaseDate: string;
 }
+
+// 判断是否为老师账户
+const isTeacher = computed(() => {
+  const roles = userStore.userInfo?.roles || [];
+  return roles.some(role => role === 'teacher');
+});
+
 
 // 用于存储展开状态的响应式变量
 const expandedKeys = ref<string[]>([]);
@@ -51,8 +60,13 @@ const formOptions: VbenFormProps = {
     },
     {
       component: 'RadioGroup',
+      defaultValue: '全部',
       componentProps: {
         options: [
+          {
+            label: '全部',
+            value: '全部',
+          },
           {
             label: '授权',
             value: '授权',
@@ -63,8 +77,8 @@ const formOptions: VbenFormProps = {
           },
         ],
       },
-      fieldName: 'radioGroup',
-      label: '授权状态',
+      fieldName: 'authstate',
+      label: '状态',
     },
   ],
   // 控制表单是否显示折叠按钮
@@ -478,14 +492,16 @@ const onAuthKC = async (row:any) => {
       table-title-help="显示所有的课程信息，用户可以通过上面的过滤条过滤数据，能够多选操作。"
     >
       <template #action="{ row }">
-        <Button 
+        <Button
+          v-if="!isTeacher"
           type="link" 
           style="color: #1890ff; margin-right: 8px"
            @click="onDatil(row)"
         >
           编辑
         </Button>
-        <Button 
+        <Button
+          v-if="!isTeacher"
           type="link"
           style="color: #1890ff; margin-right: 8px" 
           @click="onddLevel(row)"
@@ -494,7 +510,7 @@ const onAuthKC = async (row:any) => {
         </Button>
         <Button 
           type="link" 
-          v-if="!row.root" 
+          v-if="!row.root && !isTeacher" 
           style="color: #1890ff; margin-right: 8px" 
           @click="onDelLevel(row)"
         >
@@ -502,18 +518,26 @@ const onAuthKC = async (row:any) => {
         </Button>
         <Button 
           type="link" 
-          v-if="row.root"
+          v-if="row.root && !isTeacher"
           style="color: #1890ff; margin-right: 8px" 
           @click="onInformationMgr(row)"
         >
           资料管理
         </Button>
+        <Button 
+          type="link" 
+          v-else
+          style="color: #1890ff; margin-right: 8px" 
+          @click="onInformationMgr(row)"
+        >
+          查看课程
+        </Button>
       </template>
       <template #toolbar-actions>
-        <ElButton type="primary" @click="onAdd">
+        <ElButton v-if="!isTeacher" type="primary" @click="onAdd">
           新增
         </ElButton>
-        <ElButton type="danger" class="mt-1" @click="onDel">
+        <ElButton v-if="!isTeacher" type="danger" class="mt-1" @click="onDel">
           删除
         </ElButton>
         <!-- <ElButton type="danger" class="mt-1" @click="onAuthKC">
