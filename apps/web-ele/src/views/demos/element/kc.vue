@@ -549,7 +549,7 @@ const onAuthKC = async (row:any) => {
           style="color: #1890ff; margin-right: 8px" 
           @click="onInformationMgr(row)"
         >
-          资料管理
+          课程管理
         </Button>
         <Button 
           type="link" 
