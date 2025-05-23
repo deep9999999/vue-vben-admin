@@ -65,10 +65,10 @@
                 </el-button>
               </template>
               <template #toolbar-actions>
-              <ElButton type="primary" @click="onAdd" >
+              <ElButton v-if="!isTeacher" type="primary" @click="onAdd" >
                 新增
               </ElButton>
-              <ElButton type="danger" class="mt-1" @click="onDel">
+              <ElButton v-if="!isTeacher" type="danger" class="mt-1" @click="onDel">
                 删除
               </ElButton>
               </template>
@@ -100,7 +100,13 @@ import { requestClient } from '#/api/request';
 import { useAccessStore } from '@vben/stores';
 
 
-
+import { useUserStore } from '@vben/stores';
+const userStore = useUserStore();
+// 判断是否为老师账户
+const isTeacher = computed(() => {
+  const roles = userStore.userInfo?.roles || [];
+  return roles.some(role => role === 'teacher');
+});
 
 
 interface UploadFileParams {

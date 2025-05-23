@@ -10,8 +10,14 @@ import { useVbenForm } from '#/adapter/form';
 import { useRouter } from 'vue-router';
 import { ref, computed } from 'vue';
 import authkc from "#/components/authKc.vue"
+
 import { useUserStore } from '@vben/stores';
 const userStore = useUserStore();
+// 判断是否为老师账户
+const isTeacher = computed(() => {
+  const roles = userStore.userInfo?.roles || [];
+  return roles.some(role => role === 'teacher');
+});
 
 const router = useRouter();
 
@@ -29,11 +35,7 @@ interface RowType {
   releaseDate: string;
 }
 
-// 判断是否为老师账户
-const isTeacher = computed(() => {
-  const roles = userStore.userInfo?.roles || [];
-  return roles.some(role => role === 'teacher');
-});
+
 
 
 // 用于存储展开状态的响应式变量
