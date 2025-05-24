@@ -3,9 +3,13 @@
   "extends": "@vben/tsconfig/web-app.json",
   "compilerOptions": {
     "baseUrl": ".",
+    "moduleResolution": "bundler",
+    "jsx": "preserve",
     "paths": {
-      "#/*": ["./src/*"]
-    }
+      "#/*": ["./src/*"],
+      "@vben/*": ["../../packages/*"]
+    },
+    "types": ["vite/client", "element-plus/global", "vue"]
   },
   "references": [{ "path": "./tsconfig.node.json" }],
   "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"]

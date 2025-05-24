@@ -80,6 +80,7 @@
     "autoprefixer": "catalog:",
     "cross-env": "catalog:",
     "cspell": "catalog:",
+    "eslint-plugin-unicorn": "^59.0.1",
     "happy-dom": "catalog:",
     "is-ci": "catalog:",
     "lefthook": "catalog:",
@@ -117,5 +118,8 @@
       "canvas",
       "node-gyp"
     ]
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": "^2.3.1"
   }
 }

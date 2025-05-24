@@ -1,80 +1,59 @@
 <template>
   <Page auto-content-height>
 
-  <ElRow :gutter="5">
-    <ElCol :span="4">
-      <el-card class="course-sidebar" shadow="hover">
-        <template #header>
-          <div class="flex flex-col">
-            <span class="text-base font-bold">{{ mainTitle }}</span>
-            <span class="text-sm text-gray-500 mt-2">{{ subTitle }}</span>
+    <ElRow :gutter="5">
+      <ElCol :span="4">
+        <el-card class="course-sidebar" shadow="hover">
+          <template #header>
+            <div class="flex flex-col">
+              <span class="text-base font-bold">{{ mainTitle }}</span>
+              <span class="text-sm text-gray-500 mt-2">{{ subTitle }}</span>
+            </div>
+          </template>
+          <div class="h-[600px] overflow-y-auto">
+            <el-menu :default-active="String(activeIndex)" class="course-menu">
+              <el-menu-item v-for="(item, index) in courseList" :key="index" :index="String(index)"
+                @click="selectCourse(index)">
+                <template #title>
+                  <span class="text-blue-500 mr-2">{{ String(index + 1).padStart(2, '0') }}</span>
+                  <span>{{ item.name }}</span>
+                </template>
+              </el-menu-item>
+            </el-menu>
           </div>
-        </template>
-        <div class="h-[600px] overflow-y-auto">
-        <el-menu
-          :default-active="String(activeIndex)"
-          class="course-menu"
-        >
-          <el-menu-item 
-            v-for="(item, index) in courseList" 
-            :key="index"
-            :index="String(index)"
-            @click="selectCourse(index)"
-          >
-            <template #title>
-              <span class="text-blue-500 mr-2">{{ String(index + 1).padStart(2, '0') }}</span>
-              <span>{{ item.name }}</span>
-            </template>
-          </el-menu-item>
-        </el-menu>
-        </div>
-      </el-card>
-    </ElCol>
-    <ElCol :span="20">
-      <el-tabs v-model="activeTab" @tab-click="selectTab">
-              <el-tab-pane 
-                v-for="(tab, index) in tabs" 
-                :key="index"
-                :label="tab.name"
-                :name="index"
-              />
-      </el-tabs>
-      <Grid>
-        <template #action="{ row }">
-          <el-button 
-            type="primary" 
-            size="small"
-            :disabled="row.fileUrl == null || row.fileUrl == ''"
-            @click="openResource(row)"
-          >
-            {{ row.type === 'DOC' ? '备课' : '上课' }}
-          </el-button>
-          <el-button 
-            v-if="!isTeacher"
-            type="primary" 
-            size="small"
-            @click="onKcDatil(row)"
-          >
-            详情
-          </el-button>
-        </template>
-        <template #toolbar-actions>
-        <ElButton v-if="!isTeacher && tabs.length > 0" type="primary" @click="onAdd" >
-          新增
-        </ElButton>
-        <ElButton v-if="!isTeacher && tabs.length > 0" type="danger" class="mt-1" @click="onDel">
-          删除
-        </ElButton>
-        </template>
-      </Grid>
-    </ElCol>
-  </ElRow>
+        </el-card>
+      </ElCol>
+      <ElCol :span="20">
+        <el-tabs v-model="activeTab" @tab-click="selectTab">
+          <el-tab-pane v-for="(tab, index) in tabs" :key="index" :label="tab.name" :name="index" />
+        </el-tabs>
+        <Grid>
+          <template #action="{ row }">
+            <el-button type="primary" size="small" :disabled="row.fileUrl == null || row.fileUrl == ''"
+              @click="openResource(row)">
+              {{ row.type === 'DOC' ? '备课' : '上课' }}
+            </el-button>
+            <el-button v-if="!isTeacher" type="primary" size="small" @click="onKcDatil(row)">
+              详情
+            </el-button>
+          </template>
+          <template #toolbar-actions>
+            <ElButton v-if="!isTeacher && tabs.length > 0" type="primary" @click="onAdd">
+              新增
+            </ElButton>
+            <ElButton v-if="!isTeacher && tabs.length > 0" type="danger" class="mt-1" @click="onDel">
+              删除
+            </ElButton>
+          </template>
+        </Grid>
+      </ElCol>
+    </ElRow>
 
     <!-- <el-loading v-model:full-screen="loading" /> -->
     <!-- 左侧课程目录 -->
-    
-      
-     
+
+
+
 
     <!-- 右侧内容区域 -->
     <!-- <Page auto-content-width class="w-[100%]">
@@ -120,14 +99,38 @@
     <Modal class="w-[50%]">
       <Form />
     </Modal>
-    
-  
+
+    <!-- 全屏预览弹框 -->
+    <el-dialog v-model="previewVisible" :width="'80%'" :close-on-click-modal="false" :show-close="false"
+      class="preview-dialog" top="0" append-to-body>
+      <div class="preview-container" ref="previewContainer">
+        <div class="preview-toolbar">
+          <el-tooltip :content="isFullscreen ? '退出全屏' : '全屏'" placement="bottom">
+            <el-button circle @click="toggleFullscreen">
+              <el-icon>
+                <FullScreen />
+              </el-icon>
+            </el-button>
+          </el-tooltip>
+          <el-tooltip content="返回" placement="bottom">
+            <el-button circle @click="closePreview">
+              <el-icon>
+                <component :is="BackIcon" />
+              </el-icon>
+            </el-button>
+          </el-tooltip>
+        </div>
+        <iframe v-if="previewUrl" :src="previewUrl" class="preview-iframe" frameborder="0" allowfullscreen></iframe>
+      </div>
+    </el-dialog>
+
   </Page>
 </template>
 
 <script setup lang="ts">
-import { ElButton, ElRow, ElCol, ElContainer, ElMessage, ElMessageBox, ElCard, ElMenu, ElMenuItem, ElTabs, ElTabPane, valueEquals } from 'element-plus';
-import { ref, onMounted, computed, h, nextTick } from 'vue'
+import { ElButton, ElRow, ElCol, ElContainer, ElMessage, ElMessageBox, ElCard, ElMenu, ElMenuItem, ElTabs, ElTabPane, ElDialog, ElTooltip, ElIcon } from 'element-plus';
+import { FullScreen, ArrowLeft } from '@element-plus/icons-vue';
+import { ref, onMounted, computed, h, nextTick, onUnmounted } from 'vue'
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { fetchResources, getCourseDetail, addFile, editFile, getFileDetail, deleteFile, removeFile } from '#/api/core/sys';
@@ -137,6 +140,61 @@ import { useVbenModal } from '@vben/common-ui';
 import { requestClient } from '#/api/request';
 import { useAccessStore } from '@vben/stores';
 
+// 预览相关状态
+const previewVisible = ref(false);
+const previewUrl = ref('');
+const isFullscreen = ref(false);
+const BackIcon = ArrowLeft;
+const previewContainer = ref<HTMLElement | null>(null);
+
+// 监听全屏变化事件
+const handleFullscreenChange = () => {
+  isFullscreen.value = !!document.fullscreenElement;
+};
+
+onMounted(() => {
+  document.addEventListener('fullscreenchange', handleFullscreenChange);
+});
+
+onUnmounted(() => {
+  document.removeEventListener('fullscreenchange', handleFullscreenChange);
+});
+
+// 切换全屏状态
+const toggleFullscreen = async () => {
+  try {
+    if (!isFullscreen.value) {
+      // 进入全屏模式
+      if (previewContainer.value) {
+        await previewContainer.value.requestFullscreen();
+      }
+    } else {
+      // 退出全屏模式
+      if (document.fullscreenElement) {
+        await document.exitFullscreen();
+      }
+    }
+  } catch (err) {
+    console.error('全屏切换失败:', err);
+    ElMessage.error('全屏切换失败，请检查浏览器权限');
+  }
+};
+
+// 关闭预览
+const closePreview = async () => {
+  // 如果处于全屏状态，先退出全屏
+  if (document.fullscreenElement) {
+    try {
+      await document.exitFullscreen();
+    } catch (err) {
+      console.error('退出全屏失败:', err);
+    }
+  }
+
+  previewVisible.value = false;
+  previewUrl.value = '';
+  isFullscreen.value = false;
+};
 
 import { useUserStore } from '@vben/stores';
 const userStore = useUserStore();
@@ -165,8 +223,8 @@ const mainTitle = ref('')
 const subTitle = ref('')
 
 // 当前激活的课程目录索引
-const activeIndex:any = ref(0)
-const selectCourse = (index:any) => {
+const activeIndex: any = ref(0)
+const selectCourse = (index: any) => {
   activeIndex.value = index
 
   // 根据选中的课程索引获取对应的标签列表
@@ -190,12 +248,12 @@ const tabsList = ref([])
 // 课程目录数据
 const courseList = ref()
 
- // 导航标签数据
-const tabs:any = ref([])
+// 导航标签数据
+const tabs: any = ref([])
 
 // 当前激活的标签索引
-const activeTab:any = ref(0)
-let selectTabValue:any = null
+const activeTab: any = ref(0)
+let selectTabValue: any = null
 
 if (tabs.value.length > 0) {
   selectTabValue = tabs.value[0].value;
@@ -204,7 +262,7 @@ if (tabs.value.length > 0) {
 const selectTab = (v: any) => {
   activeTab.value = v.index
   selectTabValue = tabs.value[v.index].value
-  
+
   // 添加滚动逻辑
   nextTick(() => {
     // 获取当前选中的标签元素
@@ -231,7 +289,7 @@ const fetchCourseData = async () => {
   try {
     loading.value = true
     // 调用接口获取课程详情
-    const courseDetail:any = await getCourseDetail({id:courseId})
+    const courseDetail: any = await getCourseDetail({ id: courseId })
     if (courseDetail) {
       // 更新课程标题信息
       mainTitle.value = courseDetail.name
@@ -263,19 +321,33 @@ onMounted(() => {
 let resroot = "http://118.31.173.178:6001"
 // https://ow365.cn/?i=35717&furl=http://118.31.173.178:6001/api/download/2025/05/23/1%E5%89%AF%E6%9C%AC%E6%8B%BC%E8%AF%BB%E5%90%AF%E8%92%99PPT%E7%AC%AC%E4%B8%80%E8%AF%BE(1).pptx
 // 打开资源方法
-const openResource = (item:any) => {
-let url = ''
-if (item.type === 'DOC') {
-  // 文档类型，打开文档预览链接
-  url = `${resroot}${item.fileUrl}`
-} else if (item.type === 'PPT') {
-  // PPT类型，打开PPT预览链接
-  url = `https://ow365.cn/?i=35717&n=3&furl=${resroot}${item.fileUrl}`
-}
+const openResource = async (item: any) => {
+  let url = ''
+  if (item.type === 'DOC') {
+    // 文档类型，打开文档预览链接
+    url = `${resroot}${item.fileUrl}`
+    window.open(url, '_blank')
+  } else if (item.type === 'PPT') {
+    // PPT类型，打开内嵌预览
+    url = `https://ow365.cn/?i=35717&n=3&furl=${resroot}${item.fileUrl}`
+    previewUrl.value = url
+    previewVisible.value = true
 
-if (url) {
-  window.open(url, '_blank')
-}
+    // 等待DOM更新，然后自动请求全屏
+    await nextTick()
+
+    // 等待对话框动画完成后请求全屏
+    setTimeout(async () => {
+      if (previewContainer.value) {
+        try {
+          await previewContainer.value.requestFullscreen()
+        } catch (err) {
+          console.error('自动全屏失败:', err)
+          // 不显示错误提示，避免影响用户体验
+        }
+      }
+    }, 300) // 延迟300ms等待对话框动画
+  }
 }
 
 // 定义表格行数据类型
@@ -296,7 +368,7 @@ const gridOptions: VxeTableGridOptions<RowType> = {
     { field: 'name', title: '资料', width: 200, align: 'left', },
     { field: 'type', title: '类型', width: 50, align: 'left', },
     { field: 'fileUrl', title: 'URL', width: 300, align: 'left', },
-    { 
+    {
       field: 'createTime',
       title: '创建时间',
     },
@@ -317,7 +389,7 @@ const gridOptions: VxeTableGridOptions<RowType> = {
       query: async ({ page }, formValues) => {
         if (!selectTabValue) return [];
 
-        let resp:any =  await fetchResources({
+        let resp: any = await fetchResources({
           page: page.currentPage,
           pageSize: page.pageSize,
           id: selectTabValue
@@ -402,7 +474,7 @@ const [Form, formApi] = useVbenForm({
         listType: 'text',
         name: "file",
         "on-remove": async (uploadFile: any, uploadFiles: any) => {
-          await removeFile({id:uploadFile.id});
+          await removeFile({ id: uploadFile.id });
           gridApi.query();
         }
       },
@@ -443,82 +515,82 @@ async function onSubmit(values: Record<string, any>) {
   ElMessage.success('正在提交中...');
   modalApi.lock();
   try {
-      const formvalues:any = await formApi.getValues<Record<string, any>>();
-      const { values } = modalApi.getData<Record<string, any>>();
-      if (formvalues) {
-        if (values && values.id != null) {
+    const formvalues: any = await formApi.getValues<Record<string, any>>();
+    const { values } = modalApi.getData<Record<string, any>>();
+    if (formvalues) {
+      if (values && values.id != null) {
 
-          await editFile({
-            id:values.id,
-           "name": formvalues.name,
-           "type": formvalues.type,
-           fileUrl: formvalues.files[0].response.data.url
-          })
-        }
-        else {
-          await addFile({
+        await editFile({
+          id: values.id,
+          "name": formvalues.name,
+          "type": formvalues.type,
+          fileUrl: formvalues.files[0].response.data.url
+        })
+      }
+      else {
+        await addFile({
           classId: selectTabValue,
           "fileUrl": formvalues.files[0].response.data.url,
           "name": formvalues.name,
           "type": formvalues.type
-          })
-        }
+        })
       }
+    }
     //setTimeout(() => {
-      modalApi.close();
-      gridApi.reload();
-      ElMessage.success(`提交成功：${JSON.stringify(formvalues)}`);
+    modalApi.close();
+    gridApi.reload();
+    ElMessage.success(`提交成功：${JSON.stringify(formvalues)}`);
     //}, 1000);
-  }catch (error) {
+  } catch (error) {
     ElMessage.error('提交失败');
     modalApi.unlock();
   }
 }
 
-const onKcDatil = async (row : any) => {
-  let rowdata:any = await getFileDetail({id:row.id});
-    // 克隆数据以避免直接修改原始数据
-    const clonedData = JSON.parse(JSON.stringify(rowdata));
-    
-    if (clonedData.fileUrl && clonedData.fileUrl.length > 0) {
-      clonedData.files = [{
-        name: clonedData.fileUrl,
-        url: clonedData.fileUrl,
-        id: clonedData.id,
-        response: {
-          data: {
-            url: clonedData.fileUrl,
-          }
+const onKcDatil = async (row: any) => {
+  let rowdata: any = await getFileDetail({ id: row.id });
+  // 克隆数据以避免直接修改原始数据
+  const clonedData = JSON.parse(JSON.stringify(rowdata));
+
+  if (clonedData.fileUrl && clonedData.fileUrl.length > 0) {
+    clonedData.files = [{
+      name: clonedData.fileUrl,
+      url: clonedData.fileUrl,
+      id: clonedData.id,
+      response: {
+        data: {
+          url: clonedData.fileUrl,
         }
-      }];  
-    }
-    
-
-    modalApi.setData({
-      // 表单值
-      values: clonedData,
-      id: row.id,
-    })
-    
-    modalApi.setState({
-        title:'资料详情'
       }
-    );
+    }];
+  }
 
-    modalApi.open();
+
+  modalApi.setData({
+    // 表单值
+    values: clonedData,
+    id: row.id,
+  })
+
+  modalApi.setState({
+    title: '资料详情'
+  }
+  );
+
+  modalApi.open();
 };
 
 // 添加新增方法
 const onAdd = async () => {
   modalApi.open();
-    // 清空表单数据
-    formApi.resetForm();
-    modalApi.setData({
-      courseId: selectTabValue
-    })
-    modalApi.setState({
-      title: '新增资料'
-    });
+  // 清空表单数据
+  formApi.resetForm();
+  modalApi.setData({
+    courseId: selectTabValue
+  })
+  modalApi.setState({
+    title: '新增资料'
+  });
 }
 
 // 添加删除方法
@@ -528,7 +600,7 @@ const onDel = async () => {
     ElMessage.warning('请选择要删除的资料');
     return;
   }
-  
+
   ElMessageBox.confirm(`确定要删除选中的 ${rows.length} 个资料吗?`, '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
@@ -556,37 +628,38 @@ const onDel = async () => {
 
 .course-sidebar {
   margin: 20px;
-  
-  flex-shrink: 0;  /* 防止侧边栏被压缩 */
-  
+
+  flex-shrink: 0;
+  /* 防止侧边栏被压缩 */
+
   :deep(.el-card__header) {
     padding: 15px;
   }
-  
+
   :deep(.el-menu) {
     border-right: none;
   }
-  
+
   :deep(.el-menu-item) {
     height: 45px;
     line-height: 45px;
     transition: all 0.3s ease;
-    
+
     &:hover {
       background-color: var(--el-menu-hover-bg-color);
       color: var(--el-menu-hover-text-color);
     }
-    
+
     &.is-active {
       background-color: var(--el-color-primary-light-9);
       color: var(--el-color-primary);
       border-right: 2px solid var(--el-color-primary);
       font-weight: bold;
-      
+
       &::after {
         display: none;
       }
-      
+
       .text-blue-500 {
         color: var(--el-color-primary);
       }
@@ -641,7 +714,7 @@ const onDel = async () => {
 
   :deep(.el-table) {
     --el-table-border-color: var(--el-border-color-lighter);
-    
+
     .el-table__header-wrapper {
       th {
         background-color: var(--el-fill-color-light);
@@ -730,7 +803,8 @@ const onDel = async () => {
   border-radius: 2px;
 }
 
-.prev, .next {
+.prev,
+.next {
   cursor: pointer;
   color: #666;
 }
@@ -739,5 +813,58 @@ const onDel = async () => {
   margin-left: 10px;
   color: #666;
 }
-</style>
 
+.preview-dialog {
+  :deep(.el-dialog__body) {
+    padding: 0;
+    height: 100%;
+  }
+}
+
+.preview-container {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  min-height: 80vh;
+
+  &:fullscreen {
+    width: 100vw;
+    height: 100vh;
+    background: #000;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+  }
+}
+
+.preview-toolbar {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  z-index: 2000;
+  display: flex;
+  gap: 10px;
+
+  .el-button {
+    background-color: rgba(0, 0, 0, 0.5);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: white;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.7);
+    }
+  }
+}
+
+.preview-iframe {
+  width: 100%;
+  height: 100%;
+  min-height: 80vh;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #000;
+}
+</style>

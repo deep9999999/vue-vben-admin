@@ -29,7 +29,8 @@
   "dependencies": {
     "eslint-config-turbo": "catalog:",
     "eslint-plugin-command": "catalog:",
-    "eslint-plugin-import-x": "catalog:"
+    "eslint-plugin-import-x": "catalog:",
+    "eslint-plugin-unicorn": "^59.0.1"
   },
   "devDependencies": {
     "@eslint/js": "catalog:",
@@ -45,7 +46,6 @@
     "eslint-plugin-perfectionist": "catalog:",
     "eslint-plugin-prettier": "catalog:",
     "eslint-plugin-regexp": "catalog:",
-    "eslint-plugin-unicorn": "catalog:",
     "eslint-plugin-unused-imports": "catalog:",
     "eslint-plugin-vitest": "catalog:",
     "eslint-plugin-vue": "catalog:",

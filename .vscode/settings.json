@@ -62,7 +62,7 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[vue]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "Vue.volar"
   },
   // extensions
   "extensions.ignoreRecommendations": true,
@@ -237,5 +237,6 @@
     "nolebase",
     "rollup",
     "vitest"
-  ]
+  ],
+  "vue3snippets.enable-compile-vue-file-on-did-save-code": false
 }

@@ -3,6 +3,7 @@ import type { Linter } from 'eslint';
 import js from '@eslint/js';
 import pluginUnusedImports from 'eslint-plugin-unused-imports';
 import globals from 'globals';
+import pluginUnicorn from 'eslint-plugin-unicorn';
 
 export async function javascript(): Promise<Linter.Config[]> {
   return [
@@ -31,6 +32,7 @@ export async function javascript(): Promise<Linter.Config[]> {
       },
       plugins: {
         'unused-imports': pluginUnusedImports,
+        unicorn: pluginUnicorn,
       },
       rules: {
         ...js.configs.recommended.rules,
@@ -206,7 +208,6 @@ export async function javascript(): Promise<Linter.Config[]> {
           },
         ],
         'prefer-exponentiation-operator': 'error',
-
         'prefer-promise-reject-errors': 'error',
         'prefer-regex-literals': ['error', { disallowRedundantWrapping: true }],
         'prefer-rest-params': 'error',

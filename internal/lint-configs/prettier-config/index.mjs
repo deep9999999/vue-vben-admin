@@ -8,6 +8,12 @@ export default {
         singleQuote: false,
       },
     },
+    {
+      files: ['*.vue'],
+      options: {
+        singleAttributePerLine: true,
+      },
+    },
   ],
   plugins: ['prettier-plugin-tailwindcss'],
   printWidth: 80,
@@ -15,4 +21,9 @@ export default {
   semi: true,
   singleQuote: true,
   trailingComma: 'all',
+  bracketSpacing: true,
+  tabWidth: 2,
+  useTabs: false,
+  arrowParens: 'always',
+  htmlWhitespaceSensitivity: 'strict',
 };
