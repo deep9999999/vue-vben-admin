@@ -265,12 +265,13 @@ let resroot = "http://118.31.173.178:6001"
 // 打开资源方法
 const openResource = (item:any) => {
 let url = ''
+const encodedFileUrl = item.fileUrl ? encodeURIComponent(item.fileUrl) : ''
 if (item.type === 'DOC') {
   // 文档类型，打开文档预览链接
-  url = `${resroot}${item.fileUrl}`
+  url = `https://ow365.cn/?i=35717&n=3&furl=${resroot}${encodedFileUrl}`
 } else if (item.type === 'PPT') {
   // PPT类型，打开PPT预览链接
-  url = `https://ow365.cn/?i=35717&n=3&furl=${resroot}${item.fileUrl}`
+  url = `https://ow365.cn/?i=35717&n=3&furl=${resroot}${encodedFileUrl}`
 }
 
 if (url) {
