@@ -1,9 +1,9 @@
 import type { Linter } from 'eslint';
 
 import js from '@eslint/js';
+import pluginUnicorn from 'eslint-plugin-unicorn';
 import pluginUnusedImports from 'eslint-plugin-unused-imports';
 import globals from 'globals';
-import pluginUnicorn from 'eslint-plugin-unicorn';
 
 export async function javascript(): Promise<Linter.Config[]> {
   return [
