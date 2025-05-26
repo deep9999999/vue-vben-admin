@@ -37,58 +37,56 @@ import {
   removeFile,
 } from '#/api/core/sys';
 
-// 预览相关状态
+const { exit } = useFullscreen();
+
+// 预览PPT相关状态
 const previewVisible = ref(false);
 const previewUrl = ref('');
-
 const BackIcon = ArrowLeft;
 const previewContainer = ref<HTMLElement | null>(null);
 
-const { enter, exit, isFullscreen, toggle } = useFullscreen();
 
-// 监听全屏变化事件
-const handleFullscreenChange = () => {
-  isFullscreen.value = !!document.fullscreenElement;
-};
+const { isFullscreen: ispreviewDomFullscreen, toggle: previewtoggleDom } = useFullscreen(previewContainer);
 
-onMounted(() => {
-  document.addEventListener('fullscreenchange', handleFullscreenChange);
-});
 
-onUnmounted(() => {
-  document.removeEventListener('fullscreenchange', handleFullscreenChange);
-});
+// 视频预览相关状态
+const videoVisible = ref(false);
+const videoUrl = ref('https://videos.pexels.com/video-files/19022223/19022223-uhd_2560_1440_60fps.mp4');
+const videoContainer = ref<HTMLElement | null>(null);
 
-// 切换全屏状态
-const toggleFullscreen = async () => {
-  try {
-    if (isFullscreen.value) {
-      exit();
-    } else {
-      // 进入全屏模式
-      enter()
-    }
-  } catch (error) {
-    console.error('全屏切换失败:', error);
-    ElMessage.error('全屏切换失败，请检查浏览器权限');
+const { isFullscreen: isvideoDomFullscreen, toggle: videotoggleDom } = useFullscreen(videoContainer);
+
+// 关闭视频预览
+const onPlayVideo = async () => {
+  videotoggleDom();
+// 获取视频元素
+const videoElement:any = document.querySelector('.video-player');
+if (videoElement) {
+  // 开始播放视频
+  videoElement.play();
+}
+  videoVisible.value = true;
+}
+
+const closeVideo = async () => {
+  if (isvideoDomFullscreen) {
+    videotoggleDom();
   }
+  videoVisible.value = false;
+  videoUrl.value = '';
 };
 
 // 关闭预览
 const closePreview = async () => {
-  // 如果处于全屏状态，先退出全屏
-  if (document.fullscreenElement) {
-    try {
-      await document.exitFullscreen();
-    } catch (error) {
-      console.error('退出全屏失败:', error);
-    }
+  
+  if (ispreviewDomFullscreen) {
+    previewtoggleDom();
   }
-
   previewVisible.value = false;
   previewUrl.value = '';
-  isFullscreen.value = false;
+  
 };
+
 const userStore = useUserStore();
 // 判断是否为老师账户
 const isTeacher = computed(() => {
@@ -229,16 +227,20 @@ const openResource = async (item: any) => {
 
     // 等待对话框动画完成后请求全屏
     setTimeout(async () => {
-      if (previewContainer.value) {
-        try {
-          await previewContainer.value.requestFullscreen();
-        } catch (error) {
-          console.error('自动全屏失败:', error);
-          // 不显示错误提示，避免影响用户体验
-        }
-      }
+      previewtoggleDom();
     }, 300); // 延迟300ms等待对话框动画
-  }
+  } else if (item.type === 'VIDEO') {
+    // 音频类型，打开音频预览
+    videoUrl.value = `${resroot}${item.fileUrl}`;
+    videoVisible.value = true;
+
+    await nextTick();
+
+    // 等待对话框动画完成后请求全屏
+    setTimeout(async () => {
+      videotoggleDom();
+    }, 300); // 延迟300ms等待对话框动画
+  } 
 };
 
 const downloadResource = async (item: any) => {
@@ -514,7 +516,26 @@ const onDel = async () => {
       ElMessage.info('已取消删除');
     });
 };
+
+const getPlayName = (row : any) => {
+  if (row.type === 'DOC') {
+    return '备课';
+  }
+  else if (row.type === 'PPT') {
+    return '上课';
+  }
+  else if (row.type === 'AUDIO') {
+    return '听课';
+  }
+  else if (row.type === 'VIDEO') {
+    return '看课';
+  }
+}
+
 </script>
+
+
+
 
 <template>
   <Page auto-content-height>
@@ -566,24 +587,25 @@ const onDel = async () => {
         </ElTabs>
         <Grid>
           <template #action="{ row }">
+            
             <ElButton
               type="primary"
               size="small"
               :disabled="row.fileUrl == null || row.fileUrl == ''"
               @click="openResource(row)"
             >
-              {{ row.type === 'DOC' ? '备课' : '上课' }}
+              {{ getPlayName(row) }}
             </ElButton>
 
             <ElButton
               type="primary"
               size="small"
-              v-if="row.type === 'DOC'"
               :disabled="row.fileUrl == null || row.fileUrl == ''"
               @click="downloadResource(row)"
             >
               下载
             </ElButton>
+
             <ElButton
               v-if="!isTeacher"
               type="primary"
@@ -678,12 +700,12 @@ const onDel = async () => {
       >
         <div class="preview-toolbar">
           <ElTooltip
-            :content="isFullscreen ? '退出全屏' : '全屏'"
+            :content="ispreviewDomFullscreen ? '退出全屏' : '全屏'"
             placement="bottom"
           >
             <ElButton
               circle
-              @click="toggleFullscreen"
+              @click="previewtoggleDom"
             >
               <ElIcon>
                 <FullScreen />
@@ -713,8 +735,62 @@ const onDel = async () => {
         ></iframe>
       </div>
     </ElDialog>
-  </Page>
+ 
+    <!-- 视频播放对话框 -->
+    <ElDialog
+      v-model="videoVisible"
+      width="80%"
+      :close-on-click-modal="false"
+      :show-close="false"
+      class="video-dialog"
+      top="0"
+      append-to-body
+    >
+      <div
+        class="preview-container"
+        ref="videoContainer"
+      >
+        <div class="preview-toolbar">
+          <ElTooltip
+            :content="isvideoDomFullscreen ? '退出全屏' : '全屏'"
+            placement="bottom"
+          >
+          <ElButton
+              circle
+              @click="onPlayVideo"
+            >
+              <ElIcon>
+                <FullScreen />
+              </ElIcon>
+            </ElButton>
+          </ElTooltip>
+          <ElTooltip
+            content="返回"
+            placement="bottom"
+          >
+            <ElButton
+              circle
+              @click="closeVideo"
+            >
+              <ElIcon>
+                <component :is="BackIcon" />
+              </ElIcon>
+            </ElButton>
+          </ElTooltip>
+        </div>
+        <video
+          v-if="videoUrl"
+          :src="videoUrl"
+          class="video-player"
+          controls
+          autoplay
+        ></video>
+      </div>
+    </ElDialog>
+ 
+ </Page>
 </template>
+
 
 <style scoped lang="scss">
 .course-container {
@@ -958,5 +1034,10 @@ const onDel = async () => {
   height: 100%;
   min-height: 80vh;
   background: #000;
+}
+
+.video-player {
+  width: 100%;
+  height: 100%;
 }
 </style>

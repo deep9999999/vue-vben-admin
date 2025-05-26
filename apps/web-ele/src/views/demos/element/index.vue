@@ -135,7 +135,8 @@ const gridOptions: VxeTableGridOptions<RowType> = {
     { align: 'left', title: '', type: 'checkbox', width: 50 },
     { field: 'id', title: '序号', width: 50 },
     { field: 'name', align: 'left', title: '机构名称', width: 120 },
-    { field: 'contact', title: '联系信息', width: 140 },
+    { field: 'contact', title: '联系电话', width: 140 },
+    { field: 'contactPerson', title: '联系人', width: 140 },
     //{ field: 'school', title: '对应学校',width: 200 },
     { field: 'address', title: '机构地址',width: 250 },
     { field: 'state', title: '状态',width: 100, slots: { default: 'state' }, },
@@ -258,8 +259,17 @@ const [Form, formApi] = useVbenForm({
       componentProps: {
         placeholder: '请输入',
       },
-      fieldName: 'contact',
-      label: '联系信息',
+      fieldName: 'contact',   
+      label: '联系电话',
+      rules: 'required',
+    },
+    {
+      component: 'Input',
+      componentProps: {
+        placeholder: '请输入',
+      },
+      fieldName: 'contactPerson',   
+      label: '联系人',
       rules: 'required',
     },
     {
