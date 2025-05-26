@@ -278,10 +278,6 @@ const [Form, formApi] = useVbenForm({
             value: '正常授权',
           },
           {
-            label: '授权到期',
-            value: '授权到期',
-          },
-          {
             label: '停止授权',
             value: '停止授权',
           },

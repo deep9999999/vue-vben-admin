@@ -344,10 +344,6 @@ const [Form, formApi] = useVbenForm({
             value: '正常授权',
           },
           {
-            label: '授权到期',
-            value: '授权到期',
-          },
-          {
             label: '停止授权',
             value: '停止授权',
           },
@@ -367,8 +363,7 @@ const [Form, formApi] = useVbenForm({
         valueFormat: 'YYYY-MM-DD'
       },
       fieldName: 'releaseDate',
-      label: '到期时间',
-      rules: 'required',
+      label: '到期时间'
     }
   ],
   showDefaultActions: false,
