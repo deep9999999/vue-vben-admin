@@ -123,7 +123,7 @@ const selectCourse = (index: any) => {
   // 根据选中的课程索引获取对应的标签列表
   if (tabsList.value && tabsList.value.length > 0 && tabsList.value[index]) {
     // 获取当前选中课程的标签数据
-    const currentTabs = tabsList.value[index].children || [];
+    const currentTabs = (tabsList.value[index] as any).children || [];
     // 更新tabs数据
     tabs.value = currentTabs.map((tab: any) => ({
       name: tab.name,
@@ -218,11 +218,11 @@ const openResource = async (item: any) => {
   let url = '';
   if (item.type === 'DOC') {
     // 文档类型，打开文档预览链接
-    url = `${resroot}${item.fileUrl}`;
+    url = `https://ow365.cn/?i=35717&furl=${resroot}${item.fileUrl}`;
     window.open(url, '_blank');
   } else if (item.type === 'PPT') {
     // PPT类型，打开内嵌预览
-    url = `https://ow365.cn/?i=35717&n=3&furl=${resroot}${item.fileUrl}`;
+    url = `https://ow365.cn/?i=35717&furl=${resroot}${item.fileUrl}`;
     previewUrl.value = url;
     previewVisible.value = true;
 
@@ -242,6 +242,11 @@ const openResource = async (item: any) => {
     }, 300); // 延迟300ms等待对话框动画
   }
 };
+
+const downloadResource = async (item: any) => {
+  const url = `${resroot}${item.fileUrl}`;
+  window.open(url, '_blank');
+}
 
 // 定义表格行数据类型
 interface RowType {
@@ -268,6 +273,7 @@ const gridOptions: VxeTableGridOptions<RowType> = {
     {
       field: 'action',
       fixed: 'right',
+      align: 'left',
       slots: { default: 'action' },
       title: '操作',
     },
@@ -570,6 +576,16 @@ const onDel = async () => {
               @click="openResource(row)"
             >
               {{ row.type === 'DOC' ? '备课' : '上课' }}
+            </ElButton>
+
+            <ElButton
+              type="primary"
+              size="small"
+              v-if="row.type === 'DOC'"
+              :disabled="row.fileUrl == null || row.fileUrl == ''"
+              @click="downloadResource(row)"
+            >
+              下载
             </ElButton>
             <ElButton
               v-if="!isTeacher"
