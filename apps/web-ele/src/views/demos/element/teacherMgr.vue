@@ -210,8 +210,8 @@ const gridOptions: VxeGridProps<TeacherRowType> = {
   },
   showOverflow: true,
   toolbarConfig: {
-    custom: true,
-    export: true,
+    custom: false,
+    export: false,
     refresh: true,
     resizable: true,
     zoom: true,

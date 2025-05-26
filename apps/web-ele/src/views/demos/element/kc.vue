@@ -166,11 +166,10 @@ const gridOptions: VxeTableGridOptions<RowType> = {
     },
   },
   toolbarConfig: {
-    custom: true,
-    export: true,
+    custom: false,
+    export: false,
     refresh: true,
     resizable: true,
-    search: true,
     zoom: true,
   },
   treeConfig: {

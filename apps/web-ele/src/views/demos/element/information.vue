@@ -262,7 +262,6 @@ const gridOptions: VxeTableGridOptions<RowType> = {
     labelField: 'index',
   },
   columns: [
-    { align: 'left', title: '', type: 'checkbox', width: 50 },
     { field: 'name', title: '资料', width: 200, align: 'left' },
     { field: 'type', title: '类型', width: 50, align: 'left' },
     { field: 'fileUrl', title: 'URL', width: 300, align: 'left' },
@@ -299,8 +298,8 @@ const gridOptions: VxeTableGridOptions<RowType> = {
     },
   },
   toolbarConfig: {
-    custom: true,
-    export: true,
+    custom: false,
+    export: false,
     refresh: true,
     resizable: true,
     zoom: true,
