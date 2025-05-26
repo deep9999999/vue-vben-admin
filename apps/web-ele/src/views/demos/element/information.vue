@@ -23,6 +23,7 @@ import {
   ElTabs,
   ElTooltip,
 } from 'element-plus';
+import { useFullscreen } from '@vueuse/core';
 
 import { useVbenForm } from '#/adapter/form';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
@@ -39,9 +40,11 @@ import {
 // 预览相关状态
 const previewVisible = ref(false);
 const previewUrl = ref('');
-const isFullscreen = ref(false);
+
 const BackIcon = ArrowLeft;
 const previewContainer = ref<HTMLElement | null>(null);
+
+const { enter, exit, isFullscreen, toggle } = useFullscreen();
 
 // 监听全屏变化事件
 const handleFullscreenChange = () => {
@@ -60,15 +63,10 @@ onUnmounted(() => {
 const toggleFullscreen = async () => {
   try {
     if (isFullscreen.value) {
-      // 退出全屏模式
-      if (document.fullscreenElement) {
-        await document.exitFullscreen();
-      }
+      exit();
     } else {
       // 进入全屏模式
-      if (previewContainer.value) {
-        await previewContainer.value.requestFullscreen();
-      }
+      enter()
     }
   } catch (error) {
     console.error('全屏切换失败:', error);
