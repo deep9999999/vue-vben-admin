@@ -56,6 +56,13 @@ const videoContainer = ref<HTMLElement | null>(null);
 
 const { isFullscreen: isvideoDomFullscreen, toggle: videotoggleDom } = useFullscreen(videoContainer);
 
+// 音频预览相关状态
+const audioVisible = ref(false);
+const audioUrl = ref('');
+const audioContainer = ref<HTMLElement | null>(null);
+
+const { isFullscreen: isaudioDomFullscreen, toggle: audiotoggleDom } = useFullscreen(audioContainer);
+
 // 关闭视频预览
 const onPlayVideo = async () => {
   videotoggleDom();
@@ -69,17 +76,38 @@ if (videoElement) {
 }
 
 const closeVideo = async () => {
-  if (isvideoDomFullscreen) {
+  if (isvideoDomFullscreen.value) {
     videotoggleDom();
   }
   videoVisible.value = false;
   videoUrl.value = '';
 };
 
+// 播放音频
+const onPlayAudio = async () => {
+  audiotoggleDom();
+  // 获取音频元素
+  const audioElement:any = document.querySelector('.audio-player');
+  if (audioElement) {
+    // 开始播放音频
+    audioElement.play();
+  }
+  audioVisible.value = true;
+}
+
+// 关闭音频预览
+const closeAudio = async () => {
+  if (isaudioDomFullscreen.value) {
+    audiotoggleDom();
+  }
+  audioVisible.value = false;
+  audioUrl.value = '';
+};
+
 // 关闭预览
 const closePreview = async () => {
   
-  if (ispreviewDomFullscreen) {
+  if (ispreviewDomFullscreen.value) {
     previewtoggleDom();
   }
   previewVisible.value = false;
@@ -240,7 +268,13 @@ const openResource = async (item: any) => {
     setTimeout(async () => {
       videotoggleDom();
     }, 300); // 延迟300ms等待对话框动画
-  } 
+  } else if (item.type === 'AUDIO') {
+    // 音频类型，打开音频预览
+    audioUrl.value = `${resroot}${item.fileUrl}`;
+    audioVisible.value = true;
+
+    await nextTick();
+  }
 };
 
 const downloadResource = async (item: any) => {
@@ -263,8 +297,8 @@ const gridOptions: VxeTableGridOptions<RowType> = {
   },
   columns: [
     { field: 'name', title: '资料', width: 200, align: 'left' },
-    { field: 'type', title: '类型', width: 50, align: 'left' },
-    { field: 'fileUrl', title: 'URL', width: 300, align: 'left' },
+    { field: 'type', title: '类型', width: 100, align: 'left' },
+    // { field: 'fileUrl', title: 'URL', width: 300, align: 'left' },
     {
       field: 'createTime',
       title: '创建时间',
@@ -281,7 +315,8 @@ const gridOptions: VxeTableGridOptions<RowType> = {
     isHover: true,
     keyField: 'name',
   },
-  height: '600px',
+  height: '700px',
+  
   proxyConfig: {
     ajax: {
       query: async ({ page }, formValues) => {
@@ -539,8 +574,8 @@ const getPlayName = (row : any) => {
 
 <template>
   <Page auto-content-height>
-    <ElRow :gutter="5">
-      <ElCol :span="4">
+    <ElRow>
+      <ElCol :span="4" id="left">
         <ElCard
           class="course-sidebar"
           shadow="hover"
@@ -551,7 +586,7 @@ const getPlayName = (row : any) => {
               <span class="mt-2 text-sm text-gray-500">{{ subTitle }}</span>
             </div>
           </template>
-          <div class="h-[600px] overflow-y-auto">
+          <div class="h-[700px] overflow-auto">
             <ElMenu
               :default-active="String(activeIndex)"
               class="course-menu"
@@ -573,19 +608,43 @@ const getPlayName = (row : any) => {
           </div>
         </ElCard>
       </ElCol>
-      <ElCol :span="20">
-        <ElTabs
-          v-model="activeTab"
-          @tab-click="selectTab"
+      <ElCol :span="4" id="mid">
+
+        <ElCard
+          class="course-sidebar"
+          shadow="hover"
         >
-          <ElTabPane
-            v-for="(tab, index) in tabs"
-            :key="index"
-            :label="tab.name"
-            :name="index"
-          />
-        </ElTabs>
-        <Grid>
+        <template #header>
+            <div class="flex flex-col">
+              <span class="text-base font-bold">子目录</span>
+              <span class="mt-2 text-sm text-gray-500">{{  }}</span>
+            </div>
+          </template>
+          <div class="h-[700px] overflow-auto">
+            <ElMenu
+              :default-active="String(activeTab)"
+              class="course-menu"
+            >
+              <ElMenuItem
+                v-for="(item, index) in tabs"
+                :key="index"
+                :index="String(index)"
+                @click="selectTab"
+              >
+                <template #title>
+                  <span class="mr-2 text-blue-500">{{
+                    String(index + 1).padStart(2, '0')
+                  }}</span>
+                  <span>{{ item.name }}</span>
+                </template>
+              </ElMenuItem>
+            </ElMenu>
+          </div>
+        </ElCard>
+        
+      </ElCol>
+      <ElCol :span="16" class="p-6">
+        <Grid >
           <template #action="{ row }">
             
             <ElButton
@@ -635,49 +694,6 @@ const getPlayName = (row : any) => {
         </Grid>
       </ElCol>
     </ElRow>
-
-    <!-- <el-loading v-model:full-screen="loading" /> -->
-    <!-- 左侧课程目录 -->
-
-    <!-- 右侧内容区域 -->
-    <!-- <Page auto-content-width class="w-[100%]">
-      <el-tabs v-model="activeTab" @tab-click="selectTab">
-              <el-tab-pane 
-                v-for="(tab, index) in tabs" 
-                :key="index"
-                :label="tab.name"
-                :name="index"
-              />
-      </el-tabs>
-      <Grid>
-        <template #action="{ row }">
-          <el-button 
-            type="primary" 
-            size="small"
-            :disabled="row.fileUrl == null || row.fileUrl == ''"
-            @click="openResource(row)"
-          >
-            {{ row.type === 'DOC' ? '备课' : '上课' }}
-          </el-button>
-          <el-button 
-            v-if="!isTeacher"
-            type="primary" 
-            size="small"
-            @click="onKcDatil(row)"
-          >
-            详情
-          </el-button>
-        </template>
-        <template #toolbar-actions>
-        <ElButton v-if="!isTeacher" type="primary" @click="onAdd" >
-          新增
-        </ElButton>
-        <ElButton v-if="!isTeacher" type="danger" class="mt-1" @click="onDel">
-          删除
-        </ElButton>
-        </template>
-      </Grid>
-    </Page> -->
 
     <!-- 新增对话框 -->
     <Modal class="w-[50%]">
@@ -784,7 +800,60 @@ const getPlayName = (row : any) => {
           class="video-player"
           controls
           autoplay
+          controlsList="nodownload"
+          disablePictureInPicture
         ></video>
+      </div>
+    </ElDialog>
+
+    <!-- 音频播放对话框 -->
+    <ElDialog
+      v-model="audioVisible"
+      :close-on-click-modal="false"
+      :show-close="false"
+      class="audio-dialog"
+      top="0"
+      append-to-body
+    >
+      <div
+        ref="audioContainer"
+      >
+        <div class="preview-toolbar">
+          <!-- <ElTooltip
+            :content="isaudioDomFullscreen ? '退出全屏' : '全屏'"
+            placement="bottom"
+          >
+            <ElButton
+              circle
+              @click="onPlayAudio"
+            >
+              <ElIcon>
+                <FullScreen />
+              </ElIcon>
+            </ElButton>
+          </ElTooltip> -->
+          <ElTooltip
+            content="返回"
+            placement="bottom"
+          >
+            <ElButton
+              circle
+              @click="closeAudio"
+            >
+              <ElIcon>
+                <component :is="BackIcon" />
+              </ElIcon>
+            </ElButton>
+          </ElTooltip>
+        </div>
+        <audio
+          v-if="audioUrl"
+          :src="audioUrl"
+          class="audio-player"
+          controls
+          autoplay
+          controlsList="nodownload"
+        ></audio>
       </div>
     </ElDialog>
  

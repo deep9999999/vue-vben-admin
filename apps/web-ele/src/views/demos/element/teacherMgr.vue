@@ -320,7 +320,7 @@ const [Form, formApi] = useVbenForm({
       },
       fieldName: 'email',
       label: '电子邮箱',
-      rules: z.string().email('请输入正确的邮箱').optional(),
+      
     },
     {
       component: 'Input',
