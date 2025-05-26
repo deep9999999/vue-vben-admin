@@ -224,7 +224,7 @@ const headerSlots = computed(() => {
         v-if="preferences.logo.enable"
         :class="logoClass"
         :collapsed="logoCollapsed"
-        :src="preferences.logo.source"
+        src="/logo.jpg"
         :text="preferences.app.name"
         :theme="showHeaderNav ? headerTheme : theme"
         @click="clickLogo"
