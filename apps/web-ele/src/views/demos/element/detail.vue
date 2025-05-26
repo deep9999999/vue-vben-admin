@@ -346,7 +346,7 @@ async function onSubmit(values: Record<string, any>) {
     //setTimeout(() => {
       modalApi.close();
       gridApi.reload();
-      ElMessage.success(`提交成功：${JSON.stringify(formvalues)}`);
+      ElMessage.success(`提交成功`);
     //}, 1000);
   }catch (error) {
     ElMessage.error('提交失败');
