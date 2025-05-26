@@ -45,7 +45,8 @@
     "element-plus": "catalog:",
     "pinia": "catalog:",
     "vue": "catalog:",
-    "vue-router": "catalog:"
+    "vue-router": "catalog:",
+    "@element-plus/icons-vue": "^2.3.1"
   },
   "devDependencies": {
     "unplugin-element-plus": "catalog:"
