@@ -24,7 +24,7 @@
           <ElButton type="primary" @click="onTeacherAdd">
             新增
           </ElButton>
-          <ElButton type="danger" class="mt-1" @click="onTeacherDel">
+          <ElButton type="danger"  @click="onTeacherDel">
             删除
           </ElButton>
       </template>
@@ -179,12 +179,12 @@ const gridOptions: VxeGridProps<TeacherRowType> = {
     //   width: 150,
     //   editRender: { name: 'input' }
     // },
-    { 
-      field: 'releaseDate',
-      title: '到期时间',
-      width: 120,
-      formatter: 'formatDate'
-    },
+    // { 
+    //   field: 'releaseDate',
+    //   title: '到期时间',
+    //   width: 120,
+    //   formatter: 'formatDate'
+    // },
     { 
       title: '操作',
       width: 200,
@@ -335,37 +335,8 @@ const [Form, formApi] = useVbenForm({
       fieldName: 'password',
       label: '登录密码',
       rules: z.string().min(6, '密码长度至少6位'),
-    },
-    {
-      component: 'RadioGroup',
-      componentProps: {
-        options: [
-          {
-            label: '正常授权',
-            value: '正常授权',
-          },
-          {
-            label: '停止授权',
-            value: '停止授权',
-          },
-        ],
-      },
-      rules: 'required',
-      defaultValue: '正常授权',
-      fieldName: 'state',
-      label: '授权状态',
-    },
-    {
-      component: 'DatePicker',
-      componentProps: {
-        placeholder: '请选择到期时间',
-        type: 'date',
-        format: 'YYYY-MM-DD',
-        valueFormat: 'YYYY-MM-DD'
-      },
-      fieldName: 'releaseDate',
-      label: '到期时间'
     }
+    
   ],
   showDefaultActions: false,
 });

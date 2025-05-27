@@ -379,25 +379,6 @@ const [Form, formApi] = useVbenForm({
       label: '文件类型',
       rules: 'required',
     },
-    // {
-    //   component: 'RadioGroup',
-    //   componentProps: {
-    //     options: [
-    //       {
-    //         label: '查看',
-    //         value: '查看',
-    //       },
-    //       {
-    //         label: '下载',
-    //         value: '下载',
-    //       }
-    //     ],
-    //   },
-    //   rules: 'required',
-    //   defaultValue: '正常授权',
-    //   fieldName: 'state',
-    //   label: '授权状态',
-    // },
     {
       component: 'Upload',
       componentProps: {
@@ -409,7 +390,7 @@ const [Form, formApi] = useVbenForm({
         limit: 1,
         multiple: false,
         // 上传列表的内建样式，支持四种基本样式 text, picture, picture-card 和 picture-circle
-        listType: 'text',
+        listType: 'picture-circle',
         name: 'file',
         'on-remove': async (uploadFile: any, uploadFiles: any) => {
           await removeFile({ id: uploadFile.id });
@@ -559,16 +540,16 @@ const onDel = async () => {
 
 const getPlayName = (row : any) => {
   if (row.type === 'DOC') {
-    return '备课';
+    return '打开';
   }
   else if (row.type === 'PPT') {
-    return '上课';
+    return '打开';
   }
   else if (row.type === 'AUDIO') {
-    return '听课';
+    return '打开';
   }
   else if (row.type === 'VIDEO') {
-    return '看课';
+    return '打开';
   }
 }
 
@@ -690,7 +671,6 @@ const getPlayName = (row : any) => {
             <ElButton
               v-if="!isTeacher && tabs.length > 0"
               type="danger"
-              class="mt-1"
               @click="onDel"
             >
               删除
@@ -764,7 +744,7 @@ const getPlayName = (row : any) => {
           <ElButton
               @click="onPlayVideo"
             >
-            {{ispreviewDomFullscreen ? '退出全屏' : '全屏'}}
+            {{isvideoDomFullscreen ? '退出全屏' : '全屏'}}
             </ElButton>
           
             <ElButton

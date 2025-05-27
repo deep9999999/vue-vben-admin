@@ -31,7 +31,7 @@
           <ElButton type="primary" @click="onSchoolAdd">
             新增
           </ElButton>
-          <ElButton type="danger" class="mt-1" @click="onSchoolDel">
+          <ElButton type="danger" @click="onSchoolDel">
             删除
           </ElButton>
       </template>
@@ -128,15 +128,15 @@ const gridOptions: VxeGridProps<SchoolRowType> = {
   },
   columns: [
     { align: 'left', title: '', type: 'checkbox', width: 50 },
-    { field: 'id', title: '学校ID',width: 50 },
+    { field: 'id', title: '学校ID',width: 100 },
     { editRender: { name: 'input' }, field: 'name', title: '学校名称', width: 150 },
     { editRender: { name: 'input' }, field: 'address', title: '学校地址',width: 250 },
     { editRender: { name: 'input' }, field: 'principal', title: '校长' },
     { editRender: { name: 'input' }, field: 'phone', title: '联系电话' },
     { editRender: { name: 'input' }, field: 'type', title: '学校类型' },
     { field: 'state', title: '状态',width: 100, slots: { default: 'state' }, },
-    { field: 'releaseDate', formatter: 'formatDate', title: '到期时间' },
-    { slots: { default: 'action' }, fixed: 'right', title: '操作', width: 200 },
+    // { field: 'releaseDate', formatter: 'formatDate', title: '到期时间' },
+    { slots: { default: 'action' }, fixed: 'right', align:"left", title: '操作', width: 400 },
   ],
   height: '700px',
   keepSource: true,
@@ -269,36 +269,7 @@ const [Form, formApi] = useVbenForm({
       label: '学校类型',
       rules: 'required',
     },
-    {
-      component: 'RadioGroup',
-      componentProps: {
-        options: [
-          {
-            label: '正常授权',
-            value: '正常授权',
-          },
-          {
-            label: '停止授权',
-            value: '停止授权',
-          },
-        ],
-      },
-      rules: 'required',
-      defaultValue: '正常授权',
-      fieldName: 'state',
-      label: '授权状态',
-    },
-    {
-      component: 'DatePicker',
-      componentProps: {
-        placeholder: '请输入',
-        type: 'date',
-        format: 'YYYY-MM-DD',
-        valueFormat: 'YYYY-MM-DD'
-      },
-      fieldName: 'releaseDate',
-      label: '到期时间',
-    }
+    
   ],
   showDefaultActions: false,
 });

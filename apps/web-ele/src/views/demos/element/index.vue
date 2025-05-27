@@ -140,13 +140,14 @@ const gridOptions: VxeTableGridOptions<RowType> = {
     //{ field: 'school', title: '对应学校',width: 200 },
     { field: 'address', title: '机构地址',width: 250 },
     { field: 'state', title: '状态',width: 100, slots: { default: 'state' }, },
-    { field: 'releaseDate', formatter: 'formatDate', title: '到期时间',width: 150 },
+    { field: 'releaseDate', formatter: 'formatDate', title: '到期时间', slots: { default: 'releaseDate' }, width: 150 },
     {
       field: 'action',
       fixed: 'right',
+      align: 'left',
       slots: { default: 'action' },
       title: '操作',
-      width: 200,
+      width: 400,
     },
   ],
   rowConfig: {
@@ -190,6 +191,15 @@ gridApi.setGridOptions({
   border: true,
   stripe: true
 });
+
+const onUserAuth = async (row:any) => {
+  // 处理选中数据
+}
+
+const onStopUserAuth = async (row:any) => {
+  // 处理选中数据
+}
+
 
 const onDel = () => {
   const rows = gridApi.grid.getCheckboxRecords();
@@ -297,30 +307,15 @@ const [Form, formApi] = useVbenForm({
         placeholder: '请输入',
         type: 'date',
         format: 'YYYY-MM-DD',
-        valueFormat: 'YYYY-MM-DD'
+        valueFormat: 'YYYY-MM-DD',
+        // 设置最小可选日期为今天
+        disabledDate: (time: Date) => {
+          return time.getTime() < Date.now() - 8.64e7;
+        }
       },
       fieldName: 'releaseDate',
       label: '到期时间',
-    },
-    {
-      component: 'RadioGroup',
-      componentProps: {
-        options: [
-          {
-            label: '正常授权',
-            value: '正常授权',
-          },
-          {
-            label: '停止授权',
-            value: '停止授权',
-          },
-        ],
-      },
-      rules: 'required',
-      defaultValue: '正常授权',
-      fieldName: 'state',
-      label: '授权状态',
-    },
+    }
   ],
   showDefaultActions: false,
 });
@@ -455,6 +450,8 @@ const onAuth = async (row:any) => {
   authlist.value = authData;
   dialogVisible.value = true;
 }
+
+
 </script>
 
 
@@ -497,12 +494,21 @@ const onAuth = async (row:any) => {
       <template #state="{ row }">
         <ElTag :type="getStateType(row.state)">{{ row.state }}</ElTag>
       </template>
+      <template #releaseDate="{ row }" >
+        {{ row.releaseDate }}
+      </template>
       <template #toolbar-actions>
         <ElButton type="primary" @click="onAdd">
           新增
         </ElButton>
-        <ElButton type="danger" class="mt-1" @click="onDel">
+        <ElButton type="danger" @click="onDel">
           删除
+        </ElButton>
+        <ElButton type="primary" @click="onUserAuth">
+          账户启用
+        </ElButton>
+        <ElButton type="danger" @click="onStopUserAuth">
+          账户停用
         </ElButton>
       </template>
     </Grid>
