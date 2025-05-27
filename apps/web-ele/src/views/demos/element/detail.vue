@@ -34,6 +34,12 @@
           <ElButton type="danger" @click="onSchoolDel">
             删除
           </ElButton>
+          <ElButton type="primary" @click="onUserAuth">
+            账户启用
+          </ElButton>
+          <ElButton type="danger" @click="onStopUserAuth">
+            账户停用
+          </ElButton>
       </template>
       </Grid>
       <!-- 新增对话框 -->
@@ -191,6 +197,14 @@ const onSchoolDel = () => {
   }).catch(() => {
     ElMessage.info('已取消删除');
   });
+}
+
+const onUserAuth = async (row:any) => {
+  // 处理选中数据
+}
+
+const onStopUserAuth = async (row:any) => {
+  // 处理选中数据
 }
 
 // 根据授权状态返回对应的颜色

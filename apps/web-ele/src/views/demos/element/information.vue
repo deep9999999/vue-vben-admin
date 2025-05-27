@@ -407,6 +407,25 @@ const [Form, formApi] = useVbenForm({
       },
       rules: 'required',
     },
+    {
+      component: 'RadioGroup',
+      componentProps: {
+        options: [
+          {
+            label: '允许',
+            value: '允许',
+          },
+          {
+            label: '禁止',
+            value: '禁止',
+          },
+        ],
+      },
+      rules: 'required',
+      defaultValue: '允许',
+      fieldName: 'isdownload',
+      label: '允许下载',
+    },
   ],
   showDefaultActions: false,
 });
