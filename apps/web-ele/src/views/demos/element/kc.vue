@@ -130,6 +130,7 @@ const gridOptions: VxeTableGridOptions<RowType> = {
       align: 'left',
       slots: { default: 'action' },
       title: '操作',
+      width: 300
     },
   ],
   rowConfig: {

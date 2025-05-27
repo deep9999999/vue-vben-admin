@@ -146,6 +146,7 @@ const gridOptions: VxeTableGridOptions<RowType> = {
       fixed: 'right',
       slots: { default: 'action' },
       title: '操作',
+      width: 200,
     },
   ],
   rowConfig: {

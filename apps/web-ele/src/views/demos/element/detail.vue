@@ -136,7 +136,7 @@ const gridOptions: VxeGridProps<SchoolRowType> = {
     { editRender: { name: 'input' }, field: 'type', title: '学校类型' },
     { field: 'state', title: '状态',width: 100, slots: { default: 'state' }, },
     { field: 'releaseDate', formatter: 'formatDate', title: '到期时间' },
-    { slots: { default: 'action' }, title: '操作', width: 200 },
+    { slots: { default: 'action' }, fixed: 'right', title: '操作', width: 200 },
   ],
   height: '700px',
   keepSource: true,

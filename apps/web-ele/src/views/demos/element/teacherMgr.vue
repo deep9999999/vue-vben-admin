@@ -187,8 +187,9 @@ const gridOptions: VxeGridProps<TeacherRowType> = {
     },
     { 
       title: '操作',
-      width: 160,
+      width: 200,
       fixed: 'right',
+      align: 'left',
       slots: { default: 'action' }
     }
   ],
