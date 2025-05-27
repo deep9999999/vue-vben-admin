@@ -37,8 +37,6 @@ import {
   removeFile,
 } from '#/api/core/sys';
 
-const { exit } = useFullscreen();
-
 // 预览PPT相关状态
 const previewVisible = ref(false);
 const previewUrl = ref('');
@@ -85,7 +83,6 @@ const closeVideo = async () => {
 
 // 播放音频
 const onPlayAudio = async () => {
-  audiotoggleDom();
   // 获取音频元素
   const audioElement:any = document.querySelector('.audio-player');
   if (audioElement) {
@@ -97,6 +94,12 @@ const onPlayAudio = async () => {
 
 // 关闭音频预览
 const closeAudio = async () => {
+  const audioElement:any = document.querySelector('.audio-player');
+  if (audioElement) {
+    // 开始播放音频
+    audioElement.pause(); // 暂停音频播放
+  }
+
   if (isaudioDomFullscreen.value) {
     audiotoggleDom();
   }
@@ -273,7 +276,9 @@ const openResource = async (item: any) => {
     audioUrl.value = `${resroot}${item.fileUrl}`;
     audioVisible.value = true;
 
-    await nextTick();
+    setTimeout(async () => {
+      onPlayAudio();
+    }, 300); // 延迟300ms等待对话框动画
   }
 };
 
@@ -703,44 +708,32 @@ const getPlayName = (row : any) => {
     <!-- 全屏预览弹框 -->
     <ElDialog
       v-model="previewVisible"
-      width="80%"
+      width="100%"
       :close-on-click-modal="false"
       :show-close="false"
       class="preview-dialog"
       top="0"
       append-to-body
+      style="border-radius: 0px;padding:0px;--el-dialog-padding-primary: 0px"
     >
       <div
         class="preview-container"
         ref="previewContainer"
       >
         <div class="preview-toolbar">
-          <ElTooltip
-            :content="ispreviewDomFullscreen ? '退出全屏' : '全屏'"
-            placement="bottom"
-          >
+          
             <ElButton
-              circle
               @click="previewtoggleDom"
             >
-              <ElIcon>
-                <FullScreen />
-              </ElIcon>
+            {{ispreviewDomFullscreen ? '退出全屏' : '全屏'}}
             </ElButton>
-          </ElTooltip>
-          <ElTooltip
-            content="返回"
-            placement="bottom"
-          >
+          
             <ElButton
-              circle
               @click="closePreview"
             >
-              <ElIcon>
-                <component :is="BackIcon" />
-              </ElIcon>
+              返回
             </ElButton>
-          </ElTooltip>
+          
         </div>
         <iframe
           v-if="previewUrl"
@@ -761,38 +754,25 @@ const getPlayName = (row : any) => {
       class="video-dialog"
       top="0"
       append-to-body
+      style="border-radius: 0px;padding:0px;--el-dialog-padding-primary: 0px"
     >
       <div
         class="preview-container"
         ref="videoContainer"
       >
         <div class="preview-toolbar">
-          <ElTooltip
-            :content="isvideoDomFullscreen ? '退出全屏' : '全屏'"
-            placement="bottom"
-          >
           <ElButton
-              circle
               @click="onPlayVideo"
             >
-              <ElIcon>
-                <FullScreen />
-              </ElIcon>
+            {{ispreviewDomFullscreen ? '退出全屏' : '全屏'}}
             </ElButton>
-          </ElTooltip>
-          <ElTooltip
-            content="返回"
-            placement="bottom"
-          >
+          
             <ElButton
-              circle
               @click="closeVideo"
             >
-              <ElIcon>
-                <component :is="BackIcon" />
-              </ElIcon>
+              返回
             </ElButton>
-          </ElTooltip>
+          
         </div>
         <video
           v-if="videoUrl"
@@ -814,37 +794,18 @@ const getPlayName = (row : any) => {
       class="audio-dialog"
       top="0"
       append-to-body
+      style="border-radius: 0px;padding:0px;--el-dialog-padding-primary: 0px"
     >
       <div
         ref="audioContainer"
       >
         <div class="preview-toolbar">
-          <!-- <ElTooltip
-            :content="isaudioDomFullscreen ? '退出全屏' : '全屏'"
-            placement="bottom"
-          >
-            <ElButton
-              circle
-              @click="onPlayAudio"
-            >
-              <ElIcon>
-                <FullScreen />
-              </ElIcon>
-            </ElButton>
-          </ElTooltip> -->
-          <ElTooltip
-            content="返回"
-            placement="bottom"
-          >
-            <ElButton
-              circle
+          
+          <ElButton
               @click="closeAudio"
             >
-              <ElIcon>
-                <component :is="BackIcon" />
-              </ElIcon>
+              返回
             </ElButton>
-          </ElTooltip>
         </div>
         <audio
           v-if="audioUrl"
@@ -1056,17 +1017,21 @@ const getPlayName = (row : any) => {
 
 .preview-dialog {
   :deep(.el-dialog__body) {
-    height: 100%;
+    height: 100vh;
     padding: 0;
   }
+  :deep(.el-dialog__header) {
+    padding: 0px !important;
+    --el-dialog-padding-primary: 0px;
+  }
 }
+
 
 .preview-container {
   position: relative;
   width: 100%;
   height: 100%;
-  min-height: 80vh;
-
+  
   &:fullscreen {
     width: 100vw;
     height: 100vh;
@@ -1079,29 +1044,30 @@ const getPlayName = (row : any) => {
 
 .preview-toolbar {
   position: absolute;
-  top: 15px;
-  right: 15px;
+  top: 0px;
+  right: 0px;
   z-index: 2000;
   display: flex;
-  gap: 10px;
+  
 
   .el-button {
     color: white;
     background-color: rgb(0 0 0 / 50%);
     border-color: rgb(255 255 255 / 20%);
-
+    
     &:hover {
       background-color: rgb(0 0 0 / 70%);
     }
   }
 }
 
+
+
 .preview-iframe {
   position: absolute;
-  inset: 0;
   width: 100%;
-  height: 100%;
-  min-height: 80vh;
+  height: 100vh;
+  
   background: #000;
 }
 

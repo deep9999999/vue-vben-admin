@@ -55,7 +55,7 @@ let schema = [
       defaultValue: '',
       fieldName: 'secname',
       label: '课程章节',
-    },
+    }
 ]
 if (isTeacher.value) {
   schema = [
@@ -123,6 +123,7 @@ const gridOptions: VxeTableGridOptions<RowType> = {
     { field: 'id', title: '序号', width: 200 },
     { field: 'name', align: 'left', title: '课程名', width: 400,  treeNode: true },
     { field: 'secname', align: 'left', title: '课程章节', width: 300 },
+    { field: 'isdownload', align: 'left', title: '下载状态', width: 100 },
     {
       field: 'action',
       fixed: 'right',
@@ -397,7 +398,26 @@ const [Form, formApi] = useVbenForm({
       },
       fieldName: 'secname',
       label: '课程章节'
-    }
+    },
+    {
+      component: 'RadioGroup',
+      componentProps: {
+        options: [
+          {
+            label: '允许',
+            value: '允许',
+          },
+          {
+            label: '禁止',
+            value: '禁止',
+          },
+        ],
+      },
+      rules: 'required',
+      defaultValue: '允许',
+      fieldName: 'isdownload',
+      label: '允许下载',
+    },
   ],
   showDefaultActions: false,
 });
