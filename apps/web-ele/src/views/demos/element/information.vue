@@ -294,13 +294,9 @@ interface RowType {
   type: 'doc' | 'ppt';
 }
 
-// 修改表格配置，添加checkbox配置
-const gridOptions: VxeTableGridOptions<RowType> = {
-  checkboxConfig: {
-    highlight: true,
-    labelField: 'index',
-  },
-  columns: [
+let columns:any =  [
+    { align: 'left', title: '', type: 'checkbox', width: 50 },
+    { field: 'id', title: '序号', width: 50 },
     { field: 'name', title: '资料', width: 200, align: 'left' },
     { field: 'type', title: '类型', width: 100, align: 'left' },
     // { field: 'fileUrl', title: 'URL', width: 300, align: 'left' },
@@ -315,10 +311,40 @@ const gridOptions: VxeTableGridOptions<RowType> = {
       slots: { default: 'action' },
       title: '操作',
     },
-  ],
+  ]
+
+  if (isTeacher.value) {
+    columns = [
+      { field: 'id', title: '序号', width: 50 },
+      { field: 'name', title: '资料', width: 200, align: 'left' },
+      { field: 'type', title: '类型', width: 100, align: 'left' },
+      // { field: 'fileUrl', title: 'URL', width: 300, align: 'left' },
+      {
+        field: 'createTime',
+        title: '创建时间',
+      },
+      {
+        field: 'action',
+        fixed: 'right',
+        align: 'left',
+        slots: { default: 'action' },
+        title: '操作',
+      },
+    ]
+  }
+
+
+
+// 修改表格配置，添加checkbox配置
+const gridOptions: VxeTableGridOptions<RowType> = {
+  checkboxConfig: {
+    highlight: true,
+    labelField: 'index',
+  },
+  columns: columns,
   rowConfig: {
     isHover: true,
-    keyField: 'name',
+    keyField: 'id',
   },
   height: '700px',
   
