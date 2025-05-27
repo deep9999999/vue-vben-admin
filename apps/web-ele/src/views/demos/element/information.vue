@@ -463,12 +463,14 @@ async function onSubmit(values: Record<string, any>) {
             name: formvalues.name,
             type: formvalues.type,
             fileUrl: formvalues.files[0].response.data.url,
+            isdownload: formvalues.isdownload,
           })
         : addFile({
             classId: selectTabValue,
             fileUrl: formvalues.files[0].response.data.url,
             name: formvalues.name,
             type: formvalues.type,
+            isdownload: formvalues.isdownload,
           }));
     }
     // setTimeout(() => {
@@ -664,6 +666,7 @@ const getPlayName = (row : any) => {
             <ElButton
               type="primary"
               size="small"
+              v-if="row.isdownload == '允许'"
               :disabled="row.fileUrl == null || row.fileUrl == ''"
               @click="downloadResource(row)"
             >

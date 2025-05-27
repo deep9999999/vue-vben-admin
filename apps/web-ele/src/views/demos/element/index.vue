@@ -3,7 +3,7 @@ import type { VbenFormProps } from '#/adapter/form';
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 import { Page } from '@vben/common-ui';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { getOrgList, addOrg, deleteOrg, editOrg, queryOrg, courseAuth, getAuthList } from '#/api/core/sys';
+import { getOrgList, addOrg, deleteOrg, editOrg, queryOrg, courseAuth, getAuthList, updateOrgStatus } from '#/api/core/sys';
 import areadata from './area-full.json'
 import { ElButton, ElMessage, ElMessageBox, ElTag } from 'element-plus';
 
@@ -138,8 +138,8 @@ const gridOptions: VxeTableGridOptions<RowType> = {
     { field: 'contact', title: '联系电话', width: 140 },
     { field: 'contactPerson', title: '联系人', width: 140 },
     //{ field: 'school', title: '对应学校',width: 200 },
-    { field: 'address', title: '机构地址',width: 250 },
-    { field: 'state', title: '状态',width: 100, slots: { default: 'state' }, },
+    { field: 'address', title: '机构地址', width: 250 },
+    { field: 'state', title: '状态', width: 100, slots: { default: 'state' }, },
     { field: 'releaseDate', formatter: 'formatDate', title: '到期时间', slots: { default: 'releaseDate' }, width: 150 },
     {
       field: 'action',
@@ -162,7 +162,7 @@ const gridOptions: VxeTableGridOptions<RowType> = {
     ajax: {
       query: async ({ page }, formValues) => {
         // ElMessage.success(`Query params: ${JSON.stringify(formValues)}`);
-        let resp:any =  await getOrgList({
+        let resp: any = await getOrgList({
           page: page.currentPage,
           pageSize: page.pageSize,
           formValues
@@ -179,7 +179,7 @@ const gridOptions: VxeTableGridOptions<RowType> = {
     resizable: true,
     zoom: true,
   },
-  
+
 };
 
 const [Grid, gridApi] = useVbenVxeGrid({
@@ -192,12 +192,67 @@ gridApi.setGridOptions({
   stripe: true
 });
 
-const onUserAuth = async (row:any) => {
+const onUserAuth = async (row: any) => {
   // 处理选中数据
+  const rows = gridApi.grid.getCheckboxRecords();
+  if (rows.length === 0) {
+    ElMessage.warning('请选择要启用的机构');
+    return;
+  }
+
+  ElMessageBox.confirm(`确定要启用选中的 ${rows.length} 个机构吗?`, '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning',
+  }).then(async () => {
+    try {
+      // 调用启用接口
+      await updateOrgStatus({
+        ids: rows.map(row => row.id),
+        state: '正常授权',
+        type: "机构"
+      });
+      ElMessage.success('启用成功');
+      // 刷新表格数据
+      gridApi.reload();
+    } catch (error) {
+      ElMessage.error('启用失败');
+    }
+  }).catch(() => {
+    ElMessage.info('已取消启用');
+  });
+
 }
 
-const onStopUserAuth = async (row:any) => {
+const onStopUserAuth = async (row: any) => {
   // 处理选中数据
+  const rows = gridApi.grid.getCheckboxRecords();
+  if (rows.length === 0) {
+    ElMessage.warning('请选择要停用的机构');
+    return;
+  }
+
+  ElMessageBox.confirm(`确定要停用选中的 ${rows.length} 个机构吗?`, '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning',
+  }).then(async () => {
+    try {
+      // 调用停用接口
+      await updateOrgStatus({
+        ids: rows.map(row => row.id),
+        state: '停止授权',
+        type: "机构"
+      });
+      ElMessage.success('停用成功');
+      // 刷新表格数据
+      gridApi.reload();
+    } catch (error) {
+      ElMessage.error('停用失败');
+    }
+  }).catch(() => {
+    ElMessage.info('已取消停用');
+  });
 }
 
 
@@ -230,7 +285,7 @@ const onAdd = () => {
   openFormModal();
 };
 
-const handleSchoolManage = (row : any) => {
+const handleSchoolManage = (row: any) => {
   //ElMessage.success('学校管理');
   router.push({
     path: '/Organization/detail',
@@ -241,7 +296,7 @@ const handleSchoolManage = (row : any) => {
   });
 }
 
-const handleTeacherManage = (row : any) => {
+const handleTeacherManage = (row: any) => {
   // ElMessage.success('老师管理');
   router.push({
     path: '/Organization/teachermgr',
@@ -270,7 +325,7 @@ const [Form, formApi] = useVbenForm({
       componentProps: {
         placeholder: '请输入',
       },
-      fieldName: 'contact',   
+      fieldName: 'contact',
       label: '联系电话',
       rules: 'required',
     },
@@ -279,7 +334,7 @@ const [Form, formApi] = useVbenForm({
       componentProps: {
         placeholder: '请输入',
       },
-      fieldName: 'contactPerson',   
+      fieldName: 'contactPerson',
       label: '联系人',
       rules: 'required',
     },
@@ -298,7 +353,7 @@ const [Form, formApi] = useVbenForm({
       componentProps: {
         placeholder: '请输入',
       },
-      fieldName: 'address', 
+      fieldName: 'address',
       label: '地址',
     },
     {
@@ -308,9 +363,9 @@ const [Form, formApi] = useVbenForm({
         type: 'date',
         format: 'YYYY-MM-DD',
         valueFormat: 'YYYY-MM-DD',
-        // 设置最小可选日期为今天
+        //设置最小可选日期为明天
         disabledDate: (time: Date) => {
-          return time.getTime() < Date.now() - 8.64e7;
+          return time.getTime() < Date.now();
         }
       },
       fieldName: 'releaseDate',
@@ -344,66 +399,66 @@ async function onSubmit(values: Record<string, any>) {
   ElMessage.success('正在提交中...');
   modalApi.lock();
   try {
-      const formvalues:any = await formApi.getValues<Record<string, any>>();
-      const { values } = modalApi.getData<Record<string, any>>();
-      if (formvalues) {
-        if (values && values.id != null) {
-          await editOrg({
-            id:values.id,
-            ...formvalues
-          })
-        }
-        else {
-          await addOrg(formvalues)
-        }
+    const formvalues: any = await formApi.getValues<Record<string, any>>();
+    const { values } = modalApi.getData<Record<string, any>>();
+    if (formvalues) {
+      if (values && values.id != null) {
+        await editOrg({
+          id: values.id,
+          ...formvalues
+        })
       }
+      else {
+        await addOrg(formvalues)
+      }
+    }
     //setTimeout(() => {
-      modalApi.close();
-      gridApi.reload();
-      ElMessage.success(`提交成功：${JSON.stringify(values)}`);
+    modalApi.close();
+    gridApi.reload();
+    ElMessage.success(`提交成功`);
     //}, 1000);
-  }catch (error) {
+  } catch (error) {
     ElMessage.error('提交失败');
     modalApi.unlock();
   }
-  
+
 }
 
-const onOrgDatil = async (row : any) => {
+const onOrgDatil = async (row: any) => {
   // modalApi.setData({
   //     // 表单值
   //     values: { field1: 'abc', field2: '123' },
   //   })
-    let rowdata:any = await queryOrg({id:row.id});
-    // 克隆数据以避免直接修改原始数据
-    const clonedData = JSON.parse(JSON.stringify(rowdata.data));
+  let rowdata: any = await queryOrg({ id: row.id });
+  // 克隆数据以避免直接修改原始数据
+  const clonedData = JSON.parse(JSON.stringify(rowdata.data));
 
-    clonedData.area = clonedData.area.split(',');
-    
-    modalApi.setData({
-      // 表单值
-      values: clonedData,
-      id: row.id,
-    })
-    
-    modalApi.setState({
-        title:'机构详情'
-      }
-    );
+  clonedData.area = clonedData.area.split(',');
 
-    modalApi.open();
+  modalApi.setData({
+    // 表单值
+    values: clonedData,
+    id: row.id,
+  })
+
+  modalApi.setState({
+    title: '机构详情'
+  }
+  );
+
+  modalApi.open();
 };
 
 // 打开对话框
 function openFormModal() {
-    modalApi.open();
-    // 清空表单数据
-    formApi.resetForm();
-    modalApi.setData({
-    })
-    modalApi.setState({
-      title: '新增机构信息'
-    });
+  modalApi.open();
+  // 清空表单数据
+  formApi.resetForm();
+  modalApi.setData({
+  })
+  modalApi.setState({
+    title: '新增机构信息'
+  });
 }
 
 // 根据授权状态返回对应的颜色
@@ -422,14 +477,14 @@ const getStateType = (state: string) => {
 
 // 授权
 const dialogVisible = ref(false);
-let currow:any = null
+let currow: any = null
 
-const handleSelect = async (data : any) => {
+const handleSelect = async (data: any) => {
   console.log('当前授权的课程', data)
   // 处理选中数据
   let auth = await courseAuth({
-    authObjType:"机构",
-    courseList: data.map((item:any) => ({
+    authObjType: "机构",
+    courseList: data.map((item: any) => ({
       courseId: item,
       releaseDate: '',
       type: 1
@@ -440,11 +495,11 @@ const handleSelect = async (data : any) => {
   ElMessage.success(`授权成功`);
 };
 
-let authlist:any = ref([]);
-const onAuth = async (row:any) => {
+let authlist: any = ref([]);
+const onAuth = async (row: any) => {
   currow = row
   let authData = await getAuthList({
-    authObjType:"机构",
+    authObjType: "机构",
     id: currow.id
   })
   authlist.value = authData;
@@ -462,39 +517,23 @@ const onAuth = async (row:any) => {
   <Page auto-content-height>
     <Grid table-title="机构列表" table-title-help="显示所有的机构信息，用户可以通过上面的过滤条过滤数据，能够多选。">
       <template #action="{ row }">
-        <Button 
-          type="link" 
-          style="color: #1890ff; margin-right: 8px" 
-          @click="onOrgDatil(row)"
-        >
+        <Button type="link" style="color: #1890ff; margin-right: 8px" @click="onOrgDatil(row)">
           详情
         </Button>
-        <Button 
-          type="link" 
-          style="color: #1890ff; margin-right: 8px" 
-          @click="handleSchoolManage(row)"
-        >
+        <Button type="link" style="color: #1890ff; margin-right: 8px" @click="handleSchoolManage(row)">
           学校管理
         </Button>
-        <Button 
-          type="link" 
-          style="color: #1890ff; margin-right: 8px"
-          @click="handleTeacherManage(row)"
-        >
+        <Button type="link" style="color: #1890ff; margin-right: 8px" @click="handleTeacherManage(row)">
           教师管理
         </Button>
-        <Button 
-          type="link" 
-          style="color: #1890ff; margin-right: 8px" 
-          @click="onAuth(row)"
-        >
+        <Button type="link" style="color: #1890ff; margin-right: 8px" @click="onAuth(row)">
           课程授权
         </Button>
       </template>
       <template #state="{ row }">
         <ElTag :type="getStateType(row.state)">{{ row.state }}</ElTag>
       </template>
-      <template #releaseDate="{ row }" >
+      <template #releaseDate="{ row }">
         {{ row.releaseDate }}
       </template>
       <template #toolbar-actions>
@@ -516,11 +555,7 @@ const onAuth = async (row:any) => {
     <Modal>
       <Form />
     </Modal>
-     <!-- 授权对话框-->
-     <authkc
-          v-model:visible="dialogVisible"
-          @select="handleSelect"
-          :selected-keys="authlist"
-        />
+    <!-- 授权对话框-->
+    <authkc v-model:visible="dialogVisible" @select="handleSelect" :selected-keys="authlist" />
   </Page>
 </template>

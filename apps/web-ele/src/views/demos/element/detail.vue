@@ -62,7 +62,7 @@ import { useTabs } from '@vben/hooks';
 import { ElTabs, ElTabPane } from 'element-plus';
 import type { VxeGridProps } from '#/adapter/vxe-table';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { getSchoolList, addSchool, deleteSchool, querySchool, editSchool, courseAuth, getAuthList } from '#/api/core/sys';
+import { getSchoolList, addSchool, deleteSchool, querySchool, editSchool, courseAuth, getAuthList, updateOrgStatus } from '#/api/core/sys';
 import { ElButton, ElMessage, ElMessageBox, ElTag } from 'element-plus';
 import { useVbenModal } from '@vben/common-ui';
 import { useVbenForm } from '#/adapter/form';
@@ -201,10 +201,64 @@ const onSchoolDel = () => {
 
 const onUserAuth = async (row:any) => {
   // 处理选中数据
+  const rows = gridApi.grid.getCheckboxRecords();
+  if (rows.length === 0) {
+    ElMessage.warning('请选择要启用的机构');
+    return;
+  }
+
+  ElMessageBox.confirm(`确定要启用选中的 ${rows.length} 个学校吗?`, '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning',
+  }).then(async () => {
+    try {
+      // 调用启用接口
+      await updateOrgStatus({
+        ids: rows.map(row => row.id),
+        state: '正常授权',
+        type: "学校"
+      });
+      ElMessage.success('启用成功');
+      // 刷新表格数据
+      gridApi.reload();
+    } catch (error) {
+      ElMessage.error('启用失败');
+    }
+  }).catch(() => {
+    ElMessage.info('已取消启用');
+  });
 }
 
 const onStopUserAuth = async (row:any) => {
   // 处理选中数据
+  const rows = gridApi.grid.getCheckboxRecords();
+  if (rows.length === 0) {
+    ElMessage.warning('请选择要停用的学校');
+    return;
+  }
+
+  ElMessageBox.confirm(`确定要停用选中的 ${rows.length} 个学校吗?`, '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning',
+  }).then(async () => {
+    try {
+      // 调用停用接口
+      await updateOrgStatus({
+        ids: rows.map(row => row.id),
+        state: '停止授权',
+        type: "学校"
+      });
+      ElMessage.success('停用成功');
+      // 刷新表格数据
+      gridApi.reload();
+    } catch (error) {
+      ElMessage.error('停用失败');
+    }
+  }).catch(() => {
+    ElMessage.info('已取消停用');
+  });
 }
 
 // 根据授权状态返回对应的颜色
