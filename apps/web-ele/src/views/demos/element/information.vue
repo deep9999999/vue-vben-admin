@@ -632,9 +632,9 @@ const getPlayName = (row : any) => {
                 @click="selectCourse(index)"
               >
                 <template #title>
-                  <span class="mr-2 text-blue-500">{{
+                  <!-- <span class="mr-2 text-blue-500">{{
                     String(index + 1).padStart(2, '0')
-                  }}</span>
+                  }}</span> -->
                   <span>{{ item.name }}</span>
                 </template>
               </ElMenuItem>
@@ -666,9 +666,9 @@ const getPlayName = (row : any) => {
                 @click="selectTab"
               >
                 <template #title>
-                  <span class="mr-2 text-blue-500">{{
+                  <!-- <span class="mr-2 text-blue-500">{{
                     String(index + 1).padStart(2, '0')
-                  }}</span>
+                  }}</span> -->
                   <span>{{ item.name }}</span>
                 </template>
               </ElMenuItem>
