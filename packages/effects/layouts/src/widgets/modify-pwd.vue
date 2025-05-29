@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import type { Recordable } from '@vben/types';
-
 import { computed, reactive } from 'vue';
-
 import { $t } from '@vben/locales';
-
 import { useVbenForm, z } from '@vben-core/form-ui';
 import { useVbenModal } from '@vben-core/popup-ui';
 import { VbenAvatar, VbenButton } from '@vben-core/shadcn-ui';
+import { ElButton, ElMessage, ElMessageBox, ElTag } from 'element-plus';
 
 interface Props {
   avatar?: string;
@@ -25,6 +23,7 @@ withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
   submit: [Recordable<any>];
+  cancel: [];
 }>();
 
 const [Form, { resetForm, validate, getValues }] = useVbenForm(
@@ -37,23 +36,43 @@ const [Form, { resetForm, validate, getValues }] = useVbenForm(
       {
         component: 'VbenInputPassword' as const,
         componentProps: {
-          placeholder: $t('ui.widgets.lockScreen.placeholder'),
+          placeholder: "旧密码"
         },
-        fieldName: 'lockScreenPassword',
+        fieldName: 'oldPassword',
         formFieldProps: { validateOnBlur: false },
-        label: $t('authentication.password'),
-        rules: z
-          .string()
-          .min(1, { message: $t('ui.widgets.lockScreen.placeholder') }),
+        rules: z.string().min(6, { message: "密码最小6位" }),
+      },
+      {
+        component: 'VbenInputPassword' as const,
+        componentProps: {
+          placeholder: "新密码",
+        },
+        fieldName: 'newPassword',
+        label: "新密码",
+        formFieldProps: { validateOnBlur: false },
+        rules: z.string().min(6, { message: "密码最小6位" }),
+      },
+      {
+        component: 'VbenInputPassword' as const,
+        componentProps: {
+          placeholder: "确认密码",
+        },
+        fieldName: 'confirmPassword',
+        formFieldProps: { validateOnBlur: false },
+        label: "确认密码",
+        rules: z.string().min(6, { message: "密码最小6位" }),
       },
     ]),
     showDefaultActions: false,
   }),
 );
 
-const [Modal] = useVbenModal({
+const [Modal, formApi] = useVbenModal({
   onConfirm() {
     handleSubmit();
+  },
+  onCancel() {
+    emit('cancel');
   },
   onOpenChange(isOpen) {
     if (isOpen) {
@@ -66,7 +85,14 @@ async function handleSubmit() {
   const { valid } = await validate();
   const values = await getValues();
   if (valid) {
-    emit('submit', values?.lockScreenPassword);
+    if (values.newPassword !== values.confirmPassword) {
+      ElMessage.error('两次输入的密码不一致');
+      return;
+    }
+    emit('submit', {
+      oldPassword: values.oldPassword,
+      newPassword: values.newPassword,
+    });
   }
 }
 </script>
@@ -75,7 +101,7 @@ async function handleSubmit() {
   <Modal
     :footer="false"
     :fullscreen-button="false"
-    :title="$t('ui.widgets.lockScreen.title')"
+    :title="$t('ui.widgets.modifyPassword.title')"
   >
     <div
       class="mb-10 flex w-full flex-col items-center px-10"
@@ -93,7 +119,14 @@ async function handleSubmit() {
           </div>
         </div>
         <Form />
-        
+        <div class="mt-6 flex justify-end space-x-4">
+          <VbenButton @click="formApi.close()">
+            {{ $t('common.cancel') }}
+          </VbenButton>
+          <VbenButton type="primary" @click="handleSubmit">
+            {{ $t('common.confirm') }}
+          </VbenButton>
+        </div>
       </div>
     </div>
   </Modal>

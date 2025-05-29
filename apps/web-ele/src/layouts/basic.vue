@@ -12,6 +12,7 @@ import {
   LockScreen,
   Notification,
   UserDropdown,
+  ModifyPwd
 } from '@vben/layouts';
 import { preferences } from '@vben/preferences';
 import { useAccessStore, useUserStore } from '@vben/stores';
@@ -20,6 +21,12 @@ import { openWindow } from '@vben/utils';
 import { $t } from '#/locales';
 import { useAuthStore } from '#/store';
 import LoginForm from '#/views/_core/authentication/login.vue';
+import { useVbenModal } from '@vben/common-ui';
+
+
+const [LockModal, lockModalApi] = useVbenModal({
+  connectedComponent: ModifyPwd,
+});
 
 const notifications = ref<NotificationItem[]>([
   // {
@@ -60,6 +67,12 @@ const showDot = computed(() =>
   notifications.value.some((item) => !item.isRead),
 );
 
+
+const handleSubmitModifyPwd = async (data: any) => {
+  lockModalApi.close();
+  console.log("修改密码", data)
+};
+
 const menus = computed(() => [
   // {
   //   handler: () => {
@@ -79,15 +92,13 @@ const menus = computed(() => [
   //   icon: MdiGithub,
   //   text: 'GitHub',
   // },
-  // {
-  //   handler: () => {
-  //     openWindow(`${VBEN_GITHUB_URL}/issues`, {
-  //       target: '_blank',
-  //     });
-  //   },
-  //   icon: CircleHelp,
-  //   text: $t('ui.widgets.qa'),
-  // },
+  {
+    handler: () => {
+      lockModalApi.open();
+    },
+    icon: BookOpenText,
+    text: "修改密码",
+  },
 ]);
 
 const avatar = computed(() => {
@@ -123,7 +134,14 @@ watch(
 </script>
 
 <template>
+
+  <LockModal
+  :avatar
+    @submit="handleSubmitModifyPwd"
+  />
+
   <BasicLayout @clear-preferences-and-logout="handleLogout">
+    
     <template #user-dropdown>
       <UserDropdown
         :avatar
@@ -135,12 +153,15 @@ watch(
       />
     </template>
     <template #notification>
-      <Notification
+
+      
+      <ModifyPwd />
+      <!-- <Notification
         :dot="showDot"
         :notifications="notifications"
         @clear="handleNoticeClear"
         @make-all="handleMakeAll"
-      />
+      /> -->
     </template>
     <template #extra>
       <AuthenticationLoginExpiredModal

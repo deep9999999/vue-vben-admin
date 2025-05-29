@@ -451,13 +451,15 @@ const [Form, formApi] = useVbenForm({
         ],
       },
       rules: 'required',
-      defaultValue: '允许',
+      defaultValue: '禁止',
       fieldName: 'isdownload',
       label: '允许下载',
     },
   ],
   showDefaultActions: false,
 });
+
+
 
 const [Modal, modalApi] = useVbenModal({
   fullscreenButton: false,
