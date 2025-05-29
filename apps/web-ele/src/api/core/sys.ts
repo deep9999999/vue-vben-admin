@@ -328,7 +328,8 @@ export async function addFile(data: {
   name: string; // 资料名称
   type: string; // 文件类型
   fileUrl: string; // 文件对象
-  isdownload: boolean; // 是否允许下载,
+  isdownload: string; // 是否允许下载,
+  autocache: string; // 是否自动缓存
 }) {
   return requestClient.post<void>('/classesSrc/addFile', data);
 }
@@ -343,6 +344,7 @@ export async function editFile(data: {
   type: string; // 文件类型
   fileUrl: string; // 文件对象
   isdownload: string; // 是否允许下载,
+  autocache: string; // 是否自动缓存
 }) {
   return requestClient.post<void>('/classesSrc/editFile', data);
 }
@@ -408,6 +410,7 @@ export async function updateOrgStatus(data: {
   ids: string[]; // 机构ID列表
   state: string; // 状态
   type: string; // 类型
+  releaseDate?: string; // 发布时间
 }) {
   return requestClient.post<void>('/org/updateStatus', data);
 }

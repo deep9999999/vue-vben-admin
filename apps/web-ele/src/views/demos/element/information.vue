@@ -444,7 +444,7 @@ const [Form, formApi] = useVbenForm({
         limit: 1,
         multiple: false,
         // 上传列表的内建样式，支持四种基本样式 text, picture, picture-card 和 picture-circle
-        listType: 'picture-circle',
+        listType: 'text',
         name: 'file',
         'on-remove': async (uploadFile: any, uploadFiles: any) => {
           await removeFile({ id: uploadFile.id });
@@ -479,6 +479,25 @@ const [Form, formApi] = useVbenForm({
       defaultValue: '禁止',
       fieldName: 'isdownload',
       label: '允许下载',
+    },
+    {
+      component: 'RadioGroup',
+      componentProps: {
+        options: [
+          {
+            label: '允许',
+            value: '允许',
+          },
+          {
+            label: '禁止',
+            value: '禁止',
+          },
+        ],
+      },
+      rules: 'required',
+      defaultValue: '禁止',
+      fieldName: 'autocache',
+      label: '自动缓存',
     },
   ],
   showDefaultActions: false,
@@ -520,6 +539,7 @@ async function onSubmit(values: Record<string, any>) {
             type: formvalues.type,
             fileUrl: formvalues.files[0].response.data.url,
             isdownload: formvalues.isdownload,
+            autocache: formvalues.autocache,
           })
         : addFile({
             classId: selectTabValue,
@@ -527,6 +547,7 @@ async function onSubmit(values: Record<string, any>) {
             name: formvalues.name,
             type: formvalues.type,
             isdownload: formvalues.isdownload,
+            autocache: formvalues.autocache,
           }));
     }
     // setTimeout(() => {

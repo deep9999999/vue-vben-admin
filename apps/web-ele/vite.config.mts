@@ -23,8 +23,8 @@ export default defineConfig(async () => {
             
             //target: 'http://localhost:5320/api',
             // 后端代理目标地址
-            target: 'http://118.31.173.178:6001/api',
-            //target: 'https://1ac3-2409-8a4c-8015-d160-1cdc-cdd4-c89e-ef42.ngrok-free.app/api',
+            //target: 'http://118.31.173.178:6001/api',
+            target: 'https://d623-2409-8a4c-8015-d160-9c4a-cefe-ce40-b0d7.ngrok-free.app/api',
             ws: true,
           },
         },

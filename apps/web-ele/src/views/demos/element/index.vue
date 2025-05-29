@@ -193,6 +193,7 @@ gridApi.setGridOptions({
 });
 
 const onUserAuth = async (row: any) => {
+
   // 处理选中数据
   const rows = gridApi.grid.getCheckboxRecords();
   if (rows.length === 0) {
@@ -206,21 +207,14 @@ const onUserAuth = async (row: any) => {
     type: 'warning',
   }).then(async () => {
     try {
-      // 调用启用接口
-      await updateOrgStatus({
-        ids: rows.map(row => row.id),
-        state: '正常授权',
-        type: "机构"
-      });
-      ElMessage.success('启用成功');
-      // 刷新表格数据
-      gridApi.reload();
+      XmodalApi.open();
     } catch (error) {
       ElMessage.error('启用失败');
     }
   }).catch(() => {
     ElMessage.info('已取消启用');
   });
+
 
 }
 
@@ -369,6 +363,7 @@ const [Form, formApi] = useVbenForm({
         }
       },
       fieldName: 'releaseDate',
+      rules: 'required',
       label: '到期时间',
     }
   ],
@@ -507,11 +502,75 @@ const onAuth = async (row: any) => {
 }
 
 
+const XonSubmit = async (values: Record<string, any>) => {
+  // 处理选中数据
+  const rows = gridApi.grid.getCheckboxRecords();
+  try {
+    // 调用启用接口
+    await updateOrgStatus({
+      ids: rows.map(row => row.id),
+      state: '正常授权',
+      type: "机构",
+      releaseDate: values.releaseDate
+    });
+    ElMessage.success('启用成功');
+    // 刷新表格数据
+    gridApi.reload();
+
+    XmodalApi.close();
+  } catch (error) {
+    ElMessage.error('启用失败');
+  }
+}
+
+// 启用账户对话框
+const [XForm, XformApi] = useVbenForm({
+  handleSubmit: XonSubmit,
+  
+  schema: [
+    {
+      component: 'DatePicker',
+      componentProps: {
+        placeholder: '请输入',
+        type: 'date',
+        format: 'YYYY-MM-DD',
+        valueFormat: 'YYYY-MM-DD',
+        //设置最小可选日期为明天
+        disabledDate: (time: Date) => {
+          return time.getTime() < Date.now();
+        }
+      },
+      rules: 'required',
+      fieldName: 'releaseDate',
+      label: '到期时间',
+    }
+  ],
+  showDefaultActions: true,
+});
+
+const [XModal, XmodalApi] = useVbenModal({
+  fullscreenButton: false,
+  showConfirmButton: false,
+  showCancelButton: false,
+  onCancel() {
+    XmodalApi.close();
+  },
+  onConfirm: async () => {
+    await XformApi.validateAndSubmitForm();
+    // modalApi.close();
+  },
+  onOpenChange(isOpen: boolean) {
+    if (isOpen) {
+      const { values } = XmodalApi.getData<Record<string, any>>();
+      if (values) {
+        XformApi.setValues(values);
+      }
+    }
+  },
+  title: '账户启用',
+});
+
 </script>
-
-
-
-
 
 <template>
   <Page auto-content-height>
@@ -555,6 +614,10 @@ const onAuth = async (row: any) => {
     <Modal>
       <Form />
     </Modal>
+    <!-- 启用账户对话框 -->
+    <XModal>
+      <XForm />
+    </XModal>
     <!-- 授权对话框-->
     <authkc v-model:visible="dialogVisible" @select="handleSelect" :selected-keys="authlist" />
   </Page>
