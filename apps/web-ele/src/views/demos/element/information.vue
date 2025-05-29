@@ -173,6 +173,7 @@ const selectCourse = (index: any) => {
     tabs.value = currentTabs.map((tab: any) => ({
       name: tab.name,
       value: tab.id,
+      secname: tab.secname != null && tab.secname != '' ? tab.secname : null,
     }));
     // 重置当前激活的标签为第一个
     activeTab.value = 0;
@@ -237,6 +238,7 @@ const fetchCourseData = async () => {
         courseList.value = courseDetail.children.map((item: any) => ({
           name: item.name,
           value: item.id,
+          secname: item.secname != null && item.secname != '' ? item.secname : null,
         }));
 
         tabsList.value = courseDetail.children;
@@ -688,6 +690,10 @@ const getPlayName = (row : any) => {
                     String(index + 1).padStart(2, '0')
                   }}</span> -->
                   <span>{{ item.name }}</span>
+                  
+                  <span v-if="item.secname" style="padding: 0px 10px;">({{ item.secname }})</span>
+                  
+                  
                 </template>
               </ElMenuItem>
             </ElMenu>
@@ -722,6 +728,9 @@ const getPlayName = (row : any) => {
                     String(index + 1).padStart(2, '0')
                   }}</span> -->
                   <span>{{ item.name }}</span>
+                  
+                  <span v-if="item.secname" style="padding: 0px 10px;">({{ item.secname }})</span>
+                  
                 </template>
               </ElMenuItem>
             </ElMenu>
