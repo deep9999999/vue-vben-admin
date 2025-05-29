@@ -691,7 +691,7 @@ const getPlayName = (row : any) => {
                   }}</span> -->
                   <span>{{ item.name }}</span>
                   
-                  <span v-if="item.secname" style="padding: 0px 10px;">({{ item.secname }})</span>
+                  <span v-if="item.secname" >({{ item.secname }})</span>
                   
                   
                 </template>
@@ -708,7 +708,7 @@ const getPlayName = (row : any) => {
         >
         <template #header>
             <div class="flex flex-col">
-              <span class="text-base font-bold">子目录</span>
+              <span class="text-base font-bold">{{courseList[activeIndex].name}}</span>
               <span class="mt-2 text-sm text-gray-500">{{  }}</span>
             </div>
           </template>
@@ -729,7 +729,7 @@ const getPlayName = (row : any) => {
                   }}</span> -->
                   <span>{{ item.name }}</span>
                   
-                  <span v-if="item.secname" style="padding: 0px 10px;">({{ item.secname }})</span>
+                  <span v-if="item.secname">({{ item.secname }})</span>
                   
                 </template>
               </ElMenuItem>
@@ -986,8 +986,8 @@ const getPlayName = (row : any) => {
       font-weight: bold;
       color: var(--el-color-primary);
       background-color: var(--el-color-primary-light-9);
-      border-right: 2px solid var(--el-color-primary);
-
+      border-left: 2px solid var(--el-color-primary);
+      
       &::after {
         display: none;
       }
