@@ -300,7 +300,7 @@ const openResource = async (item: any) => {
     }, 300); // 延迟300ms等待对话框动画
   } else if (item.type === 'PDF') {
     // PDF类型，打开内嵌预览
-    pdfUrl.value = `${resroot}${item.fileUrl}`;
+    pdfUrl.value = `${import.meta.env.VITE_PDF_SERVER}?file=${resroot}${item.fileUrl}`;
     pdfVisible.value = true;
 
     await nextTick();
@@ -814,10 +814,11 @@ const getPlayName = (row : any) => {
       class="pdf-dialog"
       top="0"
       append-to-body
-      style="border-radius: 0px;padding:0px;--el-dialog-padding-primary: 0px"
+      style="border-radius: 0px;padding:0px;--el-dialog-padding-primary: 0px;height: 70vh;"
     >
       <div
         class="preview-container"
+        style="height: 90vh;"
         ref="pdfContainer"
       >
         <div class="preview-toolbar">
@@ -834,10 +835,13 @@ const getPlayName = (row : any) => {
         </div>
         <iframe
           v-if="pdfUrl"
-          :src="`/pdfjs/web/viewer.html?file=${pdfUrl}`"
+          :src="`${pdfUrl}`"
           class="pdf-iframe"
           frameborder="0"
           allowfullscreen
+          width="100%"
+          height="100%"
+          
         ></iframe>
       </div>
     </ElDialog>
@@ -1172,4 +1176,6 @@ const getPlayName = (row : any) => {
   width: 100%;
   height: 100%;
 }
+
+
 </style>

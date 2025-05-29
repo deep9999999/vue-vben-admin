@@ -96,7 +96,7 @@ async function handleSubmit() {
       return;
     }
     emit('submit', {
-      oldPassword: values.oldPassword,
+      password: values.oldPassword,
       newPassword: values.newPassword,
       confirmPassword: values.confirmPassword,
     });

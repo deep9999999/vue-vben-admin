@@ -81,39 +81,22 @@ const handleSubmitModifyPwd = async (data: any) => {
   await handleLogout();
 };
 
-const isTeacher = computed(() => {
+const menus = computed(() => {
   const roles = userStore.userInfo?.roles || [];
-  return roles.includes('teacher');
-});
+  if (roles.includes('teacher')) {
+    return [];
+  }
 
-const menus = computed(() => isTeacher.value ? [] :[
-  // {
-  //   handler: () => {
-  //     openWindow(VBEN_DOC_URL, {
-  //       target: '_blank',
-  //     });
-  //   },
-  //   icon: BookOpenText,
-  //   text: $t('ui.widgets.document'),
-  // },
-  // {
-  //   handler: () => {
-  //     openWindow(VBEN_GITHUB_URL, {
-  //       target: '_blank',
-  //     });
-  //   },
-  //   icon: MdiGithub,
-  //   text: 'GitHub',
-  // },
-  {
-    handler: () => {
-      lockModalApi.open();
+  return [
+    {
+      handler: () => {
+        lockModalApi.open();
+      },
+      icon: BookOpenText,
+      text: "修改密码",
     },
-    icon: BookOpenText,
-    text: "修改密码",
-  },
-]);
-
+  ]
+});
 
 const avatar = computed(() => {
   return userStore.userInfo?.avatar ?? preferences.app.defaultAvatar;
