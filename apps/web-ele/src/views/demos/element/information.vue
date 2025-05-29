@@ -162,8 +162,10 @@ const subTitle = ref('');
 
 // 当前激活的课程目录索引
 const activeIndex: any = ref(0);
+const activeName: any = ref('');
 const selectCourse = (index: any) => {
   activeIndex.value = index;
+  activeName.value = courseList.value[index].name;
 
   // 根据选中的课程索引获取对应的标签列表
   if (tabsList.value && tabsList.value.length > 0 && tabsList.value[index]) {
@@ -376,7 +378,6 @@ const gridOptions: VxeTableGridOptions<RowType> = {
     keyField: 'id',
   },
   height: '700px',
-  
   proxyConfig: {
     ajax: {
       query: async ({ page }, formValues) => {
@@ -661,8 +662,8 @@ const getPlayName = (row : any) => {
 
 
 <template>
-  <Page auto-content-height>
-    <ElRow>
+  <Page auto-content-height class="flex h-full">
+    <ElRow style="width: 100%;">
       <ElCol :span="4" id="left">
         <ElCard
           class="course-sidebar"
@@ -708,7 +709,7 @@ const getPlayName = (row : any) => {
         >
         <template #header>
             <div class="flex flex-col">
-              <span class="text-base font-bold">{{courseList[activeIndex].name}}</span>
+              <span class="text-base font-bold">{{activeName}}</span>
               <span class="mt-2 text-sm text-gray-500">{{  }}</span>
             </div>
           </template>
@@ -739,7 +740,7 @@ const getPlayName = (row : any) => {
         
       </ElCol>
       <ElCol :span="16" class="p-6">
-        <Grid >
+        <Grid>
           <template #action="{ row }">
             
             <ElButton
@@ -961,11 +962,13 @@ const getPlayName = (row : any) => {
 .course-sidebar {
   flex-shrink: 0;
   margin: 20px;
-
+  
+  height: 95%;
+  
   /* 防止侧边栏被压缩 */
 
   :deep(.el-card__header) {
-    padding: 15px;
+    padding: 10px;
   }
 
   :deep(.el-menu) {
@@ -1039,7 +1042,7 @@ const getPlayName = (row : any) => {
 .course-content {
   flex: 1;
   padding: 20px;
-
+  
   :deep(.el-tabs__header) {
     margin-bottom: 16px;
   }
