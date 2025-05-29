@@ -82,12 +82,12 @@ const closePdf = async () => {
 // 关闭视频预览
 const onPlayVideo = async () => {
   videotoggleDom();
-// 获取视频元素
-const videoElement:any = document.querySelector('.video-player');
-if (videoElement) {
-  // 开始播放视频
-  videoElement.play();
-}
+  // 获取视频元素
+  const videoElement: any = document.querySelector('.video-player');
+  if (videoElement) {
+    // 开始播放视频
+    videoElement.play();
+  }
   videoVisible.value = true;
 }
 
@@ -102,7 +102,7 @@ const closeVideo = async () => {
 // 播放音频
 const onPlayAudio = async () => {
   // 获取音频元素
-  const audioElement:any = document.querySelector('.audio-player');
+  const audioElement: any = document.querySelector('.audio-player');
   if (audioElement) {
     // 开始播放音频
     audioElement.play();
@@ -112,7 +112,7 @@ const onPlayAudio = async () => {
 
 // 关闭音频预览
 const closeAudio = async () => {
-  const audioElement:any = document.querySelector('.audio-player');
+  const audioElement: any = document.querySelector('.audio-player');
   if (audioElement) {
     // 开始播放音频
     audioElement.pause(); // 暂停音频播放
@@ -127,13 +127,13 @@ const closeAudio = async () => {
 
 // 关闭预览
 const closePreview = async () => {
-  
+
   if (ispreviewDomFullscreen.value) {
     previewtoggleDom();
   }
   previewVisible.value = false;
   previewUrl.value = '';
-  
+
 };
 
 const userStore = useUserStore();
@@ -165,7 +165,7 @@ const activeIndex: any = ref(0);
 const activeName: any = ref('');
 const selectCourse = (index: any) => {
   activeIndex.value = index;
-  activeName.value = courseList.value[index].name;
+  activeName.value = courseList.value[index].secname;
 
   // 根据选中的课程索引获取对应的标签列表
   if (tabsList.value && tabsList.value.length > 0 && tabsList.value[index]) {
@@ -175,12 +175,13 @@ const selectCourse = (index: any) => {
     tabs.value = currentTabs.map((tab: any) => ({
       name: tab.name,
       value: tab.id,
-      secname: tab.secname != null && tab.secname != '' ? tab.secname : null,
+      secname: tab.secname != null && tab.secname != '' ? `${tab.name}(${tab.secname})` : `${tab.name}`,
     }));
     // 重置当前激活的标签为第一个
     activeTab.value = 0;
     // 更新选中的标签值
     selectTabValue = tabs.value[0]?.value;
+    selectTabName.value = `${tabs.value[0].secname}`
     // 重新加载表格数据
     gridApi.query();
   }
@@ -195,15 +196,17 @@ const tabs: any = ref([]);
 // 当前激活的标签索引
 const activeTab: any = ref(0);
 let selectTabValue: any = null;
+let selectTabName: any = ref("");
 
 if (tabs.value.length > 0) {
   selectTabValue = tabs.value[0].value;
+  selectTabName.value = tabs.value[0].secname
 }
 // 选择标签的方法
 const selectTab = (v: any) => {
   activeTab.value = v.index;
   selectTabValue = tabs.value[v.index].value;
-
+  selectTabName.value = tabs.value[v.index].secname
   // 添加滚动逻辑
   nextTick(() => {
     // 获取当前选中的标签元素
@@ -240,7 +243,7 @@ const fetchCourseData = async () => {
         courseList.value = courseDetail.children.map((item: any) => ({
           name: item.name,
           value: item.id,
-          secname: item.secname != null && item.secname != '' ? item.secname : null,
+          secname: item.secname != null && item.secname != '' ? `${item.name}(${item.secname})` : `${item.name}`,
         }));
 
         tabsList.value = courseDetail.children;
@@ -327,24 +330,24 @@ interface RowType {
   type: 'doc' | 'ppt';
 }
 
-let columns:any =  [
-    { align: 'left', title: '', type: 'checkbox', width: 50 },
-    { field: 'id', title: '序号', width: 50 },
-    { field: 'name', title: '资料', width: 200, align: 'left' },
-    { field: 'type', title: '类型', width: 100, align: 'left' },
-    // { field: 'fileUrl', title: 'URL', width: 300, align: 'left' },
-    {
-      field: 'createTime',
-      title: '创建时间',
-    },
-    {
-      field: 'action',
-      fixed: 'right',
-      align: 'left',
-      slots: { default: 'action' },
-      title: '操作',
-    },
-  ]
+let columns: any = [
+  { align: 'left', title: '', type: 'checkbox', width: 50 },
+  { field: 'id', title: '序号', width: 50 },
+  { field: 'name', title: '资料', width: 200, align: 'left' },
+  { field: 'type', title: '类型', width: 100, align: 'left' },
+  // { field: 'fileUrl', title: 'URL', width: 300, align: 'left' },
+  {
+    field: 'createTime',
+    title: '创建时间',
+  },
+  {
+    field: 'action',
+    fixed: 'right',
+    align: 'left',
+    slots: { default: 'action' },
+    title: '操作',
+  },
+]
 
 if (isTeacher.value) {
   columns = [
@@ -537,21 +540,21 @@ async function onSubmit(values: Record<string, any>) {
     if (formvalues) {
       await (values && values.id != null
         ? editFile({
-            id: values.id,
-            name: formvalues.name,
-            type: formvalues.type,
-            fileUrl: formvalues.files[0].response.data.url,
-            isdownload: formvalues.isdownload,
-            autocache: formvalues.autocache,
-          })
+          id: values.id,
+          name: formvalues.name,
+          type: formvalues.type,
+          fileUrl: formvalues.files[0].response.data.url,
+          isdownload: formvalues.isdownload,
+          autocache: formvalues.autocache,
+        })
         : addFile({
-            classId: selectTabValue,
-            fileUrl: formvalues.files[0].response.data.url,
-            name: formvalues.name,
-            type: formvalues.type,
-            isdownload: formvalues.isdownload,
-            autocache: formvalues.autocache,
-          }));
+          classId: selectTabValue,
+          fileUrl: formvalues.files[0].response.data.url,
+          name: formvalues.name,
+          type: formvalues.type,
+          isdownload: formvalues.isdownload,
+          autocache: formvalues.autocache,
+        }));
     }
     // setTimeout(() => {
     modalApi.close();
@@ -639,7 +642,7 @@ const onDel = async () => {
     });
 };
 
-const getPlayName = (row : any) => {
+const getPlayName = (row: any) => {
   if (row.type === 'DOC') {
     return '打开';
   }
@@ -665,10 +668,7 @@ const getPlayName = (row : any) => {
   <Page auto-content-height class="flex h-full">
     <ElRow style="width: 100%;">
       <ElCol :span="4" id="left">
-        <ElCard
-          class="course-sidebar"
-          shadow="hover"
-        >
+        <ElCard class="course-sidebar" shadow="hover">
           <template #header>
             <div class="flex flex-col">
               <span class="text-base font-bold">{{ mainTitle }}</span>
@@ -676,116 +676,82 @@ const getPlayName = (row : any) => {
             </div>
           </template>
           <div class="h-[700px] overflow-auto">
-            <ElMenu
-              :default-active="String(activeIndex)"
-              class="course-menu"
-            >
-              <ElMenuItem
-                v-for="(item, index) in courseList"
-                :key="index"
-                :index="String(index)"
-                @click="selectCourse(index)"
-              >
+            <ElMenu :default-active="String(activeIndex)" class="course-menu">
+              <ElMenuItem v-for="(item, index) in courseList" :key="index" :index="String(index)"
+                @click="selectCourse(index)">
                 <template #title>
                   <!-- <span class="mr-2 text-blue-500">{{
                     String(index + 1).padStart(2, '0')
                   }}</span> -->
-                  <span>{{ item.name }}</span>
-                  
-                  <span v-if="item.secname" >({{ item.secname }})</span>
-                  
-                  
+                  <span>{{ item.secname }}</span>
+
+                 
+
+
                 </template>
               </ElMenuItem>
             </ElMenu>
           </div>
         </ElCard>
       </ElCol>
-      <ElCol :span="4" id="mid">
+      <ElCol :span="5" id="mid">
 
-        <ElCard
-          class="course-sidebar"
-          shadow="hover"
-        >
-        <template #header>
+        <ElCard class="course-sidebar" shadow="hover">
+          <template #header>
             <div class="flex flex-col">
-              <span class="text-base font-bold">{{activeName}}</span>
-              <span class="mt-2 text-sm text-gray-500">{{  }}</span>
+              <span class="text-base font-bold">{{ activeName }}</span>
+              <span class="mt-2 text-sm text-gray-500">{{ }}</span>
             </div>
           </template>
           <div class="h-[700px] overflow-auto">
-            <ElMenu
-              :default-active="String(activeTab)"
-              class="course-menu"
-            >
-              <ElMenuItem
-                v-for="(item, index) in tabs"
-                :key="index"
-                :index="String(index)"
-                @click="selectTab"
-              >
+            <ElMenu :default-active="String(activeTab)" class="course-menu">
+              <ElMenuItem v-for="(item, index) in tabs" :key="index" :index="String(index)" @click="selectTab">
                 <template #title>
                   <!-- <span class="mr-2 text-blue-500">{{
                     String(index + 1).padStart(2, '0')
                   }}</span> -->
-                  <span>{{ item.name }}</span>
+                  <span>{{ item.secname }}</span>
+
                   
-                  <span v-if="item.secname">({{ item.secname }})</span>
-                  
+
                 </template>
               </ElMenuItem>
             </ElMenu>
           </div>
         </ElCard>
-        
+
       </ElCol>
-      <ElCol :span="16" class="p-6">
+      <ElCol :span="15" class="p-3">
         <Grid>
           <template #action="{ row }">
-            
-            <ElButton
-              type="primary"
-              size="small"
-              :disabled="row.fileUrl == null || row.fileUrl == ''"
-              @click="openResource(row)"
-            >
+
+            <ElButton type="primary" size="small" :disabled="row.fileUrl == null || row.fileUrl == ''"
+              @click="openResource(row)">
               {{ getPlayName(row) }}
             </ElButton>
 
-            <ElButton
-              type="primary"
-              size="small"
-              v-if="row.isdownload == '允许'"
-              :disabled="row.fileUrl == null || row.fileUrl == ''"
-              @click="downloadResource(row)"
-            >
+            <ElButton type="primary" size="small" v-if="row.isdownload == '允许'"
+              :disabled="row.fileUrl == null || row.fileUrl == ''" @click="downloadResource(row)">
               下载
             </ElButton>
 
-            <ElButton
-              v-if="!isTeacher"
-              type="primary"
-              size="small"
-              @click="onKcDatil(row)"
-            >
+            <ElButton v-if="!isTeacher" type="primary" size="small" @click="onKcDatil(row)">
               详情
             </ElButton>
           </template>
           <template #toolbar-actions>
-            <ElButton
-              v-if="!isTeacher && tabs.length > 0"
-              type="primary"
-              @click="onAdd"
-            >
-              新增
-            </ElButton>
-            <ElButton
-              v-if="!isTeacher && tabs.length > 0"
-              type="danger"
-              @click="onDel"
-            >
-              删除
-            </ElButton>
+
+            <div class="flex justify-between items-center w-full">
+              <span class="text-base font-bold">{{ selectTabName }}</span>
+              <div>
+                <ElButton v-if="!isTeacher && tabs.length > 0" type="primary" @click="onAdd">
+                  新增
+                </ElButton>
+                <ElButton v-if="!isTeacher && tabs.length > 0" type="danger" @click="onDel">
+                  删除
+                </ElButton>
+              </div>
+            </div>
           </template>
         </Grid>
       </ElCol>
@@ -797,160 +763,76 @@ const getPlayName = (row : any) => {
     </Modal>
 
     <!-- 全屏预览弹框 -->
-    <ElDialog
-      v-model="previewVisible"
-      width="100%"
-      :close-on-click-modal="false"
-      :show-close="false"
-      class="preview-dialog"
-      top="0"
-      append-to-body
-      style="border-radius: 0px;padding:0px;--el-dialog-padding-primary: 0px"
-    >
-      <div
-        class="preview-container"
-        ref="previewContainer"
-      >
+    <ElDialog v-model="previewVisible" width="100%" :close-on-click-modal="false" :show-close="false"
+      class="preview-dialog" top="0" append-to-body
+      style="border-radius: 0px;padding:0px;--el-dialog-padding-primary: 0px">
+      <div class="preview-container" ref="previewContainer">
         <div class="preview-toolbar">
-          
-            <ElButton
-              @click="previewtoggleDom"
-            >
-            {{ispreviewDomFullscreen ? '退出全屏' : '全屏'}}
-            </ElButton>
-          
-            <ElButton
-              @click="closePreview"
-            >
-              返回
-            </ElButton>
-          
+
+          <ElButton @click="previewtoggleDom">
+            {{ ispreviewDomFullscreen ? '退出全屏' : '全屏' }}
+          </ElButton>
+
+          <ElButton @click="closePreview">
+            返回
+          </ElButton>
+
         </div>
-        <iframe
-          v-if="previewUrl"
-          :src="previewUrl"
-          class="preview-iframe"
-          frameborder="0"
-          allowfullscreen
-        ></iframe>
+        <iframe v-if="previewUrl" :src="previewUrl" class="preview-iframe" frameborder="0" allowfullscreen></iframe>
       </div>
     </ElDialog>
 
     <!-- PDF预览对话框 -->
-    <ElDialog
-      v-model="pdfVisible"
-      width="80%"
-      :close-on-click-modal="false"
-      :show-close="false"
-      class="pdf-dialog"
-      top="0"
-      append-to-body
-      style="border-radius: 0px;padding:0px;--el-dialog-padding-primary: 0px;height: 70vh;"
-    >
-      <div
-        class="preview-container"
-        style="height: 90vh;"
-        ref="pdfContainer"
-      >
+    <ElDialog v-model="pdfVisible" width="80%" :close-on-click-modal="false" :show-close="false" class="pdf-dialog"
+      top="0" append-to-body style="border-radius: 0px;padding:0px;--el-dialog-padding-primary: 0px;height: 70vh;">
+      <div class="preview-container" style="height: 90vh;" ref="pdfContainer">
         <div class="preview-toolbar">
-          <ElButton
-            @click="pdftoggleDom"
-          >
-            {{ispdfDomFullscreen ? '退出全屏' : '全屏'}}
+          <ElButton @click="pdftoggleDom">
+            {{ ispdfDomFullscreen ? '退出全屏' : '全屏' }}
           </ElButton>
-          <ElButton
-            @click="closePdf"
-          >
+          <ElButton @click="closePdf">
             返回
           </ElButton>
         </div>
-        <iframe
-          v-if="pdfUrl"
-          :src="`${pdfUrl}`"
-          class="pdf-iframe"
-          frameborder="0"
-          allowfullscreen
-          width="100%"
-          height="100%"
-          
-        ></iframe>
+        <iframe v-if="pdfUrl" :src="`${pdfUrl}`" class="pdf-iframe" frameborder="0" allowfullscreen width="100%"
+          height="100%"></iframe>
       </div>
     </ElDialog>
- 
+
     <!-- 视频播放对话框 -->
-    <ElDialog
-      v-model="videoVisible"
-      width="80%"
-      :close-on-click-modal="false"
-      :show-close="false"
-      class="video-dialog"
-      top="0"
-      append-to-body
-      style="border-radius: 0px;padding:0px;--el-dialog-padding-primary: 0px"
-    >
-      <div
-        class="preview-container"
-        ref="videoContainer"
-      >
+    <ElDialog v-model="videoVisible" width="80%" :close-on-click-modal="false" :show-close="false" class="video-dialog"
+      top="0" append-to-body style="border-radius: 0px;padding:0px;--el-dialog-padding-primary: 0px">
+      <div class="preview-container" ref="videoContainer">
         <div class="preview-toolbar">
-          <ElButton
-              @click="onPlayVideo"
-            >
-            {{isvideoDomFullscreen ? '退出全屏' : '全屏'}}
-            </ElButton>
-          
-            <ElButton
-              @click="closeVideo"
-            >
-              返回
-            </ElButton>
-          
+          <ElButton @click="onPlayVideo">
+            {{ isvideoDomFullscreen ? '退出全屏' : '全屏' }}
+          </ElButton>
+
+          <ElButton @click="closeVideo">
+            返回
+          </ElButton>
+
         </div>
-        <video
-          v-if="videoUrl"
-          :src="videoUrl"
-          class="video-player"
-          controls
-          autoplay
-          controlsList="nodownload"
-          disablePictureInPicture
-        ></video>
+        <video v-if="videoUrl" :src="videoUrl" class="video-player" controls autoplay controlsList="nodownload"
+          disablePictureInPicture></video>
       </div>
     </ElDialog>
 
     <!-- 音频播放对话框 -->
-    <ElDialog
-      v-model="audioVisible"
-      :close-on-click-modal="false"
-      :show-close="false"
-      class="audio-dialog"
-      top="0"
-      append-to-body
-      style="border-radius: 0px;padding:0px;--el-dialog-padding-primary: 0px"
-    >
-      <div
-        ref="audioContainer"
-      >
+    <ElDialog v-model="audioVisible" :close-on-click-modal="false" :show-close="false" class="audio-dialog" top="0"
+      append-to-body style="border-radius: 0px;padding:0px;--el-dialog-padding-primary: 0px">
+      <div ref="audioContainer">
         <div class="preview-toolbar">
-          
-          <ElButton
-              @click="closeAudio"
-            >
-              返回
-            </ElButton>
+
+          <ElButton @click="closeAudio">
+            返回
+          </ElButton>
         </div>
-        <audio
-          v-if="audioUrl"
-          :src="audioUrl"
-          class="audio-player"
-          controls
-          autoplay
-          controlsList="nodownload"
-        ></audio>
+        <audio v-if="audioUrl" :src="audioUrl" class="audio-player" controls autoplay controlsList="nodownload"></audio>
       </div>
     </ElDialog>
 
- </Page>
+  </Page>
 </template>
 
 
@@ -961,10 +843,11 @@ const getPlayName = (row : any) => {
 
 .course-sidebar {
   flex-shrink: 0;
-  margin: 20px;
-  
+  margin-left: 10px;
+  margin-top: 10px;
+
   height: 95%;
-  
+
   /* 防止侧边栏被压缩 */
 
   :deep(.el-card__header) {
@@ -990,7 +873,7 @@ const getPlayName = (row : any) => {
       color: var(--el-color-primary);
       background-color: var(--el-color-primary-light-9);
       border-left: 2px solid var(--el-color-primary);
-      
+
       &::after {
         display: none;
       }
@@ -1042,7 +925,7 @@ const getPlayName = (row : any) => {
 .course-content {
   flex: 1;
   padding: 20px;
-  
+
   :deep(.el-tabs__header) {
     margin-bottom: 16px;
   }
@@ -1154,6 +1037,7 @@ const getPlayName = (row : any) => {
     height: 100vh;
     padding: 0;
   }
+
   :deep(.el-dialog__header) {
     padding: 0px !important;
     --el-dialog-padding-primary: 0px;
@@ -1165,7 +1049,7 @@ const getPlayName = (row : any) => {
   position: relative;
   width: 100%;
   height: 100%;
-  
+
   &:fullscreen {
     width: 100vw;
     height: 100vh;
@@ -1182,13 +1066,13 @@ const getPlayName = (row : any) => {
   right: 0px;
   z-index: 2000;
   display: flex;
-  
+
 
   .el-button {
     color: white;
     background-color: rgb(0 0 0 / 50%);
     border-color: rgb(255 255 255 / 20%);
-    
+
     &:hover {
       background-color: rgb(0 0 0 / 70%);
     }
@@ -1201,7 +1085,7 @@ const getPlayName = (row : any) => {
   position: absolute;
   width: 100%;
   height: 100vh;
-  
+
   background: #000;
 }
 
@@ -1209,6 +1093,4 @@ const getPlayName = (row : any) => {
   width: 100%;
   height: 100%;
 }
-
-
 </style>
