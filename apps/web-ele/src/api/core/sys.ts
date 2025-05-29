@@ -411,3 +411,15 @@ export async function updateOrgStatus(data: {
 }) {
   return requestClient.post<void>('/org/updateStatus', data);
 }
+
+/**
+ * 修改密码
+ */
+export async function updatePassword(data: {
+  oldPassword: string; // 原密码
+  newPassword: string; // 新密码
+  confirmPassword: string; // 确认密码
+}) {
+  return requestClient.post<void>('/user/updatePassword', data);
+}
+

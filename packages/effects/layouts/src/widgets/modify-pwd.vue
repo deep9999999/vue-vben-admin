@@ -5,7 +5,13 @@ import { $t } from '@vben/locales';
 import { useVbenForm, z } from '@vben-core/form-ui';
 import { useVbenModal } from '@vben-core/popup-ui';
 import { VbenAvatar, VbenButton } from '@vben-core/shadcn-ui';
-import { ElButton, ElMessage, ElMessageBox, ElTag } from 'element-plus';
+
+import {
+
+  ElMessage,
+  
+} from 'element-plus';
+
 
 interface Props {
   avatar?: string;
@@ -40,7 +46,7 @@ const [Form, { resetForm, validate, getValues }] = useVbenForm(
         },
         fieldName: 'oldPassword',
         formFieldProps: { validateOnBlur: false },
-        rules: z.string().min(6, { message: "密码最小6位" }),
+        rules: z.string().min(1, { message: "密码最小6位" }),
       },
       {
         component: 'VbenInputPassword' as const,
@@ -92,6 +98,7 @@ async function handleSubmit() {
     emit('submit', {
       oldPassword: values.oldPassword,
       newPassword: values.newPassword,
+      confirmPassword: values.confirmPassword,
     });
   }
 }

@@ -63,6 +63,22 @@ const audioContainer = ref<HTMLElement | null>(null);
 
 const { isFullscreen: isaudioDomFullscreen, toggle: audiotoggleDom } = useFullscreen(audioContainer);
 
+// PDF预览相关状态
+const pdfVisible = ref(false);
+const pdfUrl = ref('');
+const pdfContainer = ref<HTMLElement | null>(null);
+
+const { isFullscreen: ispdfDomFullscreen, toggle: pdftoggleDom } = useFullscreen(pdfContainer);
+
+// 关闭PDF预览
+const closePdf = async () => {
+  if (ispdfDomFullscreen.value) {
+    pdftoggleDom();
+  }
+  pdfVisible.value = false;
+  pdfUrl.value = '';
+};
+
 // 关闭视频预览
 const onPlayVideo = async () => {
   videotoggleDom();
@@ -282,6 +298,16 @@ const openResource = async (item: any) => {
     setTimeout(async () => {
       onPlayAudio();
     }, 300); // 延迟300ms等待对话框动画
+  } else if (item.type === 'PDF') {
+    // PDF类型，打开内嵌预览
+    pdfUrl.value = `${resroot}${item.fileUrl}`;
+    pdfVisible.value = true;
+
+    await nextTick();
+
+    setTimeout(async () => {
+      pdftoggleDom();
+    }, 300);
   }
 };
 
@@ -316,27 +342,25 @@ let columns:any =  [
     },
   ]
 
-  if (isTeacher.value) {
-    columns = [
-      { field: 'id', title: '序号', width: 50 },
-      { field: 'name', title: '资料', width: 200, align: 'left' },
-      { field: 'type', title: '类型', width: 100, align: 'left' },
-      // { field: 'fileUrl', title: 'URL', width: 300, align: 'left' },
-      {
-        field: 'createTime',
-        title: '创建时间',
-      },
-      {
-        field: 'action',
-        fixed: 'right',
-        align: 'left',
-        slots: { default: 'action' },
-        title: '操作',
-      },
-    ]
-  }
-
-
+if (isTeacher.value) {
+  columns = [
+    { field: 'id', title: '序号', width: 50 },
+    { field: 'name', title: '资料', width: 200, align: 'left' },
+    { field: 'type', title: '类型', width: 100, align: 'left' },
+    // { field: 'fileUrl', title: 'URL', width: 300, align: 'left' },
+    {
+      field: 'createTime',
+      title: '创建时间',
+    },
+    {
+      field: 'action',
+      fixed: 'right',
+      align: 'left',
+      slots: { default: 'action' },
+      title: '操作',
+    },
+  ]
+}
 
 // 修改表格配置，添加checkbox配置
 const gridOptions: VxeTableGridOptions<RowType> = {
@@ -402,6 +426,7 @@ const [Form, formApi] = useVbenForm({
           { label: 'DOC', value: 'DOC' },
           { label: 'AUDIO', value: 'AUDIO' },
           { label: 'VIDEO', value: 'VIDEO' },
+          { label: 'PDF', value: 'PDF' },
         ],
       },
       fieldName: 'type',
@@ -414,7 +439,7 @@ const [Form, formApi] = useVbenForm({
         headers: {
           Authorization: `Bearer ${useAccessStore().accessToken}`,
         },
-        accept: '.pptx,.ppt,.doc,.docx,.mp3,.mp4',
+        accept: '.pptx,.ppt,.doc,.docx,.mp3,.mp4,.pdf',
         action: '/api/file/upload',
         limit: 1,
         multiple: false,
@@ -603,6 +628,8 @@ const getPlayName = (row : any) => {
   else if (row.type === 'VIDEO') {
     return '打开';
   }
+
+  return '打开';
 }
 
 </script>
@@ -777,6 +804,43 @@ const getPlayName = (row : any) => {
         ></iframe>
       </div>
     </ElDialog>
+
+    <!-- PDF预览对话框 -->
+    <ElDialog
+      v-model="pdfVisible"
+      width="80%"
+      :close-on-click-modal="false"
+      :show-close="false"
+      class="pdf-dialog"
+      top="0"
+      append-to-body
+      style="border-radius: 0px;padding:0px;--el-dialog-padding-primary: 0px"
+    >
+      <div
+        class="preview-container"
+        ref="pdfContainer"
+      >
+        <div class="preview-toolbar">
+          <ElButton
+            @click="pdftoggleDom"
+          >
+            {{ispdfDomFullscreen ? '退出全屏' : '全屏'}}
+          </ElButton>
+          <ElButton
+            @click="closePdf"
+          >
+            返回
+          </ElButton>
+        </div>
+        <iframe
+          v-if="pdfUrl"
+          :src="`/pdfjs/web/viewer.html?file=${pdfUrl}`"
+          class="pdf-iframe"
+          frameborder="0"
+          allowfullscreen
+        ></iframe>
+      </div>
+    </ElDialog>
  
     <!-- 视频播放对话框 -->
     <ElDialog
@@ -850,7 +914,7 @@ const getPlayName = (row : any) => {
         ></audio>
       </div>
     </ElDialog>
- 
+
  </Page>
 </template>
 

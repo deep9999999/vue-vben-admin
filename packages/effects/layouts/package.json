@@ -38,6 +38,7 @@
     "@vben/utils": "workspace:*",
     "@vueuse/core": "catalog:",
     "vue": "catalog:",
-    "vue-router": "catalog:"
+    "vue-router": "catalog:",
+    "element-plus": "catalog:"
   }
 }

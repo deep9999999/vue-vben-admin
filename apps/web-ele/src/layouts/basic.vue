@@ -23,6 +23,11 @@ import { useAuthStore } from '#/store';
 import LoginForm from '#/views/_core/authentication/login.vue';
 import { useVbenModal } from '@vben/common-ui';
 
+import {
+  updatePassword
+} from '#/api/core/sys';
+
+
 
 const [LockModal, lockModalApi] = useVbenModal({
   connectedComponent: ModifyPwd,
@@ -71,9 +76,17 @@ const showDot = computed(() =>
 const handleSubmitModifyPwd = async (data: any) => {
   lockModalApi.close();
   console.log("修改密码", data)
+
+  await updatePassword(data);
+  await handleLogout();
 };
 
-const menus = computed(() => [
+const isTeacher = computed(() => {
+  const roles = userStore.userInfo?.roles || [];
+  return roles.includes('teacher');
+});
+
+const menus = computed(() => isTeacher.value ? [] :[
   // {
   //   handler: () => {
   //     openWindow(VBEN_DOC_URL, {
@@ -100,6 +113,7 @@ const menus = computed(() => [
     text: "修改密码",
   },
 ]);
+
 
 const avatar = computed(() => {
   return userStore.userInfo?.avatar ?? preferences.app.defaultAvatar;
