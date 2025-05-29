@@ -37,6 +37,8 @@ import {
   removeFile,
 } from '#/api/core/sys';
 
+
+
 // 预览PPT相关状态
 const previewVisible = ref(false);
 const previewUrl = ref('');
@@ -238,8 +240,8 @@ onMounted(() => {
   fetchCourseData();
 });
 
-const resroot = 'http://1.95.120.9';
-const clientId = 35741
+const resroot = import.meta.env.VITE_RESOURCE_ROOT;
+const clientId = import.meta.env.VITE_RESOURCE_ID;
 // https://ow365.cn/?i=35717&furl=http://118.31.173.178:6001/api/download/2025/05/23/1%E5%89%AF%E6%9C%AC%E6%8B%BC%E8%AF%BB%E5%90%AF%E8%92%99PPT%E7%AC%AC%E4%B8%80%E8%AF%BE(1).pptx
 // 打开资源方法
 const openResource = async (item: any) => {
