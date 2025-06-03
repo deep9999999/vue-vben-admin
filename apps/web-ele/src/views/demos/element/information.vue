@@ -452,9 +452,24 @@ const [Form, formApi] = useVbenForm({
         // 上传列表的内建样式，支持四种基本样式 text, picture, picture-card 和 picture-circle
         listType: 'text',
         name: 'file',
+        'on-success': (response: any, uploadFile: any, uploadFiles: any) => {
+          // response 是服务端返回的数据
+          console.log('上传成功，服务端返回：', response);
+          // 可以根据需要处理返回的数据
+          if (response.code === 0) {
+            ElMessage.success('文件上传成功');
+            // 这里可以处理返回的文件信息，比如保存文件ID等
+            uploadFile.id = response.data.id;
+          } else {
+            ElMessage.error(response.message || '上传失败');
+          }
+        },
         'on-remove': async (uploadFile: any, uploadFiles: any) => {
           await removeFile({ id: uploadFile.id });
           gridApi.query();
+        },
+        'on-error': (error: Error, uploadFile: any, uploadFiles: any) => {
+          ElMessage.error(`文件 ${uploadFile.name} 上传失败: ${error.message}`);
         },
       },
       fieldName: 'files',
