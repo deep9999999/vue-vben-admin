@@ -275,7 +275,7 @@ const openResource = async (item: any) => {
     window.open(url, '_blank');
   } else if (item.type === 'PPT') {
     // PPT类型，打开内嵌预览
-    url = `https://ow365.cn/?i=${clientId}&furl=${resroot}${item.fileUrl}`;
+    url = `https://ow365.cn/?i=${clientId}&n=5&furl=${resroot}${item.fileUrl}`;
     previewUrl.value = url;
     previewVisible.value = true;
 
