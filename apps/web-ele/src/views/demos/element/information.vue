@@ -99,6 +99,21 @@ const closeVideo = async () => {
   videoUrl.value = '';
 };
 
+
+// 关闭PPT预览
+const closePreviewPPT = async () => {
+
+
+  // 获取预览iframe元素
+  const previewIframe:any = document.getElementById('preview-iframe');
+  if (previewIframe) {
+    // 向iframe发送关闭消息
+    previewIframe.contentWindow?.postMessage("hide,h", "*");
+  }
+
+};
+
+
 // 播放音频
 const onPlayAudio = async () => {
   // 获取音频元素
@@ -285,6 +300,7 @@ const openResource = async (item: any) => {
     // 等待对话框动画完成后请求全屏
     setTimeout(async () => {
       previewtoggleDom();
+      closePreviewPPT();
     }, 300); // 延迟300ms等待对话框动画
   } else if (item.type === 'VIDEO') {
     // 音频类型，打开音频预览
@@ -793,7 +809,7 @@ const getPlayName = (row: any) => {
           </ElButton>
 
         </div>
-        <iframe v-if="previewUrl" :src="previewUrl" class="preview-iframe" frameborder="0" allowfullscreen></iframe>
+        <iframe v-if="previewUrl" :src="previewUrl" id="preview-iframe" class="preview-iframe" frameborder="0" allowfullscreen></iframe>
       </div>
     </ElDialog>
 
