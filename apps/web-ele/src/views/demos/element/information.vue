@@ -300,7 +300,9 @@ const openResource = async (item: any) => {
     // 等待对话框动画完成后请求全屏
     setTimeout(async () => {
       previewtoggleDom();
-      closePreviewPPT();
+      setTimeout(async () => {
+        closePreviewPPT();  
+      }, 500)
     }, 300); // 延迟300ms等待对话框动画
   } else if (item.type === 'VIDEO') {
     // 音频类型，打开音频预览
