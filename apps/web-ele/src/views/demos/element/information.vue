@@ -37,7 +37,9 @@ import {
   removeFile,
 } from '#/api/core/sys';
 
-
+import { useClipboard } from '@vueuse/core';
+const source = ref('Hello');
+const { copy, text } = useClipboard({ legacy: true, source });
 
 // 预览PPT相关状态
 const previewVisible = ref(false);
@@ -286,11 +288,11 @@ const openResource = async (item: any) => {
   let url = '';
   if (item.type === 'DOC') {
     // 文档类型，打开文档预览链接
-    url = `https://ow365.cn/?i=${clientId}&furl=${resroot}${item.fileUrl}`;
+    url = `https://vip.ow365.cn/?i=${clientId}&furl=${resroot}${item.fileUrl}`;
     window.open(url, '_blank');
   } else if (item.type === 'PPT') {
     // PPT类型，打开内嵌预览
-    url = `https://ow365.cn/?i=${clientId}&n=5&furl=${resroot}${item.fileUrl}`;
+    url = `https://vip.ow365.cn/?i=${clientId}&n=5&furl=${resroot}${item.fileUrl}`;
     previewUrl.value = url;
     previewVisible.value = true;
 
@@ -633,6 +635,21 @@ const onKcDatil = async (row: any) => {
   modalApi.open();
 };
 
+
+const onCopyUrl = async (row: any) => {
+  if (row.type == "PPT") {
+    let url = `https://vip.ow365.cn/?i=${clientId}&n=5&furl=${resroot}${row.fileUrl}`;
+    copy(url);
+    ElMessage.success(`复制成功 ${url}`);
+  }
+  else {
+    let url = `${resroot}${row.fileUrl}`;
+    copy(url);
+    ElMessage.success(`复制成功 ${url}`);
+  }
+}
+
+
 // 添加新增方法
 const onAdd = async () => {
   modalApi.open();
@@ -717,10 +734,6 @@ const getPlayName = (row: any) => {
                     String(index + 1).padStart(2, '0')
                   }}</span> -->
                   <span>{{ item.secname }}</span>
-
-                 
-
-
                 </template>
               </ElMenuItem>
             </ElMenu>
@@ -744,9 +757,6 @@ const getPlayName = (row: any) => {
                     String(index + 1).padStart(2, '0')
                   }}</span> -->
                   <span>{{ item.secname }}</span>
-
-                  
-
                 </template>
               </ElMenuItem>
             </ElMenu>
@@ -770,6 +780,10 @@ const getPlayName = (row: any) => {
 
             <ElButton v-if="!isTeacher" type="primary" size="small" @click="onKcDatil(row)">
               详情
+            </ElButton>
+
+            <ElButton v-if="!isTeacher" type="primary" size="small" @click="onCopyUrl(row)">
+              复制链接
             </ElButton>
           </template>
           <template #toolbar-actions>
