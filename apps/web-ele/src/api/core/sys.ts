@@ -426,3 +426,52 @@ export async function updatePassword(data: {
   return requestClient.post<void>('/user/updatePassword', data);
 }
 
+/**
+ * 发送消息
+ */
+export async function sendMessage(data: {
+  content: string; // 消息内容
+  title: string; // 消息标题
+  type: string; // 消息类型
+  userId: string[]; // 接收者ID列表
+}) {
+  return requestClient.post<void>('/msg/send', data);
+}
+
+
+/**
+ * 标记消息为已读
+ */
+export async function readMessage(data: {
+  id: string[]; // 消息ID列表
+}) {
+  return requestClient.post<void>('/msg/read', data);
+}
+
+
+/**
+ * 检查是否有未读消息
+ */
+export async function hasUnreadMessage() {
+  return requestClient.post<boolean>('/msg/hasUnread');
+}
+
+// 消息列表项目信息
+export interface MessageResult {
+  id: number; // 消息ID
+  title: string; // 消息标题
+  message: string; // 消息内容
+  avatar: string; // 头像
+  date: string; // 创建时间
+  isRead: boolean; // 是否已读
+}
+
+/**
+ * 获取消息列表
+ */
+export async function getMessageList(data: {
+  page: number;
+  pageSize: number;
+}) {
+  return requestClient.post<MessageResult[]>('/msg/getMsg', data);
+}
