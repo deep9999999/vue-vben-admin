@@ -76,7 +76,7 @@ function setupAccessGuard(router: Router) {
           // 如不需要，直接删除 query
           query:
             to.fullPath === preferences.app.defaultHomePath
-              ? {}
+              ? { redirect: encodeURIComponent(to.fullPath) }
               : { redirect: encodeURIComponent(to.fullPath) },
           // 携带当前跳转的页面，登录后重新跳转该页面
           replace: true,

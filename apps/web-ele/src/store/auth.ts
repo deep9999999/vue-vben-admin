@@ -94,11 +94,11 @@ export const useAuthStore = defineStore('auth', () => {
     // 回登录页带上当前路由地址
     await router.replace({
       path: LOGIN_PATH,
-      query: redirect
-        ? {
-            redirect: encodeURIComponent(router.currentRoute.value.fullPath),
-          }
-        : {},
+      // query: redirect
+      //   ? {
+      //       redirect: encodeURIComponent(router.currentRoute.value.fullPath),
+      //     }
+      //   : {},
     });
   }
 
