@@ -1,8 +1,12 @@
 <script lang="ts" setup>
 import { ref, nextTick } from 'vue';
 import { Page } from '@vben/common-ui';
-import { ElInput, ElButton, ElTable, ElTableColumn } from 'element-plus';
+import { ElInput, ElButton, } from 'element-plus';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
+import type { VxeTableGridOptions } from '#/adapter/vxe-table';
+import {
+ getMessageList
+} from '#/api/core/sys';
 
 // 消息列表数据
 interface MessageItem {
@@ -41,13 +45,32 @@ const addMessage = () => {
 };
 
 // 表格配置
-const gridOptions = {
+const gridOptions: VxeTableGridOptions<MessageItem> = {
   columns: [
     { field: 'id', title: 'ID', width: 80 },
     { field: 'title', title: '标题', width: 200 },
     { field: 'content', title: '内容' },
     { field: 'createTime', title: '创建时间', width: 180 },
   ],
+  height: '700px',
+  proxyConfig: {
+    ajax: {
+      query: async ({ page }) => {
+        const resp: any = await getMessageList({
+          page: page.currentPage,
+          pageSize: page.pageSize,
+        });
+        return resp;
+      },
+    },
+  },
+  toolbarConfig: {
+    custom: false,
+    export: false,
+    refresh: true,
+    resizable: true,
+    zoom: true,
+  },
 };
 
 const [Grid, gridApi] = useVbenVxeGrid({
@@ -80,7 +103,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
       
       <!-- 右侧消息列表 -->
       <div class="message-list">
-        <h2>消息列表</h2>
+        <h2 style="margin-bottom: 10px;">消息列表</h2>
         <Grid :data="messageList" />
       </div>
     </div>
