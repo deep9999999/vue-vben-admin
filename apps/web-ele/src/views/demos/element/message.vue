@@ -5,7 +5,10 @@ import { ElInput, ElButton, } from 'element-plus';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 import {
- getMessageList
+ getMessageList,
+ sendMessage,
+ readMessage,
+ hasUnreadMessage
 } from '#/api/core/sys';
 
 // 消息列表数据
@@ -21,23 +24,18 @@ const title = ref('');
 const content = ref('');
 
 // 添加消息
-const addMessage = () => {
+const addMessage = async () => {
   if (!title.value || !content.value) {
     return;
   }
   
-  const newMessage: MessageItem = {
-    id: Date.now(),
+  await sendMessage({
     title: title.value,
     content: content.value,
-    createTime: new Date().toLocaleString()
-  };
-  
-  nextTick(() => {
-    messageList.value.push(newMessage);
-    console.log('消息列表:', messageList.value); // 添加这行
-  });
-  gridApi.refreshData(); // 添加这行，假设 gridApi 有 refreshData 方法
+    type: 3
+  })
+
+  gridApi.reload();
   
   // 清空输入
   title.value = '';

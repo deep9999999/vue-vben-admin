@@ -432,8 +432,8 @@ export async function updatePassword(data: {
 export async function sendMessage(data: {
   content: string; // 消息内容
   title: string; // 消息标题
-  type: string; // 消息类型
-  userId: string[]; // 接收者ID列表
+  type: any; // 消息类型
+  userId?: string[]; // 接收者ID列表
 }) {
   return requestClient.post<void>('/msg/send', data);
 }
