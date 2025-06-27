@@ -366,6 +366,7 @@ let columns: any = [
   {
     field: 'createTime',
     title: '创建时间',
+    width: "auto"
   },
   {
     field: 'action',
@@ -386,6 +387,7 @@ if (isTeacher.value) {
     {
       field: 'createTime',
       title: '创建时间',
+      width: "auto"
     },
     {
       field: 'action',
