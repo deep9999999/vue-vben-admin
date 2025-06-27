@@ -475,3 +475,14 @@ export async function getMessageList(data: {
 }) {
   return requestClient.post<MessageResult[]>('/msg/getMsg', data);
 }
+
+
+/**
+ * 获取消息列表
+ */
+export async function getMsgList(data: {
+  page: number;
+  pageSize: number;
+}) {
+  return requestClient.post<MessageResult[]>('/msg/list', data);
+}

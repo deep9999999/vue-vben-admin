@@ -130,7 +130,7 @@ function handleClick(item: NotificationItem) {
         </div>
       </template>
 
-      <div
+      <!-- <div
         class="border-border flex items-center justify-between border-t px-4 py-3"
       >
         <VbenButton
@@ -144,7 +144,7 @@ function handleClick(item: NotificationItem) {
         <VbenButton size="sm" @click="handleViewAll">
           {{ $t('ui.widgets.viewAll') }}
         </VbenButton>
-      </div>
+      </div> -->
     </div>
   </VbenPopover>
 </template>

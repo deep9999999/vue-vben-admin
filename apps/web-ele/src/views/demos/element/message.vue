@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, nextTick } from 'vue';
+import { ref, nextTick, shallowRef,onBeforeUnmount } from 'vue';
 import { Page } from '@vben/common-ui';
 import { ElInput, ElButton, } from 'element-plus';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
@@ -8,8 +8,11 @@ import {
  getMessageList,
  sendMessage,
  readMessage,
- hasUnreadMessage
+ hasUnreadMessage,
+ getMsgList
 } from '#/api/core/sys';
+import '@wangeditor/editor/dist/css/style.css';
+import { Editor, Toolbar } from '@wangeditor/editor-for-vue';
 
 // 消息列表数据
 interface MessageItem {
@@ -23,6 +26,12 @@ const messageList = ref<MessageItem[]>([]);
 const title = ref('');
 const content = ref('');
 
+// 编辑器实例，必须用 shallowRef，重要！
+const editorRef = shallowRef();
+
+// 内容 HTML
+const valueHtml = ref('');
+
 // 添加消息
 const addMessage = async () => {
   if (!title.value || !content.value) {
@@ -32,7 +41,7 @@ const addMessage = async () => {
   await sendMessage({
     title: title.value,
     content: content.value,
-    type: 3
+    type: 2
   })
 
   gridApi.reload();
@@ -40,6 +49,7 @@ const addMessage = async () => {
   // 清空输入
   title.value = '';
   content.value = '';
+  valueHtml.value = '';
 };
 
 // 表格配置
@@ -54,7 +64,7 @@ const gridOptions: VxeTableGridOptions<MessageItem> = {
   proxyConfig: {
     ajax: {
       query: async ({ page }) => {
-        const resp: any = await getMessageList({
+        const resp: any = await getMsgList({
           page: page.currentPage,
           pageSize: page.pageSize,
         });
@@ -74,6 +84,35 @@ const gridOptions: VxeTableGridOptions<MessageItem> = {
 const [Grid, gridApi] = useVbenVxeGrid({
   gridOptions,
 });
+
+
+// 组件销毁时，也及时销毁编辑器，重要！
+onBeforeUnmount(() => {
+  const editor = editorRef.value;
+  if (editor == null) return;
+
+  editor.destroy();
+});
+
+// 编辑器回调函数
+const handleCreated = (editor:any) => {
+  console.log('created', editor);
+  editorRef.value = editor; // 记录 editor 实例，重要！
+};
+const handleChange = (editor:any) => {
+  console.log('change:', editor.getHtml());
+  content.value = editor.getHtml()
+};
+const handleDestroyed = (editor:any) => {
+  console.log('destroyed', editor);
+};
+const handleFocus = (editor:any) => {
+  console.log('focus', editor);
+};
+const handleBlur = (editor:any) => {
+  console.log('blur', editor);
+};
+
 </script>
 
 <template>
@@ -88,12 +127,27 @@ const [Grid, gridApi] = useVbenVxeGrid({
         <div class="input-group">
           <h3>内容</h3>
           <div class="editor-container">
-            <ElInput
-              v-model="content"
-              type="textarea"
-              :rows="10"
-              placeholder="请输入内容"
-            />
+            <div style="border: 1px solid #ccc; margin-top: 10px">
+              <Toolbar
+                :editor="editorRef"
+                :defaultConfig="toolbarConfig"
+                :mode="mode"
+                style="border-bottom: 1px solid #ccc"
+              />
+              <Editor
+                :defaultConfig="editorConfig"
+                :mode="mode"
+                v-model="valueHtml"
+                style="height: 400px; overflow-y: hidden"
+                @onCreated="handleCreated"
+                @onChange="handleChange"
+                @onDestroyed="handleDestroyed"
+                @onFocus="handleFocus"
+                @onBlur="handleBlur"
+                @customAlert="customAlert"
+                @customPaste="customPaste"
+              />
+          </div>
           </div>
         </div>
         <ElButton type="primary" @click="addMessage">添加消息</ElButton>

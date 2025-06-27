@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { NotificationItem } from '@vben/layouts';
 
-import { computed, ref, watch } from 'vue';
+import { computed, ref, watch, onMounted } from 'vue';
 
 import { AuthenticationLoginExpiredModal } from '@vben/common-ui';
 import { VBEN_DOC_URL, VBEN_GITHUB_URL } from '@vben/constants';
@@ -22,6 +22,11 @@ import { $t } from '#/locales';
 import { useAuthStore } from '#/store';
 import LoginForm from '#/views/_core/authentication/login.vue';
 import { useVbenModal } from '@vben/common-ui';
+
+import {
+ getMessageList,
+ hasUnreadMessage
+} from '#/api/core/sys';
 
 import {
   updatePassword
@@ -64,6 +69,8 @@ const notifications = ref<NotificationItem[]>([
   // },
 ]);
 
+
+
 const userStore = useUserStore();
 const authStore = useAuthStore();
 const accessStore = useAccessStore();
@@ -72,6 +79,19 @@ const showDot = computed(() =>
   notifications.value.some((item) => !item.isRead),
 );
 
+const page = {
+  currentPage:1,
+  pageSize: 20
+}
+onMounted(async ()=>{
+  const resp: any = await getMessageList({
+          page: page.currentPage,
+          pageSize: page.pageSize,
+        });
+        return resp;
+
+ console.log("page", resp)
+})
 
 const handleSubmitModifyPwd = async (data: any) => {
   lockModalApi.close();
@@ -153,12 +173,12 @@ watch(
 
       
       <ModifyPwd />
-      <!-- <Notification
+      <Notification
         :dot="showDot"
         :notifications="notifications"
         @clear="handleNoticeClear"
         @make-all="handleMakeAll"
-      /> -->
+      />
     </template>
     <template #extra>
       <AuthenticationLoginExpiredModal
