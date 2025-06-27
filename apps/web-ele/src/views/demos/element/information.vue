@@ -197,8 +197,15 @@ const selectCourse = (index: any) => {
     // 重置当前激活的标签为第一个
     activeTab.value = 0;
     // 更新选中的标签值
-    selectTabValue = tabs.value[0]?.value;
-    selectTabName.value = `${tabs.value[0].secname}`
+    if (tabs.value[0]) {
+      selectTabValue = tabs.value[0]?.value;
+      selectTabName.value = `${tabs.value[0].secname}`  
+    }
+    else {
+      selectTabValue = null;
+      selectTabName.value = null
+    }
+    
     // 重新加载表格数据
     gridApi.query();
   }
@@ -362,10 +369,11 @@ let columns: any = [
   },
   {
     field: 'action',
-    fixed: 'right',
+    //fixed: 'right',
     align: 'left',
     slots: { default: 'action' },
     title: '操作',
+    width: "auto"
   },
 ]
 
@@ -381,10 +389,11 @@ if (isTeacher.value) {
     },
     {
       field: 'action',
-      fixed: 'right',
+      //fixed: 'right',
       align: 'left',
       slots: { default: 'action' },
       title: '操作',
+      width: "auto"
     },
   ]
 }
@@ -716,8 +725,8 @@ const getPlayName = (row: any) => {
 
 <template>
   <Page auto-content-height class="flex h-full">
-    <ElRow style="width: 100%;">
-      <ElCol :span="4" id="left">
+    <ElRow :gutter="20" type="flex" justify="space-between" :style="{ width: '100%' }">
+      <ElCol :xs="24" :sm="24" :md="4" :lg="4" :xl="4" id="left">
         <ElCard class="course-sidebar" shadow="hover">
           <template #header>
             <div class="flex flex-col">
@@ -725,7 +734,7 @@ const getPlayName = (row: any) => {
               <span class="mt-2 text-sm text-gray-500">{{ subTitle }}</span>
             </div>
           </template>
-          <div class="h-[700px] overflow-auto">
+          <div class="h-[500px] overflow-auto">
             <ElMenu :default-active="String(activeIndex)" class="course-menu">
               <ElMenuItem v-for="(item, index) in courseList" :key="index" :index="String(index)"
                 @click="selectCourse(index)">
@@ -740,7 +749,7 @@ const getPlayName = (row: any) => {
           </div>
         </ElCard>
       </ElCol>
-      <ElCol :span="5" id="mid">
+      <ElCol :xs="24" :sm="24" :md="5" :lg="5" :xl="5" id="mid">
 
         <ElCard class="course-sidebar" shadow="hover">
           <template #header>
@@ -764,7 +773,7 @@ const getPlayName = (row: any) => {
         </ElCard>
 
       </ElCol>
-      <ElCol :span="15" class="p-3">
+      <ElCol :xs="24" :sm="24" :md="15" :lg="15" :xl="15" class="p-3">
         <Grid>
           <template #action="{ row }">
 
@@ -1139,5 +1148,19 @@ const getPlayName = (row: any) => {
 .video-player {
   width: 100%;
   height: 100%;
+}
+
+@media (max-width: 768px) {
+  .course-sidebar {
+    margin-left: 0;
+    margin-top: 10px;
+  }
+
+  .preview-dialog,
+  .pdf-dialog,
+  .video-dialog,
+  .audio-dialog {
+    width: 100% !important;
+  }
 }
 </style>

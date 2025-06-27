@@ -123,14 +123,14 @@ const gridOptions: VxeTableGridOptions<RowType> = {
     { field: 'id', title: '序号', width: 200 },
     { field: 'name', align: 'left', title: '课程名', width: 400,  treeNode: true },
     { field: 'secname', align: 'left', title: '课程章节', width: 300 },
-    { field: 'isdownload', align: 'left', title: '下载状态', width: 100 },
+    //{ field: 'isdownload', align: 'left', title: '下载状态', width: 100 },
     {
       field: 'action',
       fixed: 'right',
       align: 'left',
       slots: { default: 'action' },
       title: '操作',
-      width: 300
+      width:"auto"
     },
   ],
   rowConfig: {
@@ -562,6 +562,7 @@ const onAuthKC = async (row:any) => {
         </Button>
       </template>
       <template #toolbar-actions>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
         <ElButton v-if="!isTeacher" type="primary" @click="onAdd">
           新增
         </ElButton>
@@ -575,6 +576,7 @@ const onAuthKC = async (row:any) => {
           展开全部
         </ElButton>
         <ElButton type="primary" @click="collapseAll"> 折叠全部 </ElButton>
+        </div>
       </template>
     </Grid>
     <!-- 新增对话框 -->
@@ -588,3 +590,5 @@ const onAuthKC = async (row:any) => {
         />
   </Page>
 </template>
+
+

@@ -486,3 +486,12 @@ export async function getMsgList(data: {
 }) {
   return requestClient.post<MessageResult[]>('/msg/list', data);
 }
+
+/**
+ * 删除消息
+ */
+export async function deleteMessage(data: {
+  ids: string[]; // 消息ID列表
+}) {
+  return requestClient.post<void>('/msg/delMsg', data);
+}

@@ -1,14 +1,15 @@
 <script lang="ts" setup>
 import { ref, nextTick, shallowRef,onBeforeUnmount } from 'vue';
 import { Page } from '@vben/common-ui';
-import { ElInput, ElButton, } from 'element-plus';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
+import { ElButton, ElMessage, ElMessageBox, ElInput } from 'element-plus';
 import {
  getMessageList,
  sendMessage,
  readMessage,
  hasUnreadMessage,
+ deleteMessage,
  getMsgList
 } from '#/api/core/sys';
 import '@wangeditor/editor/dist/css/style.css';
@@ -52,9 +53,54 @@ const addMessage = async () => {
   valueHtml.value = '';
 };
 
+const deletedKeys = ref<string[]>([]);
+
+const saveSelection = (row:any, checked:any) => {
+  if (checked) {
+      // 如果是选中,将id添加到deletedKeys
+      if (!deletedKeys.value.includes(row.id)) {
+        deletedKeys.value.push(row.id);
+      }
+  } else {
+    // 如果是取消选中,从deletedKeys中移除
+    const index = deletedKeys.value.indexOf(row.id);
+    if (index > -1) {
+      deletedKeys.value.splice(index, 1);
+    }
+  }
+}
+
+const gridEvents = {
+  checkboxChange: ({ records, row, checked } : any) => {
+    saveSelection(row, checked);
+    console.log('选中节点列表：', deletedKeys.value);
+  },
+  
+  checkboxAll: ({ records, checked }: any) => {
+    console.log('全选状态:', checked);
+    console.log('所有选中记录:', records);
+
+    if (checked) {
+      // 全选时,将所有记录的id添加到deletedKeys
+      deletedKeys.value = []
+      records.forEach((record: any) => {
+        deletedKeys.value.push(record.id);
+      });
+
+      console.log('选中记录:', deletedKeys.value);
+
+    } else {
+      deletedKeys.value = [];
+
+      console.log('删除记录:', deletedKeys.value);
+    }
+  },
+}
+
 // 表格配置
 const gridOptions: VxeTableGridOptions<MessageItem> = {
   columns: [
+    { align: 'left', title: '', type: 'checkbox', width: 50 },
     { field: 'id', title: 'ID', width: 80 },
     { field: 'title', title: '标题', width: 200 },
     { field: 'content', title: '内容' },
@@ -83,6 +129,7 @@ const gridOptions: VxeTableGridOptions<MessageItem> = {
 
 const [Grid, gridApi] = useVbenVxeGrid({
   gridOptions,
+  gridEvents
 });
 
 
@@ -112,6 +159,33 @@ const handleFocus = (editor:any) => {
 const handleBlur = (editor:any) => {
   console.log('blur', editor);
 };
+
+const onDel = ()=>{
+   const rows:any = deletedKeys.value
+
+  if (rows.length === 0) {
+    ElMessage.warning('请选择要删除的消息');
+    return;
+  }
+  ElMessageBox.confirm(`确定要删除选中的 ${rows.length} 个消息吗?`, '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning',
+  }).then(async () => {
+    try {
+      // 调用删除接口
+      await deleteMessage({ids:rows.map((row:any) => row)});
+      ElMessage.success('删除成功');
+      deletedKeys.value = [];
+      // 刷新表格数据
+      gridApi.reload();
+    } catch (error) {
+      ElMessage.error('删除失败');
+    }
+  }).catch(() => {
+    ElMessage.info('已取消删除');
+  });
+}
 
 </script>
 
@@ -155,8 +229,14 @@ const handleBlur = (editor:any) => {
       
       <!-- 右侧消息列表 -->
       <div class="message-list">
-        <h2 style="margin-bottom: 10px;">消息列表</h2>
-        <Grid :data="messageList" />
+        <Grid :data="messageList" table-title="消息列表" >
+
+          <template #toolbar-actions>
+          <ElButton type="danger"  @click="onDel">
+            删除
+          </ElButton>
+      </template>
+        </Grid>
       </div>
     </div>
   </Page>
