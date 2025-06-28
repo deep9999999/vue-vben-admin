@@ -93,8 +93,7 @@
     "vite": "catalog:",
     "vitest": "catalog:",
     "vue": "catalog:",
-    "vue-tsc": "catalog:",
-    "@vitejs/plugin-legacy": "^4.1.1"
+    "vue-tsc": "catalog:"
   },
   "engines": {
     "node": ">=20.10.0",
