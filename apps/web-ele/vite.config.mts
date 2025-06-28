@@ -1,6 +1,8 @@
 import { defineConfig } from '@vben/vite-config';
 
 import ElementPlus from 'unplugin-element-plus/vite';
+import legacy from "@vitejs/plugin-legacy";
+import autoprefixer from "autoprefixer";
 
 export default defineConfig(async () => {
   return {
@@ -10,7 +12,23 @@ export default defineConfig(async () => {
         ElementPlus({
           format: 'esm',
         }),
+        autoprefixer,
+         legacy({
+        // 添加以下配置
+          modernPolyfills: true,
+          renderLegacyChunks: true,
+          targets: [
+            "Android >= 6.0",
+            "iOS >= 9.0",
+            "Chrome >= 58",
+            "Firefox >= 60",
+            "Safari >= 12"
+          ]
+        }),
       ],
+      // optimizeDeps: {
+      //   exclude: ['jiti'],
+      // },
       server: {
         allowedHosts: [
           '*'

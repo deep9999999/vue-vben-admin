@@ -87,30 +87,30 @@ const routes: RouteRecordRaw[] = [
       },
     ]
   },
-  {
-    meta: {
-      icon: 'ic:baseline-message',
-      keepAlive: true,
-      order: 1002,
-      title: "消息管理",
-      authority: ['super'],
-      hideChildrenInMenu: true
-    }, 
-    name: 'Message',
-    path: '/Message',
-    children: [
-      {
-        name: 'Message_Index',
-        path: '',
-        component: () => import('#/views/demos/element/message.vue'),
-        meta: {
-          // hideInMenu: true,
-          keepAlive: true,
-          title: "消息管理",
-        },
-      }
-    ]
-  }
+  // {
+  //   meta: {
+  //     icon: 'ic:baseline-message',
+  //     keepAlive: true,
+  //     order: 1002,
+  //     title: "消息管理",
+  //     authority: ['super'],
+  //     hideChildrenInMenu: true
+  //   }, 
+  //   name: 'Message',
+  //   path: '/Message',
+  //   children: [
+  //     {
+  //       name: 'Message_Index',
+  //       path: '',
+  //       component: () => import('#/views/demos/element/message.vue'),
+  //       meta: {
+  //         // hideInMenu: true,
+  //         keepAlive: true,
+  //         title: "消息管理",
+  //       },
+  //     }
+  //   ]
+  // }
 ];
 
 export default routes;

@@ -47,8 +47,8 @@
     "@wangeditor/editor-for-vue": "^5.1.12",
     "dayjs": "catalog:",
     "element-plus": "catalog:",
-    "pinia": "catalog:",
-    "vue": "catalog:",
+    "pinia": "^3.0.3",
+    "vue": "^3.5.17",
     "vue-router": "catalog:"
   },
   "devDependencies": {
