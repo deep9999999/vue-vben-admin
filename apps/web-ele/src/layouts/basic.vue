@@ -84,13 +84,11 @@ const page = {
   pageSize: 20
 }
 onMounted(async ()=>{
-  // const resp: any = await getMessageList({
-  //         page: page.currentPage,
-  //         pageSize: page.pageSize,
-  //       });
-  //       return resp;
-
- 
+  const resp: any = await getMessageList({
+          page: page.currentPage,
+          pageSize: page.pageSize,
+        });
+  notifications.value = resp
 })
 
 const handleSubmitModifyPwd = async (data: any) => {
