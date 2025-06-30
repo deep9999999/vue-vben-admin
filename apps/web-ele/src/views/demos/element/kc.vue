@@ -163,6 +163,7 @@ const gridOptions: VxeTableGridOptions<RowType> = {
           });
         }, 0);
 
+        
         return resp;
       },
     },
@@ -184,21 +185,21 @@ const gridOptions: VxeTableGridOptions<RowType> = {
 
 // 监听展开状态变化
 const handleTreeExpand = (params: any) => {
-  console.log('展开状态变化:', params.expanded);
+  //console.log('展开状态变化:', params.expanded);
   const { row } = params;
   
   if (params.expanded) {
     // 添加到展开状态列表
     if (!expandedKeys.value.includes(row.id)) {
       expandedKeys.value.push(row.id);
-      console.log('展开节点列表：', expandedKeys.value);
+      //console.log('展开节点列表：', expandedKeys.value);
     }
   } else {
     // 从展开状态列表中移除
     const index = expandedKeys.value.indexOf(row.id);
     if (index > -1) {
       expandedKeys.value.splice(index, 1);
-      console.log('收起后节点列表：', expandedKeys.value);
+      //console.log('收起后节点列表：', expandedKeys.value);
     }
   }
 };

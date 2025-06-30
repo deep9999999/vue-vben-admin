@@ -211,6 +211,7 @@ const gridOptions: VxeGridProps<TeacherRowType> = {
           page: page.currentPage,
           pageSize: page.pageSize,
         });
+
         return resp;
       },
     },
@@ -403,7 +404,9 @@ const [Form, formApi] = useVbenForm({
       },
       fieldName: 'password',
       label: '登录密码',
-      rules: z.string().min(6, '密码长度至少6位'),
+      rules: z.string()
+        .min(6, '密码长度至少6位')
+        .refine((val) => !val.includes(' '), '密码不能包含空格'),
     }
     
   ],

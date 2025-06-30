@@ -98,6 +98,8 @@ const gridOptions: VxeTableGridOptions<RowType> = {
           formValues
         });
 
+        console.log('展开状态:', expandedKeys.value);
+
         // 在数据加载完成后恢复展开状态
         setTimeout(() => {
           
@@ -108,15 +110,34 @@ const gridOptions: VxeTableGridOptions<RowType> = {
             }
           });
 
+          var parentlist:any = []
           // 恢复选中状态
           deletedKeys.value.forEach((key:any) => {
             const row = gridApi.grid.getRowById(key);
-            if (row) {
+            
+            if (row != null) {
+              if (row.children.length == 0){
               gridApi.grid.setCheckboxRow(row, true);
+              }
+              else {
+                parentlist.push(row);
+              }
+            }
+            else {
+              console.error(`这个权限key=${key}没有发现`);
+            }
+            
+          });
+
+          // 移除有子节点的父节点
+          parentlist.forEach((parent:any) => {
+            const index = deletedKeys.value.indexOf(parent.id);
+            if (index > -1) {
+              deletedKeys.value.splice(index, 1);
             }
           });
 
-
+          console.log('选中节点列表：', deletedKeys.value);
         }, 0);
 
         return resp;
@@ -140,37 +161,40 @@ const gridOptions: VxeTableGridOptions<RowType> = {
 
 // 监听展开状态变化
 const handleTreeExpand = (params: any) => {
-  console.log('展开状态变化:', params.expanded);
+  //console.log('展开状态变化:', params.expanded);
   const { row } = params;
   
   if (params.expanded) {
     // 添加到展开状态列表
     if (!expandedKeys.value.includes(row.id)) {
       expandedKeys.value.push(row.id);
-      console.log('展开节点列表：', expandedKeys.value);
+      //console.log('展开节点列表：', expandedKeys.value);
     }
   } else {
     // 从展开状态列表中移除
     const index = expandedKeys.value.indexOf(row.id);
     if (index > -1) {
       expandedKeys.value.splice(index, 1);
-      console.log('收起后节点列表：', expandedKeys.value);
+      //console.log('收起后节点列表：', expandedKeys.value);
     }
   }
 };
 
 
 const saveSelection = (row:any, checked:any) => {
-  if (checked) {
-      // 如果是选中,将id添加到deletedKeys
-      if (!deletedKeys.value.includes(row.id)) {
-        deletedKeys.value.push(row.id);
+
+  if (row.children.length == 0) {
+    if (checked) {
+        // 如果是选中,将id添加到deletedKeys
+        if (!deletedKeys.value.includes(row.id)) {
+          deletedKeys.value.push(row.id);
+        }
+    } else {
+      // 如果是取消选中,从deletedKeys中移除
+      const index = deletedKeys.value.indexOf(row.id);
+      if (index > -1) {
+        deletedKeys.value.splice(index, 1);
       }
-  } else {
-    // 如果是取消选中,从deletedKeys中移除
-    const index = deletedKeys.value.indexOf(row.id);
-    if (index > -1) {
-      deletedKeys.value.splice(index, 1);
     }
   }
 
@@ -185,8 +209,8 @@ const gridEvents = {
   // 展开/收起事件
   toggleTreeExpand: handleTreeExpand,
   // 复选框勾选事件处理
-  checkboxChange: ({ records, row, checked } : any) => {
-    saveSelection(row, checked);
+  checkboxChange: (data : any) => {
+    saveSelection(data.row, data.checked);
     console.log('选中节点列表：', deletedKeys.value);
   },
 
@@ -230,6 +254,7 @@ const [Modal, modalApi] = useVbenModal({
     handleAfterClose();
   },
   onConfirm() {
+    console.log('选中节点列表：', deletedKeys.value);
     emit('select',deletedKeys.value);
     handleAfterClose();
     return true;
@@ -270,6 +295,7 @@ const resetSelection = () => {
 const handleAfterClose = () => {
   handleClose();
   resetSelection();
+  deletedKeys.value = []
 };
 </script>
 
