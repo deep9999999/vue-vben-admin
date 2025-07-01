@@ -183,7 +183,7 @@ const activeName: any = ref('');
 const selectCourse = (index: any) => {
   activeIndex.value = index;
   activeName.value = courseList.value[index].secname;
-
+  
   // 根据选中的课程索引获取对应的标签列表
   if (tabsList.value && tabsList.value.length > 0 && tabsList.value[index]) {
     // 获取当前选中课程的标签数据
@@ -202,8 +202,8 @@ const selectCourse = (index: any) => {
       selectTabName.value = `${tabs.value[0].secname}`  
     }
     else {
-      selectTabValue = null;
-      selectTabName.value = null
+      selectTabValue = courseList.value[index].value;
+      selectTabName.value = courseList.value[index].secname
     }
     
     // 重新加载表格数据
@@ -727,7 +727,7 @@ const getPlayName = (row: any) => {
 
 <template>
   <Page auto-content-height class="flex h-full">
-    <ElRow :gutter="20" type="flex" justify="space-between" :style="{ width: '100%' }">
+    <ElRow :gutter="20" type="flex" justify="start" :style="{ width: '100%' }">
       <ElCol :xs="24" :sm="24" :md="4" :lg="4" :xl="4" id="left">
         <ElCard class="course-sidebar" shadow="hover">
           <template #header>
@@ -751,9 +751,9 @@ const getPlayName = (row: any) => {
           </div>
         </ElCard>
       </ElCol>
-      <ElCol :xs="24" :sm="24" :md="5" :lg="5" :xl="5" id="mid">
+      <ElCol :xs="24" :sm="24" :md="5" :lg="5" :xl="5" id="mid" v-if="tabs.length > 0">
 
-        <ElCard class="course-sidebar" shadow="hover">
+        <ElCard class="course-sidebar" shadow="hover" >
           <template #header>
             <div class="flex flex-col">
               <span class="text-base font-bold">{{ activeName }}</span>
@@ -802,10 +802,10 @@ const getPlayName = (row: any) => {
             <div class="flex justify-between items-center w-full">
               <span class="text-base font-bold">{{ selectTabName }}</span>
               <div>
-                <ElButton v-if="!isTeacher && tabs.length > 0" type="primary" @click="onAdd">
+                <ElButton v-if="!isTeacher" type="primary" @click="onAdd">
                   新增
                 </ElButton>
-                <ElButton v-if="!isTeacher && tabs.length > 0" type="danger" @click="onDel">
+                <ElButton v-if="!isTeacher" type="danger" @click="onDel">
                   删除
                 </ElButton>
               </div>
