@@ -443,7 +443,7 @@ export async function sendMessage(data: {
  * 标记消息为已读
  */
 export async function readMessage(data: {
-  id: string[]; // 消息ID列表
+  messageId: any; // 消息ID列表
 }) {
   return requestClient.post<void>('/msg/read', data);
 }

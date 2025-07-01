@@ -25,7 +25,8 @@ import { useVbenModal } from '@vben/common-ui';
 
 import {
  getMessageList,
- hasUnreadMessage
+ hasUnreadMessage,
+ readMessage
 } from '#/api/core/sys';
 
 import {
@@ -125,7 +126,13 @@ async function handleLogout() {
 }
 
 function handleNoticeClear() {
-  notifications.value = [];
+  const unreadMessages = notifications.value
+    .filter((item) => !item.isRead)
+    .map((item) => item.id);
+
+  readMessage({
+    messageId: unreadMessages
+  })
 }
 
 function handleMakeAll() {
