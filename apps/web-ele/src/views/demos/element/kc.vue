@@ -522,6 +522,14 @@ const onAuthKC = async (row:any) => {
     >
       <template #action="{ row }">
         <Button
+          v-if="!isTeacher && row.fileCount > 0"
+          type="link"
+          disabled
+          style="color: red; margin-right: 8px" 
+          @click="onddLevel(row)"
+        >({{row.fileCount}})</Button>
+
+        <Button
           v-if="!isTeacher"
           type="link" 
           style="color: #1890ff; margin-right: 8px"
@@ -530,7 +538,7 @@ const onAuthKC = async (row:any) => {
           编辑
         </Button>
         <Button
-          v-if="!isTeacher"
+          v-if="!isTeacher && row.fileCount == 0"
           type="link"
           style="color: #1890ff; margin-right: 8px" 
           @click="onddLevel(row)"
